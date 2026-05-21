@@ -3297,7 +3297,8 @@ function isUsablePhonetic(value) {
   const text = String(value || "").trim();
   if (!text || text.length < 3) return false;
   if (/[\u3400-\u9fff?]/.test(text)) return false;
-  return /[\/\[\]ˈˌəɚɝɑɔæɛɪʊʌθðʃʒŋ]/.test(text);
+  if (!/^([/].+[/]|\[.+\])$/.test(text)) return false;
+  return /[A-Za-z\u0250-\u02af\u02c8\u02cc\u02d0]/.test(text);
 }
 
 function phoneticText(item) {
@@ -5255,9 +5256,10 @@ function dismissWeeklyNotice() {
 
 function buildDailyWords() {
   const profile = activeProfile();
-  const source = wordsForGoal(activeGoal(), words);
+  const libraryId = currentStudyLibraryId();
+  const source = studySourceForLibrary(libraryId);
   if (!dailyTestAvailable()) return [];
-  const todayWords = todayStudyWords(source).slice(0, 10);
+  const todayWords = todayStudyWords(source, libraryId).slice(0, 10);
   const seen = new Set(todayWords.map((item) => item.word));
   const reviewWords = uniqueWordObjects(
     getWordsLearnedBefore(todayKey()).map((wordText) => findWord(wordText)).filter((item) => item && source.some((candidate) => candidate.word === item.word) && !seen.has(item.word)),
@@ -5268,16 +5270,16 @@ function buildDailyWords() {
 }
 
 function todayStudyComplete() {
-  return dailyStudyCompleted();
+  return dailyStudyCompleted(currentStudyLibraryId());
 }
 
 function dailyTestAvailable() {
   return todayStudyComplete();
 }
 
-function todayStudyWords(source = wordsForGoal(activeGoal(), words)) {
+function todayStudyWords(source = studySourceForLibrary(), libraryId = currentStudyLibraryId()) {
   state.dailyStudy = state.dailyStudy || {};
-  const locked = state.dailyStudy[dailyStudyKey(null)];
+  const locked = state.dailyStudy[dailyStudyKey(libraryId)];
   if (!Array.isArray(locked) || !locked.length) return [];
   return uniqueWordObjects(
     locked
