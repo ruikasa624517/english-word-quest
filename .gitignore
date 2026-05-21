@@ -1,6 +1,7 @@
 # 字典查詢快取（執行時自動產生，不需版控）
 data/lookup-cache.json
-data/
+data/*
+!data/built-in-words.json
 
 # Node
 node_modules/

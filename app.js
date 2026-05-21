@@ -2214,11 +2214,28 @@ function migrateState() {
 }
 
 function activeWords() {
-  if (state.activeLibraryId && state.activeLibraryId !== "built-in") {
-    const library = state.customLibraries.find((item) => item.id === state.activeLibraryId);
-    return library?.words?.length ? library.words : words;
+  return studySourceForLibrary(currentStudyLibraryId());
+}
+
+function currentStudyLibraryId() {
+  if (!state.activeLibraryId || state.activeLibraryId === "built-in") return null;
+  const library = (state.customLibraries || []).find((item) => item.id === state.activeLibraryId);
+  return library?.words?.length ? state.activeLibraryId : null;
+}
+
+function studySourceForLibrary(libraryId = currentStudyLibraryId()) {
+  if (libraryId) {
+    const library = (state.customLibraries || []).find((item) => item.id === libraryId);
+    return library?.words?.length ? library.words : [];
   }
   return wordsForGoal(activeGoal(), words);
+}
+
+function activeLibraryLabel() {
+  const libraryId = currentStudyLibraryId();
+  if (!libraryId) return goalLabel(activeGoal());
+  const library = (state.customLibraries || []).find((item) => item.id === libraryId);
+  return library?.name || t("customLibrary");
 }
 
 function loadState() {
@@ -2776,7 +2793,7 @@ function renderDashboard() {
   const level = currentRankLevel();
   const label = levelLabel(level);
   const today = todayKey();
-  const todayCount = getWordsLearnedOn(today).length;
+  const todayCount = todayStudyWords(studySourceForLibrary(), currentStudyLibraryId()).length;
   const todayComplete = todayCount >= 10;
   const learnedPercent = getLearnedPercent();
   const progress = learnedPercent;
@@ -2834,7 +2851,7 @@ function renderDashboard() {
           ${orderedUserGoals().map((goal) => `<button class="chip ${activeGoal() === goal ? "active" : ""}" data-active-goal="${goal}">${goalLabel(goal)}</button>`).join("")}
           ${unselectedGoals().map((goal) => `<button class="chip add" data-add-goal="${goal}">+ ${goalLabel(goal)}</button>`).join("")}
         </div>
-        <p class="hero-copy">${msg("dashboardCopy", { goal: goalLabel(activeGoal()) })}</p>
+        <p class="hero-copy">${msg("dashboardCopy", { goal: activeLibraryLabel() })}</p>
         <div class="hud">
           <div class="hud-item">
             <span>${t("adventurerRank")}</span>
@@ -4186,12 +4203,13 @@ function bindActions() {
   });
   document.querySelectorAll("[data-action='study']").forEach((button) => {
     button.addEventListener("click", () => {
+      const libraryId = currentStudyLibraryId();
       navigateTo("study");
-      studySession = { phase: "loading", previewIndex: 0, words: [], libraryId: null, questions: [], index: 0, correct: 0 };
+      studySession = { phase: "loading", previewIndex: 0, words: [], libraryId, questions: [], index: 0, correct: 0 };
       toast = "";
       render();
       setTimeout(() => {
-        studySession = createStudySession();
+        studySession = createStudySession(libraryId);
         render();
       }, 0);
     });
@@ -4199,18 +4217,19 @@ function bindActions() {
   document.querySelectorAll("[data-action='next-round']").forEach((button) => {
     button.addEventListener("click", () => {
       if (!window.confirm(t("confirmNextRound"))) return;
+      const libraryId = currentStudyLibraryId();
       // 清掉當日鎖定 → 重新抽 10 個未做過的字
       state.dailyStudy = state.dailyStudy || {};
       state.dailyStudyCompleted = state.dailyStudyCompleted || {};
-      delete state.dailyStudy[dailyStudyKey()];
-      delete state.dailyStudyCompleted[dailyStudyKey()];
+      delete state.dailyStudy[dailyStudyKey(libraryId)];
+      delete state.dailyStudyCompleted[dailyStudyKey(libraryId)];
       saveState();
       navigateTo("study");
-      studySession = { phase: "loading", previewIndex: 0, words: [], libraryId: null, questions: [], index: 0, correct: 0 };
+      studySession = { phase: "loading", previewIndex: 0, words: [], libraryId, questions: [], index: 0, correct: 0 };
       toast = "";
       render();
       setTimeout(() => {
-        studySession = createStudySession();
+        studySession = createStudySession(libraryId);
         render();
       }, 0);
     });
@@ -4250,6 +4269,8 @@ function bindActions() {
   document.querySelectorAll("[data-start-custom-study]").forEach((button) => {
     button.addEventListener("click", () => {
       const libraryId = button.dataset.startCustomStudy;
+      state.activeLibraryId = libraryId;
+      saveState();
       navigateTo("study");
       studySession = { phase: "loading", previewIndex: 0, words: [], libraryId, questions: [], index: 0, correct: 0 };
       toast = "";
