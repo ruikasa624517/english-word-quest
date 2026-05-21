@@ -2,6 +2,7 @@
 data/lookup-cache.json
 data/*
 !data/built-in-words.json
+!data/runtime-config.json
 
 # Node
 node_modules/

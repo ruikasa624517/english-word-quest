@@ -4,6 +4,7 @@ let runtimeConfig = {
   googleClientId: "",
   adminEmails: [],
   localTestLoginEnabled: false,
+  staticGoogleLogin: false,
 };
 const CUSTOM_LIBRARY_LIMITS = {
   生活英文: 3000,
@@ -2561,23 +2562,31 @@ async function loadBuiltInWords() {
 }
 
 async function loadRuntimeConfig() {
+  const normalizeConfig = (config) => ({
+    googleClientId: String(config.googleClientId || ""),
+    adminEmails: Array.isArray(config.adminEmails)
+      ? config.adminEmails.map((email) => String(email).toLowerCase())
+      : [],
+    localTestLoginEnabled: config.localTestLoginEnabled === true,
+    staticGoogleLogin: config.staticGoogleLogin === true,
+  });
   try {
     const response = await fetch("./api/config", { cache: "no-store" });
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    const config = await response.json();
-    runtimeConfig = {
-      googleClientId: String(config.googleClientId || ""),
-      adminEmails: Array.isArray(config.adminEmails)
-        ? config.adminEmails.map((email) => String(email).toLowerCase())
-        : [],
-      localTestLoginEnabled: config.localTestLoginEnabled === true,
-    };
+    runtimeConfig = normalizeConfig(await response.json());
   } catch {
-    runtimeConfig = {
-      googleClientId: "",
-      adminEmails: [],
-      localTestLoginEnabled: false,
-    };
+    try {
+      const response = await fetch("./data/runtime-config.json", { cache: "no-store" });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      runtimeConfig = normalizeConfig(await response.json());
+    } catch {
+      runtimeConfig = {
+        googleClientId: "",
+        adminEmails: [],
+        localTestLoginEnabled: false,
+        staticGoogleLogin: false,
+      };
+    }
   }
 }
 
@@ -2653,6 +2662,12 @@ function mountGoogleSignInButton() {
 
 async function handleGoogleCredential(response) {
   try {
+    if (runtimeConfig.staticGoogleLogin) {
+      const user = parseGoogleCredential(response?.credential || "");
+      switchUserAccount(user);
+      render();
+      return;
+    }
     const authResponse = await fetch("./api/auth/google", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -2666,6 +2681,33 @@ async function handleGoogleCredential(response) {
     toast = error?.message || "Google login failed";
     render();
   }
+}
+
+function parseGoogleCredential(credential) {
+  if (!credential || typeof credential !== "string") throw new Error("Google login failed");
+  const parts = credential.split(".");
+  if (parts.length < 2) throw new Error("Google login failed");
+  const payload = JSON.parse(decodeBase64Url(parts[1]));
+  if (payload.aud !== runtimeConfig.googleClientId) throw new Error("Google login client mismatch");
+  if (payload.email_verified !== true && payload.email_verified !== "true") throw new Error("Google email is not verified");
+  const email = String(payload.email || "").toLowerCase();
+  if (!email) throw new Error("Google account has no email");
+  return {
+    id: `google:${payload.sub}`,
+    provider: "google",
+    name: payload.name || email,
+    email,
+    picture: payload.picture || "",
+    isAdmin: runtimeConfig.adminEmails.includes(email),
+  };
+}
+
+function decodeBase64Url(value) {
+  const base64 = String(value).replace(/-/g, "+").replace(/_/g, "/");
+  const padded = base64.padEnd(base64.length + ((4 - (base64.length % 4)) % 4), "=");
+  const binary = atob(padded);
+  const bytes = Uint8Array.from(binary, (ch) => ch.charCodeAt(0));
+  return new TextDecoder().decode(bytes);
 }
 
 function renderGoalGate() {
