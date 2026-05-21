@@ -6,6 +6,9 @@ const path = require("path");
 const root = __dirname;
 const port = Number(process.env.PORT || 5173);
 const VERBOSE = process.env.LOOKUP_VERBOSE !== "0"; // 預設開 log，要關就 LOOKUP_VERBOSE=0 啟動
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || "";
+const ADMIN_EMAILS = parseEmailList(process.env.ADMIN_EMAILS || "");
+const LOCAL_TEST_LOGIN = process.env.LOCAL_TEST_LOGIN === "1";
 const types = {
   ".html": "text/html; charset=utf-8",
   ".css": "text/css; charset=utf-8",
@@ -57,6 +60,26 @@ function log(...args) {
 // ----------------------------------------------------------------------
 const server = http.createServer((req, res) => {
   const urlPath = decodeURIComponent(req.url.split("?")[0]);
+  if (urlPath === "/api/config") {
+    sendJson(res, {
+      googleClientId: GOOGLE_CLIENT_ID,
+      adminEmails: ADMIN_EMAILS,
+      localTestLoginEnabled: LOCAL_TEST_LOGIN && isLocalRequest(req),
+    });
+    return;
+  }
+
+  if (urlPath === "/api/auth/google" && req.method === "POST") {
+    readJsonBody(req)
+      .then(({ credential }) => verifyGoogleCredential(credential))
+      .then((user) => sendJson(res, { user }))
+      .catch((err) => {
+        res.writeHead(401, { "Content-Type": "application/json; charset=utf-8" });
+        res.end(JSON.stringify({ error: String(err?.message || err || "Unauthorized") }));
+      });
+    return;
+  }
+
   if (urlPath === "/api/cambridge" || urlPath === "/api/lookup") {
     const url = new URL(req.url, `http://localhost:${port}`);
     const word = url.searchParams.get("word") || "";
@@ -836,3 +859,69 @@ server.listen(port, () => {
   console.log(`Set LOOKUP_VERBOSE=0 to silence per-word logs`);
 });
 
+function parseEmailList(raw) {
+  return String(raw || "")
+    .split(",")
+    .map((item) => item.trim().toLowerCase())
+    .filter(Boolean);
+}
+
+function sendJson(res, payload, status = 200) {
+  res.writeHead(status, { "Content-Type": "application/json; charset=utf-8" });
+  res.end(JSON.stringify(payload));
+}
+
+function readJsonBody(req) {
+  return new Promise((resolve, reject) => {
+    let body = "";
+    req.on("data", (chunk) => {
+      body += chunk;
+      if (body.length > 1024 * 1024) {
+        req.destroy();
+        reject(new Error("Request body too large"));
+      }
+    });
+    req.on("end", () => {
+      try {
+        resolve(JSON.parse(body || "{}"));
+      } catch {
+        reject(new Error("Invalid JSON"));
+      }
+    });
+    req.on("error", reject);
+  });
+}
+
+function isLocalRequest(req) {
+  const host = String(req.headers.host || "").split(":")[0].toLowerCase();
+  return host === "localhost" || host === "127.0.0.1" || host === "::1";
+}
+
+async function verifyGoogleCredential(credential) {
+  if (!GOOGLE_CLIENT_ID) throw new Error("GOOGLE_CLIENT_ID is not configured");
+  if (!credential || typeof credential !== "string") throw new Error("Missing Google credential");
+  const url = `https://oauth2.googleapis.com/tokeninfo?id_token=${encodeURIComponent(credential)}`;
+  const { status, body } = await httpsGetTextWithStatus(url, {
+    "User-Agent": "VocabArcana/1.0",
+    Accept: "application/json",
+  });
+  if (status !== 200 || !body) throw new Error("Google token verification failed");
+  let token = {};
+  try {
+    token = JSON.parse(body);
+  } catch {
+    throw new Error("Invalid Google token response");
+  }
+  if (token.aud !== GOOGLE_CLIENT_ID) throw new Error("Google token audience mismatch");
+  if (token.email_verified !== "true" && token.email_verified !== true) throw new Error("Google email is not verified");
+  const email = String(token.email || "").toLowerCase();
+  if (!email) throw new Error("Google account has no email");
+  return {
+    id: `google:${token.sub}`,
+    provider: "google",
+    name: token.name || email,
+    email,
+    picture: token.picture || "",
+    isAdmin: ADMIN_EMAILS.includes(email),
+  };
+}

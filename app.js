@@ -1,6 +1,10 @@
 ﻿const STORAGE_KEY = "vocab-arcana-progress";
 const BASE_DATE = new Date();
-const ADMIN_EMAILS = ["your-email@example.com"];
+let runtimeConfig = {
+  googleClientId: "",
+  adminEmails: [],
+  localTestLoginEnabled: false,
+};
 const CUSTOM_LIBRARY_LIMITS = {
   生活英文: 3000,
   會考: 2000,
@@ -104,7 +108,7 @@ const i18n = {
     backPrevious: "回上一頁",
     signout: "登出",
     setup: "開始設定",
-    firebaseNote: "正式上線版會接 Firebase Authentication 與 Firestore；目前先用本機帳號與 localStorage 測完整流程。",
+    firebaseNote: "正式版使用 Google 帳號註冊登入；本機測試登入只在開發環境且伺服器允許時顯示。",
     placementTitle: "3 分鐘喚醒你的詞魂",
     dailyTitle: "每日 3 分鐘應用小測",
     placementHelper: "題庫不重複，並混合字義選擇與簡短句子填空。",
@@ -332,7 +336,7 @@ const i18n = {
     backPrevious: "Back to previous page",
     signout: "Sign out",
     setup: "Setup",
-    firebaseNote: "The production version will connect Firebase Authentication and Firestore. This MVP uses a local account and localStorage for testing.",
+    firebaseNote: "Production uses Google sign-in. Local test login only appears in development when the server allows it.",
     placementTitle: "Awaken your word power in 3 minutes",
     dailyTitle: "Daily 3-minute application test",
     placementHelper: "No repeated words. Questions mix meaning choices and short sentence blanks.",
@@ -560,7 +564,7 @@ const i18n = {
     backPrevious: "前のページへ",
     signout: "ログアウト",
     setup: "初期設定",
-    firebaseNote: "正式版では Firebase Authentication と Firestore に接続します。現在はローカルアカウントと localStorage でテストします。",
+    firebaseNote: "正式版は Google ログインを使用します。ローカルテストログインは開発環境でサーバーが許可した場合のみ表示されます。",
     placementTitle: "3分で語彙力を診断",
     dailyTitle: "毎日3分の応用テスト",
     placementHelper: "単語は重複せず、意味選択と短文穴埋めを混ぜます。",
@@ -788,7 +792,7 @@ const i18n = {
     backPrevious: "이전 페이지",
     signout: "로그아웃",
     setup: "설정 시작",
-    firebaseNote: "정식판에서는 Firebase Authentication과 Firestore를 연결합니다. 현재는 로컬 계정과 localStorage로 테스트합니다.",
+    firebaseNote: "정식판은 Google 로그인을 사용합니다. 로컬 테스트 로그인은 개발 환경에서 서버가 허용할 때만 표시됩니다.",
     placementTitle: "3분 어휘력 진단",
     dailyTitle: "매일 3분 실전 테스트",
     placementHelper: "단어 중복 없이 의미 선택과 짧은 빈칸을 섞습니다.",
@@ -1016,7 +1020,7 @@ const i18n = {
     backPrevious: "Página anterior",
     signout: "Cerrar sesión",
     setup: "Iniciar configuración",
-    firebaseNote: "La versión final usará Firebase Authentication y Firestore. Por ahora se usa cuenta local y localStorage.",
+    firebaseNote: "La versión final usa inicio con Google. El login local solo aparece en desarrollo si el servidor lo permite.",
     placementTitle: "Despierta tu vocabulario en 3 minutos",
     dailyTitle: "Prueba diaria de 3 minutos",
     placementHelper: "Sin palabras repetidas. Mezcla selección de significado y huecos cortos.",
@@ -2113,8 +2117,8 @@ function activeGoal() {
 
 function canUseAdmin() {
   if (!state.user) return false;
-  if (state.user.id === "local-google-user") return true;
-  return ADMIN_EMAILS.includes(String(state.user.email || "").toLowerCase());
+  if (state.user.isAdmin === true) return true;
+  return runtimeConfig.adminEmails.includes(String(state.user.email || "").toLowerCase());
 }
 
 function activeProfile() {
@@ -2195,6 +2199,7 @@ function migrateState() {
   if (state.limitedBattleTitle?.expiresWeekKey && state.limitedBattleTitle.expiresWeekKey <= currentWeekKey()) state.limitedBattleTitle = null;
   if (!state.studyHistory) state.studyHistory = {};
   if (!state.dailyStudy) state.dailyStudy = {};
+  if (!state.dailyStudyCompleted) state.dailyStudyCompleted = {};
   if (!state.completedAchievements) state.completedAchievements = [];
   if (!state.equippedTitle) state.equippedTitle = "";
   ensureRivals();
@@ -2227,6 +2232,7 @@ function loadState() {
     dayOffset: 0,
     studyHistory: {},
     dailyStudy: {},
+    dailyStudyCompleted: {},
     placement: null,
     learned: [],
     learnedLog: {},
@@ -2323,28 +2329,35 @@ function saveState() {
 // 從 user 物件算出穩定的 user id（mock 模式用 name 為 key）
 function userKeyFor(user) {
   if (!user) return null;
-  if (user.id && user.id !== "local-google-user") return `id::${user.id}`;
+  if (user.id) return `id::${user.id}`;
   if (user.email) return `email::${String(user.email).toLowerCase()}`;
   if (user.name) return `name::${String(user.name).trim().toLowerCase()}`;
   return null;
 }
 
 // 切換到指定帳號：若該帳號已有 state 就載入；否則全新開始
-function switchUserAccount(name, goal) {
+function switchUserAccount(user) {
   // 先把當前帳號的狀態存進 store
   if (state.user) saveState();
   const STORE_KEY = "vocab-arcana-store";
   let store = {};
   try { store = JSON.parse(localStorage.getItem(STORE_KEY) || "{}"); } catch {}
   if (!store.users || typeof store.users !== "object") store.users = {};
-  const newUser = { id: "local-google-user", name };
+  const newUser = {
+    id: user.id,
+    provider: user.provider || "local",
+    name: user.name || user.email || t("traveler"),
+    email: user.email || "",
+    picture: user.picture || "",
+    isAdmin: user.isAdmin === true,
+  };
   const targetId = userKeyFor(newUser);
   if (targetId && store.users[targetId]) {
     // 既有帳號 → 把 state 整個換成該帳號的版本
     const fresh = freshState();
     state = { ...fresh, ...store.users[targetId] };
     // 確保有 user 欄位（有些舊資料可能沒記 user）
-    if (!state.user) state.user = newUser;
+    state.user = { ...(state.user || {}), ...newUser };
   } else {
     // 全新帳號 → 從預設開始
     state = freshState();
@@ -2368,6 +2381,16 @@ function switchUserAccount(name, goal) {
   studySession = null;
 }
 
+function switchLocalTestAccount(name) {
+  if (!runtimeConfig.localTestLoginEnabled) return;
+  switchUserAccount({
+    id: `local:${String(name || t("traveler")).trim().toLowerCase()}`,
+    provider: "local-test",
+    name: name || t("traveler"),
+    isAdmin: false,
+  });
+}
+
 // 預設空白 state（供 switchUserAccount 重置用）
 function freshState() {
   return {
@@ -2380,6 +2403,7 @@ function freshState() {
     dayOffset: 0,
     studyHistory: {},
     dailyStudy: {},
+    dailyStudyCompleted: {},
     placement: null,
     learned: [],
     learnedLog: {},
@@ -2519,7 +2543,29 @@ async function loadBuiltInWords() {
   }
 }
 
+async function loadRuntimeConfig() {
+  try {
+    const response = await fetch("./api/config", { cache: "no-store" });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const config = await response.json();
+    runtimeConfig = {
+      googleClientId: String(config.googleClientId || ""),
+      adminEmails: Array.isArray(config.adminEmails)
+        ? config.adminEmails.map((email) => String(email).toLowerCase())
+        : [],
+      localTestLoginEnabled: config.localTestLoginEnabled === true,
+    };
+  } catch {
+    runtimeConfig = {
+      googleClientId: "",
+      adminEmails: [],
+      localTestLoginEnabled: false,
+    };
+  }
+}
+
 async function bootstrap() {
+  await loadRuntimeConfig();
   words = await loadBuiltInWords();
   migrateState();
   builtInWordsLoaded = true;
@@ -2539,8 +2585,8 @@ function renderLogin() {
           <h2>${t("introTitle")}</h2>
           <p class="hero-copy">${t("introCopy")}</p>
           <div class="actions">
-            <button class="btn" data-action="login">${t("google")}</button>
-            <button class="btn secondary" data-action="login">${t("mock")}</button>
+            <div id="googleSignInButton" class="google-signin-slot"></div>
+            ${runtimeConfig.localTestLoginEnabled ? `<button class="btn secondary" data-action="local-test-login">${t("mock")}</button>` : ""}
           </div>
         </div>
         <div class="stats">
@@ -2561,6 +2607,48 @@ function renderLogin() {
       </aside>
     </section>
   `);
+}
+
+function mountGoogleSignInButton() {
+  const slot = document.querySelector("#googleSignInButton");
+  if (!slot) return;
+  if (!runtimeConfig.googleClientId) {
+    slot.innerHTML = `<button class="btn" type="button" disabled>${t("google")}</button>`;
+    return;
+  }
+  if (!window.google?.accounts?.id) {
+    window.setTimeout(mountGoogleSignInButton, 250);
+    return;
+  }
+  window.google.accounts.id.initialize({
+    client_id: runtimeConfig.googleClientId,
+    callback: handleGoogleCredential,
+    auto_select: false,
+  });
+  window.google.accounts.id.renderButton(slot, {
+    theme: "filled_black",
+    size: "large",
+    text: "continue_with",
+    shape: "pill",
+    width: 260,
+  });
+}
+
+async function handleGoogleCredential(response) {
+  try {
+    const authResponse = await fetch("./api/auth/google", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ credential: response?.credential || "" }),
+    });
+    const payload = await authResponse.json();
+    if (!authResponse.ok || !payload.user) throw new Error(payload.error || "Google login failed");
+    switchUserAccount(payload.user);
+    render();
+  } catch (error) {
+    toast = error?.message || "Google login failed";
+    render();
+  }
 }
 
 function renderGoalGate() {
@@ -2969,7 +3057,6 @@ function renderStudy() {
             <button class="btn secondary icon-btn" data-action="speak-word" data-word="${current.word}" title="${t("speak")}">🔊</button>
             <button class="btn secondary" data-action="prev-card">${t("previousCard")}</button>
             <button class="btn" data-action="next-card">${t("nextCard")}</button>
-            ${studySession.previewIndex === studySession.words.length - 1 ? `<button class="btn secondary" data-action="study-new-words">${t("studyNewWords")}</button>` : ""}
             <button class="btn" data-action="start-study-quiz">${t("previewDone")}</button>
             <button class="btn secondary flashcard-back" data-action="back">${backButtonLabel()}</button>
           </div>
@@ -3100,12 +3187,12 @@ function displayMeaning(item) {
 
 function cambridgeExampleText(item) {
   const ex = String(item?.example || "").trim();
-  return ex && hasCambridgeExampleSource(item) && isCompleteExample(ex) ? ex : "";
+  return ex && isCompleteExample(ex) ? ex : "";
 }
 
 function renderCambridgeExample(item, className = "") {
   const exampleText = cambridgeExampleText(item);
-  if (!exampleText || !hasNativeMeaningSource(item)) {
+  if (!exampleText) {
     requestDictionaryEntry(item);
   }
   if (!exampleText) {
@@ -3932,6 +4019,10 @@ function badgeSvg(icon, done, tierIndex = 0) {
 }
 
 function renderAdmin() {
+  if (!canUseAdmin()) {
+    navigateTo("dashboard", { clearHistory: true, pushHistory: false });
+    return renderDashboard();
+  }
   return appShell(`
     <section class="panel">
       <div class="eyebrow">${t("admin")}</div>
@@ -3957,6 +4048,7 @@ function renderAdmin() {
 }
 
 function bindActions() {
+  mountGoogleSignInButton();
   document.querySelectorAll("[data-action='native']").forEach((select) => {
     select.addEventListener("change", (event) => {
       state.native = event.target.value;
@@ -3999,10 +4091,10 @@ function bindActions() {
       switchActiveGoal(goal);
     });
   });
-  document.querySelectorAll("[data-action='login']").forEach((button) => {
+  document.querySelectorAll("[data-action='local-test-login']").forEach((button) => {
     button.addEventListener("click", () => {
       const name = document.querySelector("#nameInput")?.value?.trim() || t("traveler");
-      switchUserAccount(name, selectedGoal);
+      switchLocalTestAccount(name);
       render();
     });
   });
@@ -4025,7 +4117,10 @@ function bindActions() {
     });
   });
   document.querySelectorAll("[data-admin]").forEach((button) => {
-    button.addEventListener("click", () => runAdminAction(button.dataset.admin));
+    button.addEventListener("click", () => {
+      if (!canUseAdmin()) return;
+      runAdminAction(button.dataset.admin);
+    });
   });
   document.querySelectorAll("[data-quiz-answer]").forEach((button) => {
     button.addEventListener("click", () => answerQuiz(button.dataset.quizAnswer, button.dataset.correct));
@@ -4106,7 +4201,9 @@ function bindActions() {
       if (!window.confirm(t("confirmNextRound"))) return;
       // 清掉當日鎖定 → 重新抽 10 個未做過的字
       state.dailyStudy = state.dailyStudy || {};
+      state.dailyStudyCompleted = state.dailyStudyCompleted || {};
       delete state.dailyStudy[dailyStudyKey()];
+      delete state.dailyStudyCompleted[dailyStudyKey()];
       saveState();
       navigateTo("study");
       studySession = { phase: "loading", previewIndex: 0, words: [], libraryId: null, questions: [], index: 0, correct: 0 };
@@ -4207,7 +4304,9 @@ function bindActions() {
       if (!window.confirm(t("confirmNextRound"))) return;
       const libraryId = studySession?.libraryId || null;
       state.dailyStudy = state.dailyStudy || {};
+      state.dailyStudyCompleted = state.dailyStudyCompleted || {};
       delete state.dailyStudy[dailyStudyKey(libraryId)];
+      delete state.dailyStudyCompleted[dailyStudyKey(libraryId)];
       saveState();
       studySession = createStudySession(libraryId);
       toast = "";
@@ -4986,8 +5085,9 @@ function hasNativeMeaningChars(value) {
 function isCompleteExample(text) {
   const s = String(text || "").trim();
   if (!s || s.includes("/") || s.includes(";")) return false;
-  if (s.split(/\s+/).filter(Boolean).length < 5) return false;
-  return /^[A-Z"'(]/.test(s) && /[.!?]["']?\s*$/.test(s);
+  const englishPart = s.replace(/\s*\([^)]*[\u3400-\u9fff][^)]*\)\s*$/, "").trim();
+  if (englishPart.split(/\s+/).filter(Boolean).length < 5) return false;
+  return /^[A-Z"'(]/.test(englishPart) && /[.!?]["']?\s*$/.test(englishPart);
 }
 
 // 兩段釋義是否接近重複（共享 ≥ 60% 字符）
@@ -5086,8 +5186,9 @@ function buildPlacementWords() {
 }
 
 function buildReviewWords() {
-  const levelId = wordDifficultyLevelId();
-  const source = wordsForGoal(activeGoal(), words).filter((item) => item.level <= levelId);
+  const learnedSet = new Set(activeProfile().learned || []);
+  const source = wordsForGoal(activeGoal(), words)
+    .filter((item) => learnedSet.has(item.word));
   return sampleUniqueWords(source, Math.min(60, source.length));
 }
 
@@ -5146,7 +5247,7 @@ function buildDailyWords() {
 }
 
 function todayStudyComplete() {
-  return todayStudyWords().length >= 10;
+  return dailyStudyCompleted();
 }
 
 function dailyTestAvailable() {
@@ -5157,10 +5258,8 @@ function todayStudyWords(source = wordsForGoal(activeGoal(), words)) {
   state.dailyStudy = state.dailyStudy || {};
   const locked = state.dailyStudy[dailyStudyKey(null)];
   if (!Array.isArray(locked) || !locked.length) return [];
-  const learnedSet = new Set(getWordsLearnedOn(todayKey()));
   return uniqueWordObjects(
     locked
-      .filter((wordText) => learnedSet.has(wordText))
       .map((wordText) => findWord(wordText))
       .filter((item) => item && source.some((candidate) => candidate.word === item.word)),
   );
@@ -5362,16 +5461,26 @@ function dailyStudyKey(libraryId = null) {
   return `${todayKey()}::${libraryId || "built-in"}::${activeGoal()}`;
 }
 
+function dailyStudyCompleted(libraryId = null) {
+  state.dailyStudyCompleted = state.dailyStudyCompleted || {};
+  const key = dailyStudyKey(libraryId);
+  if (state.dailyStudyCompleted[key]) return true;
+  const locked = state.dailyStudy?.[key];
+  if (!Array.isArray(locked) || !locked.length) return false;
+  const learnedSet = new Set(activeProfile().learned || []);
+  return locked.every((wordText) => learnedSet.has(wordText));
+}
+
 // 今日鎖定的 10 字是否已全部學過（profile.learned 涵蓋全部）
 // 給「刷新單字」按鈕用：只有完成今日後才能點
 function todayLockComplete(libraryId = null) {
   state.dailyStudy = state.dailyStudy || {};
-  const locked = state.dailyStudy[dailyStudyKey(libraryId)];
+  const key = dailyStudyKey(libraryId);
+  const locked = state.dailyStudy[key];
   if (!Array.isArray(locked) || !locked.length) return false;
-  const profile = activeProfile();
-  const learnedSet = new Set(profile.learned || []);
-  if (!locked.every((w) => learnedSet.has(w))) return false;
+  if (!dailyStudyCompleted(libraryId)) return false;
   // 加條件：今日每日測驗通過 70% 才能解鎖刷新
+  const profile = activeProfile();
   const todayTest = profile.dailyTests?.[todayKey()];
   if (!todayTest || !todayTest.total) return false;
   return todayTest.correct / todayTest.total >= 0.7;
@@ -5398,14 +5507,24 @@ function createStudySession(libraryId = null) {
   // 2) 沒有當日鎖定 → 從「之前完全沒做過」的字裡挑 10 個（按段位加權）
   if (!finalWords.length) {
     const seen = studyHistorySet(libraryId); // 跨日累積的學習史
+    const learnedSet = new Set(profile.learned || []);
     const unseen = libraryId
       ? source.filter((item) => !seen.has(item.word))
       : source.filter((item) => !seen.has(item.word) && !profile.learned.includes(item.word));
     if (!unseen.length) {
-      if (!libraryId) return { phase: "all-done", previewIndex: 0, words: [], libraryId, questions: [], index: 0, correct: 0 };
-      finalWords = tierWeightedSample(source, Math.min(10, source.length), wordDifficultyLevelId());
-      state.dailyStudy[dailyKey] = finalWords.map((item) => item.word);
-      saveState();
+      const recoverable = source.filter((item) => !learnedSet.has(item.word));
+      if (!libraryId && recoverable.length) {
+        finalWords = tierWeightedSample(recoverable, Math.min(10, recoverable.length), wordDifficultyLevelId());
+        state.dailyStudy[dailyKey] = finalWords.map((item) => item.word);
+        recordStudyHistory(finalWords.map((item) => item.word), libraryId);
+        saveState();
+      } else if (!libraryId) {
+        return { phase: "all-done", previewIndex: 0, words: [], libraryId, questions: [], index: 0, correct: 0 };
+      } else {
+        finalWords = tierWeightedSample(source, Math.min(10, source.length), wordDifficultyLevelId());
+        state.dailyStudy[dailyKey] = finalWords.map((item) => item.word);
+        saveState();
+      }
     } else {
       // 依玩家段位選字：低段位多挑簡單字、高段位多挑難字
       finalWords = tierWeightedSample(unseen, Math.min(10, unseen.length), wordDifficultyLevelId());
@@ -5413,6 +5532,10 @@ function createStudySession(libraryId = null) {
       recordStudyHistory(finalWords.map((item) => item.word), libraryId);
       saveState();
     }
+  }
+
+  if (!finalWords.length) {
+    return { phase: "empty", previewIndex: 0, words: [], libraryId, questions: [], index: 0, correct: 0 };
   }
 
   const session = {
@@ -5540,6 +5663,15 @@ function answerStudy(answer, correct) {
   studySession.index += 1;
   if (studySession.index >= studySession.questions.length) {
     state.streak += 1;
+    if (studySession.mode !== "weak") {
+      const completedWords = (studySession.words || []).map((item) => item.word).filter(Boolean);
+      profile.learned = Array.from(new Set([...(profile.learned || []), ...completedWords]));
+      completedWords.forEach((wordText) => {
+        profile.learnedLog[wordText] = todayKey();
+      });
+      state.dailyStudyCompleted = state.dailyStudyCompleted || {};
+      state.dailyStudyCompleted[dailyStudyKey(studySession.libraryId || null)] = true;
+    }
     // 進結算畫面
     state.lastQuizSummary = {
       kind: studySession.mode === "weak" ? "weak" : "recall",
