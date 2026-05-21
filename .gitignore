@@ -1,0 +1,16 @@
+# 字典查詢快取（執行時自動產生，不需版控）
+data/lookup-cache.json
+data/
+
+# Node
+node_modules/
+npm-debug.log*
+
+# 作業系統雜檔
+.DS_Store
+Thumbs.db
+
+# 編輯器
+.vscode/
+.idea/
+*.swp
