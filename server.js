@@ -6,9 +6,27 @@ const path = require("path");
 const root = __dirname;
 const port = Number(process.env.PORT || 5173);
 const VERBOSE = process.env.LOOKUP_VERBOSE !== "0"; // 預設開 log，要關就 LOOKUP_VERBOSE=0 啟動
+// 設定來源優先序：環境變數 > data/runtime-config.json > 預設值
+// （修正：先前只讀環境變數，直接 `node server.js` 會拿到空設定，
+//   導致 Google 登入按鈕失效、本機測試/管理員登入按鈕消失）
+const FILE_CONFIG = loadRuntimeConfigFile();
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || "";
+const STATIC_GOOGLE_CLIENT_ID = String(FILE_CONFIG.googleClientId || "");
 const ADMIN_EMAILS = parseEmailList(process.env.ADMIN_EMAILS || "");
+const FILE_ADMIN_EMAILS = Array.isArray(FILE_CONFIG.adminEmails)
+  ? FILE_CONFIG.adminEmails.map((email) => String(email).toLowerCase())
+  : [];
+// 本機測試登入預設關閉；要用的話以 LOCAL_TEST_LOGIN=1 啟動（且僅 localhost 生效）
+// 管理員請直接用 Google 登入（adminEmails 名單），一般訪客不會看到任何管理員相關按鈕
 const LOCAL_TEST_LOGIN = process.env.LOCAL_TEST_LOGIN === "1";
+
+function loadRuntimeConfigFile() {
+  try {
+    return JSON.parse(fs.readFileSync(path.join(__dirname, "data", "runtime-config.json"), "utf-8")) || {};
+  } catch {
+    return {};
+  }
+}
 const types = {
   ".html": "text/html; charset=utf-8",
   ".css": "text/css; charset=utf-8",
@@ -18,6 +36,10 @@ const types = {
   ".jpg": "image/jpeg",
   ".jpeg": "image/jpeg",
   ".json": "application/json; charset=utf-8",
+  ".webmanifest": "application/manifest+json; charset=utf-8",
+  ".ico": "image/x-icon",
+  ".webp": "image/webp",
+  ".woff2": "font/woff2",
 };
 
 // ----------------------------------------------------------------------
@@ -62,9 +84,12 @@ const server = http.createServer((req, res) => {
   const urlPath = decodeURIComponent(req.url.split("?")[0]);
   if (urlPath === "/api/config") {
     sendJson(res, {
-      googleClientId: GOOGLE_CLIENT_ID,
-      adminEmails: ADMIN_EMAILS,
+      googleClientId: GOOGLE_CLIENT_ID || STATIC_GOOGLE_CLIENT_ID,
+      adminEmails: [...new Set([...ADMIN_EMAILS, ...FILE_ADMIN_EMAILS])],
       localTestLoginEnabled: LOCAL_TEST_LOGIN && isLocalRequest(req),
+      // 沒設 GOOGLE_CLIENT_ID 環境變數時 server 無法驗證 token，
+      // 改走前端靜態解析（與 data/runtime-config.json 的行為一致）
+      staticGoogleLogin: !GOOGLE_CLIENT_ID && Boolean(STATIC_GOOGLE_CLIENT_ID),
     });
     return;
   }
@@ -922,6 +947,6 @@ async function verifyGoogleCredential(credential) {
     name: token.name || email,
     email,
     picture: token.picture || "",
-    isAdmin: ADMIN_EMAILS.includes(email),
+    isAdmin: ADMIN_EMAILS.includes(email) || FILE_ADMIN_EMAILS.includes(email),
   };
 }

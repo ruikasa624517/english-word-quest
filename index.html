@@ -4,16 +4,17 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Vocab Arcana</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Noto+Serif+TC:wght@500;700;900&display=swap"
-      rel="stylesheet"
-    />
+    <meta name="theme-color" content="#233844" />
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <link rel="icon" type="image/svg+xml" href="./assets/app-icon.svg" />
+    <link rel="preload" href="./assets/fonts/atkinson-hyperlegible-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
-    <main id="app"></main>
+    <main id="app">
+      <noscript><p class="boot-note">Vocab Arcana 需要啟用 JavaScript 才能執行。</p></noscript>
+      <p class="boot-note">載入中…</p>
+    </main>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="./app.js"></script>
   </body>

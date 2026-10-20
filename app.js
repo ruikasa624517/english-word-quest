@@ -70,18 +70,20 @@ const BUILT_IN_CARD_ART = new Set([
 ]);
 
 function todayKey() {
+  // 用本地日期：toISOString() 是 UTC，台灣早上 8 點前會被算成前一天
   const d = new Date();
   const offset = Number(state?.dayOffset || 0);
   d.setDate(d.getDate() + offset);
-  return d.toISOString().slice(0, 10);
+  const pad = (n) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 }
 
 const i18n = {
   "zh-Hant": {
-    subtitle: "遊戲化英文單字修煉場",
+    subtitle: "英文單字練習機",
     introTitle: "Vocab Arcana",
     introCopy:
-      "選定目標後直接開始單字修煉；系統會依照你的母語、弱點與週排名段位安排單字戰鬥。每日測驗會混入今天學的字與以前學過的字，降低遺忘。",
+      "選好考試目標，每天看 10 張字卡、做一次背誦測驗。學過的字會依照遺忘曲線回到每日測驗，答錯的字進弱點池，直到你連續答對兩次。",
     google: "使用 Google 繼續",
     mock: "本機測試登入",
     native: "母語",
@@ -92,7 +94,7 @@ const i18n = {
     learn: "學習 10 字",
     daily: "每日測驗",
     weekly: "週測驗",
-    weeklyTitle: "週測驗 · 5 分鐘",
+    weeklyTitle: "週測驗（5 分鐘）",
     weeklyHelper: "本週學過的單字總考一次，混合字義選擇與克漏字。",
     weeklyNoticeTitle: "週測驗開啟！",
     weeklyNoticeCopy: "已連續學習 {day} 天。挑戰本週的單字總考來鞏固記憶吧！",
@@ -122,7 +124,7 @@ const i18n = {
     target: "目標",
     accuracy: "答對率",
     quizSummary: "結算",
-    quizSummaryTitle: "測驗結束 · 答題回顧",
+    quizSummaryTitle: "測驗結束",
     wrongCount: "錯題數",
     correctAnswer: "正解",
     dashboardCopy: "目標：{goal}。建議先一次看完 10 個單字，再進行背誦測驗；每日測驗會混入舊字追蹤記憶。",
@@ -132,13 +134,13 @@ const i18n = {
     previewTitle: "先看完整批單字",
     previewCopy: "這一輪會先讓你快速看完 10 個字，接著才進入背誦測驗。舊字與弱點字會依照你的進度混入。",
     recallTitle: "背誦測驗",
-    weakTitle: "暗影錯題本",
+    weakTitle: "弱點池",
     weakCopyFilled: "這些單字會在學習與每日測驗中更常出現。",
     weakCopyEmpty: "目前沒有錯題。去打一輪單字戰鬥吧。",
     hit: "命中。",
     hitStudy: "命中！這個單字已刻進魔導書。",
     miss: "失手，正解是 {answer}。",
-    missStudy: "失手。正解是「{answer}」，已加入暗影錯題本。",
+    missStudy: "答錯。正解是「{answer}」，已放進弱點池。",
     dailyDone: "每日測驗完成：{correct}/{total}",
     traveler: "旅人",
     statPlacement: "分級測驗",
@@ -148,7 +150,7 @@ const i18n = {
     previousCard: "上一張",
     nextCard: "下一張",
     cardProgress: "{current} / {total}",
-    cardHint: "往右滑進入下一個單字",
+    cardHint: "左右滑動換下一張",
     exampleLabel: "例句",
     studyLoading: "準備單字中",
     xp: "經驗值",
@@ -199,7 +201,7 @@ const i18n = {
     builtInLibrary: "內建考試單字庫",
     customLibrary: "自訂單字庫",
     importTitle: "建立新的單字庫",
-    importCopy: "輸入每行一個單字，格式：英文, 中文意思, 例句。也可以上傳照片後，把辨識出的文字貼到輸入框。",
+    importCopy: "每行輸入一個英文單字就好，中文釋義、詞性和例句會自動查。也可以拍照上傳，再把辨識出的英文字貼進下面的框。",
     libraryName: "單字庫名稱",
     wordInput: "單字內容",
     photoInput: "拍照/上傳圖片",
@@ -250,6 +252,30 @@ const i18n = {
     noWrongAnswers: "沒有錯題。",
     deferBattle: "下次再說",
     itemReward: "獲得打怪道具：{items}",
+    itemRewardTitle: "獲得道具",
+    importNoneFound: "這些字都查不到釋義。請確認拼字（只接受英文單字），或稍後在有網路時再試。",
+    todayWordsEmpty: "按下「學習 10 字」就會抽出今天的字，同一天重新進來都是同一批。",
+    monsterAttack: "攻擊力",
+    confirmReset: "這會清除此帳號在這台裝置上的所有進度（學過的字、弱點池、道具、成就），而且無法復原。建議先匯出存檔。確定要重置嗎？",
+    battleReady: "選一個道具出手，怪物每回合都會反擊，生命見底前記得喝藥水。",
+    keyHint: "鍵盤：← → 換卡，空白鍵朗讀",
+    answerKeyHint: "可直接按數字鍵 1–4 作答",
+    loginLead: "每天 10 個字，背熟了才往下一關。",
+    loginStep1: "翻完今天的 10 張字卡，聽發音、看例句",
+    loginStep2: "背誦測驗：答對才算真的學會",
+    loginStep3: "每日測驗把舊字和弱點字再拿出來考一次",
+    loginStepNote: "段位每升到 5 的倍數會遇到怪物，平常累積的道具就是那時候用的。",
+    loginNameHint: "本機測試登入用的暱稱",
+    todayWords: "今天的 10 個字",
+    todayCount: "{today} / 10",
+    reviewZone: "複習",
+    adventureZone: "冒險",
+    saveZone: "存檔與設定",
+    streakDays: "連續登入 {days} 天",
+    itemsTotal: "{count} 件道具",
+    weeklyLockedNote: "每累計登入 7 天開放",
+    reviewLockedNote: "學過 60% 後開放",
+    rankLabel: "週排名稱號",
     battleDamage: "{item} 造成 {damage} 傷害。",
     battleHeal: "{item} 回復 {heal} 生命。",
     battleLost: "討伐失敗，返還已消耗道具的一半。",
@@ -308,6 +334,25 @@ const i18n = {
     viewWordLibrary: "查看單字庫",
     viewLibraryCopy: "純粹顯示已匯入的單字，含音標、詞性、釋義與例句。",
     noMeaning: "（無釋義）",
+    saveFailed: "進度儲存失敗：瀏覽器儲存空間可能已滿，最近的進度可能不會保留。建議先「匯出存檔」備份。",
+    learnedWords: "學過的單字",
+    learnedWordsTitle: "學過的單字",
+    learnedWordsCopy: "這裡列出你在目前學習目標中學過的所有單字，可用下方搜尋快速查找。",
+    learnedSearchPlaceholder: "搜尋單字或字義…",
+    learnedEmpty: "還沒有學過任何單字，先去「學習 10 字」吧。",
+    learnedNoResults: "沒有符合搜尋的單字。",
+    learnedTotal: "共 {count} 字",
+    exportProgress: "匯出存檔",
+    importProgressBtn: "匯入存檔",
+    exportDone: "已下載存檔備份。",
+    importProgressDone: "匯入成功，進度已還原。",
+    importProgressInvalid: "存檔格式錯誤，未做任何變更。",
+    confirmImportProgress: "匯入會覆蓋此瀏覽器上所有帳號的本機進度。確定要繼續嗎？",
+    backupHint: "進度存在瀏覽器內，清除瀏覽紀錄會歸零。可匯出 JSON 存檔備份或搬到其他裝置。",
+    listenPrompt: "聽發音，選出正確的單字",
+    replayAudio: "重播發音",
+    darkMode: "夜間模式",
+    lightMode: "日間模式",
   },
   en: {
     subtitle: "A game-first English vocabulary arena",
@@ -324,7 +369,7 @@ const i18n = {
     learn: "Study 10 Words",
     daily: "Daily Test",
     weekly: "Weekly Test",
-    weeklyTitle: "Weekly Test · 5 min",
+    weeklyTitle: "Weekly test (5 min)",
     weeklyHelper: "Covers all words learned this week, mixing meaning and cloze.",
     weeklyNoticeTitle: "Weekly test unlocked!",
     weeklyNoticeCopy: "You have studied for {day} days. Take this week's challenge!",
@@ -354,7 +399,7 @@ const i18n = {
     target: "Goal",
     accuracy: "Accuracy",
     quizSummary: "Summary",
-    quizSummaryTitle: "Quiz finished · Review",
+    quizSummaryTitle: "Quiz finished",
     wrongCount: "Wrong",
     correctAnswer: "Answer",
     dashboardCopy: "Goal: {goal}. Study 10 words first, then take a recall test. Daily tests mix older words to track memory.",
@@ -380,7 +425,7 @@ const i18n = {
     previousCard: "Previous",
     nextCard: "Next",
     cardProgress: "{current} / {total}",
-    cardHint: "Swipe right to move to the next word",
+    cardHint: "Swipe sideways for the next card",
     exampleLabel: "Example",
     studyLoading: "Preparing words",
     xp: "XP",
@@ -431,7 +476,7 @@ const i18n = {
     builtInLibrary: "Built-in Exam Library",
     customLibrary: "Custom Library",
     importTitle: "Create a New Word Library",
-    importCopy: "Enter one word per line: English, meaning, example. You can also upload a photo and paste recognized text into the box.",
+    importCopy: "Enter one English word per line. Meaning, part of speech and an example are looked up for you. You can also upload a photo and paste the recognized words below.",
     libraryName: "Library Name",
     wordInput: "Word Content",
     photoInput: "Photo Upload",
@@ -482,6 +527,30 @@ const i18n = {
     noWrongAnswers: "No missed words.",
     deferBattle: "Later",
     itemReward: "Gained battle items: {items}",
+    itemRewardTitle: "Items received",
+    importNoneFound: "None of these words could be found. Check the spelling (English words only) or try again when you're online.",
+    todayWordsEmpty: "Tap “Study 10 Words” to draw today's set. It stays the same all day.",
+    monsterAttack: "Attack",
+    confirmReset: "This erases all progress for this account on this device (learned words, weak words, items, achievements) and cannot be undone. Export a backup first if you need one. Reset now?",
+    battleReady: "Pick an item to strike. The monster hits back every turn, so drink a potion before your HP runs out.",
+    keyHint: "Keyboard: ← → to flip, Space to hear it",
+    answerKeyHint: "Press 1–4 to answer",
+    loginLead: "Ten words a day. Learn them before moving on.",
+    loginStep1: "Flip through today's 10 cards, hear each word, read the example",
+    loginStep2: "Recall quiz: a word only counts once you get it right",
+    loginStep3: "Daily quiz brings back older and weak words",
+    loginStepNote: "Every fifth level a monster shows up, and the items you've saved are for that fight.",
+    loginNameHint: "Nickname for local test login",
+    todayWords: "Today's 10 words",
+    todayCount: "{today} / 10",
+    reviewZone: "Review",
+    adventureZone: "Adventure",
+    saveZone: "Save & settings",
+    streakDays: "{days}-day streak",
+    itemsTotal: "{count} items",
+    weeklyLockedNote: "Opens every 7 login days",
+    reviewLockedNote: "Opens at 60% learned",
+    rankLabel: "Weekly title",
     battleDamage: "{item} dealt {damage} damage.",
     battleHeal: "{item} restored {heal} HP.",
     battleLost: "Hunt failed. Half of used items were returned.",
@@ -540,6 +609,25 @@ const i18n = {
     viewWordLibrary: "View library",
     viewLibraryCopy: "Imported words only, with phonetic, POS, meaning and example.",
     noMeaning: "(no meaning)",
+    saveFailed: "Failed to save progress: browser storage may be full. Recent progress may be lost. Consider exporting a backup.",
+    learnedWords: "Learned Words",
+    learnedWordsTitle: "Learned Words",
+    learnedWordsCopy: "All words you have learned for the current goal. Use the search box to find one quickly.",
+    learnedSearchPlaceholder: "Search word or meaning…",
+    learnedEmpty: "No learned words yet. Start with \"Study 10 words\".",
+    learnedNoResults: "No words match your search.",
+    learnedTotal: "{count} words in total",
+    exportProgress: "Export save",
+    importProgressBtn: "Import save",
+    exportDone: "Backup downloaded.",
+    importProgressDone: "Import complete. Progress restored.",
+    importProgressInvalid: "Invalid save file. Nothing was changed.",
+    confirmImportProgress: "Importing will overwrite local progress for all accounts in this browser. Continue?",
+    backupHint: "Progress lives in this browser; clearing site data wipes it. Export a JSON backup or move it to another device.",
+    listenPrompt: "Listen and pick the word you hear",
+    replayAudio: "Replay audio",
+    darkMode: "Dark mode",
+    lightMode: "Light mode",
   },
   ja: {
     subtitle: "英単語をゲーム感覚で鍛える",
@@ -556,7 +644,7 @@ const i18n = {
     learn: "10語を学習",
     daily: "毎日テスト",
     weekly: "週テスト",
-    weeklyTitle: "週テスト · 5分",
+    weeklyTitle: "週テスト（5分）",
     weeklyHelper: "今週学習した語をまとめてテスト。意味選択と穴埋めを混在。",
     weeklyNoticeTitle: "週テスト解放！",
     weeklyNoticeCopy: "{day} 日間継続！今週の単語テストに挑戦しよう。",
@@ -586,7 +674,7 @@ const i18n = {
     target: "目標",
     accuracy: "正答率",
     quizSummary: "結果",
-    quizSummaryTitle: "テスト終了 · 振り返り",
+    quizSummaryTitle: "テスト終了",
     wrongCount: "誤答",
     correctAnswer: "正解",
     dashboardCopy: "目標：{goal}。まず10語を確認してから暗記テストに進みます。毎日テストでは過去の単語も混ぜます。",
@@ -612,7 +700,7 @@ const i18n = {
     previousCard: "前へ",
     nextCard: "次へ",
     cardProgress: "{current} / {total}",
-    cardHint: "右にスワイプすると次の単語へ進みます",
+    cardHint: "左右にスワイプして次のカードへ",
     exampleLabel: "例文",
     studyLoading: "単語を準備中",
     xp: "経験値",
@@ -663,7 +751,7 @@ const i18n = {
     builtInLibrary: "内蔵試験単語帳",
     customLibrary: "カスタム単語帳",
     importTitle: "新しい単語帳を作成",
-    importCopy: "1行に1語を入力：英語, 意味, 例文。写真をアップロードして、認識した文字を貼り付けることもできます。",
+    importCopy: "1行に英単語を1つ入力するだけで、意味・品詞・例文は自動で調べます。写真をアップロードして、認識した英単語を貼り付けることもできます。",
     libraryName: "単語帳名",
     wordInput: "単語内容",
     photoInput: "写真アップロード",
@@ -714,6 +802,30 @@ const i18n = {
     noWrongAnswers: "間違いはありません。",
     deferBattle: "次回にする",
     itemReward: "討伐アイテムを獲得：{items}",
+    itemRewardTitle: "アイテム獲得",
+    importNoneFound: "どの単語も意味が見つかりませんでした。綴りを確認するか、オンライン時に再試行してください。",
+    todayWordsEmpty: "「10語を学習」を押すと今日の単語が決まります。同じ日は同じセットです。",
+    monsterAttack: "攻撃力",
+    confirmReset: "この端末にあるこのアカウントの進捗（学習済み単語・苦手単語・アイテム・実績）をすべて消去します。元に戻せません。リセットしますか？",
+    battleReady: "アイテムを選んで攻撃しよう。モンスターは毎ターン反撃してくるので、HP が尽きる前に回復を。",
+    keyHint: "キーボード：← → でめくる、スペースで発音",
+    answerKeyHint: "数字キー 1–4 で回答できます",
+    loginLead: "1日10語。覚えてから次へ進む。",
+    loginStep1: "今日の10枚のカードをめくり、発音と例文を確認",
+    loginStep2: "暗記テスト：正解して初めて覚えたことになる",
+    loginStep3: "デイリーテストで古い単語と苦手な単語をもう一度",
+    loginStepNote: "レベルが5の倍数になるとモンスターが現れます。貯めたアイテムはその戦いで使います。",
+    loginNameHint: "ローカルテスト用のニックネーム",
+    todayWords: "今日の10語",
+    todayCount: "{today} / 10",
+    reviewZone: "復習",
+    adventureZone: "冒険",
+    saveZone: "セーブと設定",
+    streakDays: "{days}日連続ログイン",
+    itemsTotal: "アイテム {count} 個",
+    weeklyLockedNote: "累計ログイン7日ごとに開放",
+    reviewLockedNote: "60% 学習後に開放",
+    rankLabel: "週間称号",
     battleDamage: "{item} が {damage} ダメージ。",
     battleHeal: "{item} が {heal} HP 回復。",
     battleLost: "討伐失敗。使用アイテムの半分を返還しました。",
@@ -772,6 +884,25 @@ const i18n = {
     viewWordLibrary: "単語帳を表示",
     viewLibraryCopy: "インポートした単語のみ表示（発音記号・品詞・意味・例文）。",
     noMeaning: "（意味なし）",
+    saveFailed: "進捗の保存に失敗しました。ブラウザの保存領域が満杯の可能性があります。「セーブを書き出す」でバックアップしてください。",
+    learnedWords: "学習済みの単語",
+    learnedWordsTitle: "学習済みの単語",
+    learnedWordsCopy: "現在の学習目標で学んだすべての単語です。検索ボックスで素早く探せます。",
+    learnedSearchPlaceholder: "単語や意味を検索…",
+    learnedEmpty: "まだ学習した単語がありません。「10単語を学ぶ」から始めましょう。",
+    learnedNoResults: "検索に一致する単語がありません。",
+    learnedTotal: "合計 {count} 語",
+    exportProgress: "セーブを書き出す",
+    importProgressBtn: "セーブを読み込む",
+    exportDone: "バックアップをダウンロードしました。",
+    importProgressDone: "読み込み完了。進捗を復元しました。",
+    importProgressInvalid: "セーブファイルが不正です。変更は行われていません。",
+    confirmImportProgress: "読み込むと、このブラウザ内すべてのアカウントの進捗が上書きされます。続行しますか？",
+    backupHint: "進捗はブラウザ内に保存されます。閲覧データを消すと初期化されるため、JSONバックアップの書き出しをおすすめします。",
+    listenPrompt: "発音を聞いて正しい単語を選ぼう",
+    replayAudio: "もう一度再生",
+    darkMode: "ダークモード",
+    lightMode: "ライトモード",
   },
   ko: {
     subtitle: "게임으로 익히는 영단어 도장",
@@ -788,7 +919,7 @@ const i18n = {
     learn: "10단어 학습",
     daily: "매일 테스트",
     weekly: "주간 테스트",
-    weeklyTitle: "주간 테스트 · 5분",
+    weeklyTitle: "주간 테스트 (5분)",
     weeklyHelper: "이번 주 학습한 단어를 종합 시험합니다. 의미 선택과 빈칸 채우기를 혼합.",
     weeklyNoticeTitle: "주간 테스트 개방!",
     weeklyNoticeCopy: "{day}일 연속 학습! 이번 주 단어 종합 시험에 도전해 보세요.",
@@ -818,7 +949,7 @@ const i18n = {
     target: "목표",
     accuracy: "정답률",
     quizSummary: "결산",
-    quizSummaryTitle: "테스트 종료 · 답안 정리",
+    quizSummaryTitle: "테스트 종료",
     wrongCount: "오답",
     correctAnswer: "정답",
     dashboardCopy: "목표: {goal}. 10단어 먼저 살펴본 뒤 암기 테스트로 진행합니다. 매일 테스트에는 옛 단어가 섞입니다.",
@@ -844,7 +975,7 @@ const i18n = {
     previousCard: "이전",
     nextCard: "다음",
     cardProgress: "{current} / {total}",
-    cardHint: "오른쪽으로 스와이프하면 다음 단어",
+    cardHint: "좌우로 스와이프해 다음 카드",
     exampleLabel: "예문",
     studyLoading: "단어 준비 중",
     xp: "경험치",
@@ -895,7 +1026,7 @@ const i18n = {
     builtInLibrary: "기본 시험 단어집",
     customLibrary: "커스텀 단어집",
     importTitle: "새 단어집 만들기",
-    importCopy: "한 줄에 하나의 단어 입력: 영어, 뜻, 예문. 사진을 올려 인식된 텍스트를 붙여넣을 수도 있습니다.",
+    importCopy: "한 줄에 영어 단어 하나만 입력하면 뜻, 품사, 예문은 자동으로 찾습니다. 사진을 올려 인식된 단어를 붙여넣을 수도 있습니다.",
     libraryName: "단어집 이름",
     wordInput: "단어 내용",
     photoInput: "사진 업로드",
@@ -946,6 +1077,30 @@ const i18n = {
     noWrongAnswers: "오답이 없습니다.",
     deferBattle: "다음으로",
     itemReward: "토벌 아이템 획득: {items}",
+    itemRewardTitle: "아이템 획득",
+    importNoneFound: "어떤 단어도 뜻을 찾지 못했습니다. 철자를 확인하거나 온라인 상태에서 다시 시도하세요.",
+    todayWordsEmpty: "‘10단어 학습’을 누르면 오늘의 단어가 정해지고, 하루 동안 그대로 유지됩니다.",
+    monsterAttack: "공격력",
+    confirmReset: "이 기기에 있는 이 계정의 모든 진행(학습 단어, 약점 단어, 아이템, 업적)이 삭제되며 되돌릴 수 없습니다. 초기화할까요?",
+    battleReady: "아이템을 골라 공격하세요. 몬스터는 매 턴 반격하니 HP가 바닥나기 전에 회복하세요.",
+    keyHint: "키보드: ← → 로 넘기기, 스페이스로 발음",
+    answerKeyHint: "숫자 키 1–4 로 답할 수 있어요",
+    loginLead: "하루 10단어, 외우고 나서 다음으로.",
+    loginStep1: "오늘의 카드 10장을 넘기며 발음과 예문 확인",
+    loginStep2: "암기 테스트: 맞혀야 외운 것으로 기록",
+    loginStep3: "데일리 테스트로 예전 단어와 약점 단어를 다시",
+    loginStepNote: "레벨이 5의 배수가 되면 몬스터가 나타납니다. 모아 둔 아이템은 그때 씁니다.",
+    loginNameHint: "로컬 테스트용 닉네임",
+    todayWords: "오늘의 10단어",
+    todayCount: "{today} / 10",
+    reviewZone: "복습",
+    adventureZone: "모험",
+    saveZone: "저장 및 설정",
+    streakDays: "{days}일 연속 로그인",
+    itemsTotal: "아이템 {count}개",
+    weeklyLockedNote: "누적 로그인 7일마다 열림",
+    reviewLockedNote: "60% 학습 후 열림",
+    rankLabel: "주간 칭호",
     battleDamage: "{item}이(가) {damage} 데미지.",
     battleHeal: "{item}이(가) {heal} HP 회복.",
     battleLost: "토벌 실패. 사용한 아이템의 절반을 돌려받았습니다.",
@@ -1004,6 +1159,25 @@ const i18n = {
     viewWordLibrary: "단어집 보기",
     viewLibraryCopy: "가져온 단어만 표시합니다 (발음 기호 · 품사 · 뜻 · 예문).",
     noMeaning: "(뜻 없음)",
+    saveFailed: "진행 상황 저장 실패: 브라우저 저장 공간이 가득 찼을 수 있습니다. 최근 진행 상황이 사라질 수 있으니 백업을 내보내세요.",
+    learnedWords: "학습한 단어",
+    learnedWordsTitle: "학습한 단어",
+    learnedWordsCopy: "현재 학습 목표에서 학습한 모든 단어입니다. 검색창으로 빠르게 찾을 수 있습니다.",
+    learnedSearchPlaceholder: "단어 또는 뜻 검색…",
+    learnedEmpty: "아직 학습한 단어가 없습니다. \"10단어 학습\"부터 시작하세요.",
+    learnedNoResults: "검색과 일치하는 단어가 없습니다.",
+    learnedTotal: "총 {count} 단어",
+    exportProgress: "저장 내보내기",
+    importProgressBtn: "저장 가져오기",
+    exportDone: "백업을 다운로드했습니다.",
+    importProgressDone: "가져오기 완료. 진행 상황이 복원되었습니다.",
+    importProgressInvalid: "잘못된 저장 파일입니다. 아무것도 변경되지 않았습니다.",
+    confirmImportProgress: "가져오면 이 브라우저의 모든 계정 진행 상황을 덮어씁니다. 계속할까요?",
+    backupHint: "진행 상황은 브라우저에 저장됩니다. 데이터 삭제 시 초기화되므로 JSON 백업을 내보내 두세요.",
+    listenPrompt: "발음을 듣고 알맞은 단어를 고르세요",
+    replayAudio: "다시 듣기",
+    darkMode: "다크 모드",
+    lightMode: "라이트 모드",
   },
   es: {
     subtitle: "Dojo gamificado de vocabulario en inglés",
@@ -1020,7 +1194,7 @@ const i18n = {
     learn: "Estudiar 10 palabras",
     daily: "Prueba diaria",
     weekly: "Prueba semanal",
-    weeklyTitle: "Prueba semanal · 5 min",
+    weeklyTitle: "Prueba semanal (5 min)",
     weeklyHelper: "Cubre todas las palabras aprendidas esta semana, mezclando significado y rellenar huecos.",
     weeklyNoticeTitle: "¡Prueba semanal desbloqueada!",
     weeklyNoticeCopy: "Llevas {day} días aprendiendo. ¡Acepta el desafío semanal!",
@@ -1050,7 +1224,7 @@ const i18n = {
     target: "Objetivo",
     accuracy: "Precisión",
     quizSummary: "Resumen",
-    quizSummaryTitle: "Prueba terminada · Repaso",
+    quizSummaryTitle: "Prueba terminada",
     wrongCount: "Falladas",
     correctAnswer: "Respuesta",
     dashboardCopy: "Objetivo: {goal}. Primero repasa 10 palabras, luego haz la prueba de memoria. Las diarias mezclan palabras antiguas.",
@@ -1076,7 +1250,7 @@ const i18n = {
     previousCard: "Anterior",
     nextCard: "Siguiente",
     cardProgress: "{current} / {total}",
-    cardHint: "Desliza a la derecha para la siguiente palabra",
+    cardHint: "Desliza a los lados para la siguiente tarjeta",
     exampleLabel: "Ejemplo",
     studyLoading: "Preparando palabras",
     xp: "XP",
@@ -1127,7 +1301,7 @@ const i18n = {
     builtInLibrary: "Biblioteca integrada",
     customLibrary: "Biblioteca personal",
     importTitle: "Crear una biblioteca nueva",
-    importCopy: "Una palabra por línea: inglés, significado, ejemplo. También puedes subir una foto y pegar el texto reconocido.",
+    importCopy: "Escribe una palabra en inglés por línea; el significado, la categoría y un ejemplo se buscan solos. También puedes subir una foto y pegar las palabras reconocidas.",
     libraryName: "Nombre de la biblioteca",
     wordInput: "Contenido",
     photoInput: "Subir foto",
@@ -1178,6 +1352,30 @@ const i18n = {
     noWrongAnswers: "Sin fallos.",
     deferBattle: "Para luego",
     itemReward: "Objeto obtenido: {items}",
+    itemRewardTitle: "Objetos obtenidos",
+    importNoneFound: "No se encontró ninguna de estas palabras. Revisa la ortografía o inténtalo de nuevo con conexión.",
+    todayWordsEmpty: "Pulsa «Estudiar 10 palabras» para sacar las palabras de hoy; no cambian en todo el día.",
+    monsterAttack: "Ataque",
+    confirmReset: "Esto borra todo el progreso de esta cuenta en este dispositivo (palabras aprendidas, débiles, objetos y logros) y no se puede deshacer. ¿Reiniciar?",
+    battleReady: "Elige un objeto para atacar. El monstruo contraataca cada turno: usa una poción antes de quedarte sin vida.",
+    keyHint: "Teclado: ← → para pasar, Espacio para escuchar",
+    answerKeyHint: "Pulsa 1–4 para responder",
+    loginLead: "Diez palabras al día. Apréndelas antes de seguir.",
+    loginStep1: "Pasa las 10 tarjetas de hoy, escucha cada palabra y lee el ejemplo",
+    loginStep2: "Prueba de memoria: solo cuenta si aciertas",
+    loginStep3: "La prueba diaria repasa palabras antiguas y débiles",
+    loginStepNote: "Cada cinco niveles aparece un monstruo, y los objetos que guardes son para esa pelea.",
+    loginNameHint: "Apodo para el inicio de sesión local",
+    todayWords: "Las 10 palabras de hoy",
+    todayCount: "{today} / 10",
+    reviewZone: "Repaso",
+    adventureZone: "Aventura",
+    saveZone: "Guardado y ajustes",
+    streakDays: "Racha de {days} días",
+    itemsTotal: "{count} objetos",
+    weeklyLockedNote: "Se abre cada 7 días de acceso",
+    reviewLockedNote: "Se abre al 60 % aprendido",
+    rankLabel: "Título semanal",
     battleDamage: "{item} causa {damage} de daño.",
     battleHeal: "{item} recupera {heal} HP.",
     battleLost: "Caza fallida. Se reembolsa la mitad de los objetos usados.",
@@ -1236,6 +1434,25 @@ const i18n = {
     viewWordLibrary: "Ver biblioteca",
     viewLibraryCopy: "Solo las palabras importadas (fonética, parte de la oración, significado, ejemplo).",
     noMeaning: "(sin significado)",
+    saveFailed: "No se pudo guardar el progreso: el almacenamiento del navegador puede estar lleno. Exporta una copia de seguridad.",
+    learnedWords: "Palabras aprendidas",
+    learnedWordsTitle: "Palabras aprendidas",
+    learnedWordsCopy: "Todas las palabras aprendidas para tu meta actual. Usa el buscador para encontrarlas rápido.",
+    learnedSearchPlaceholder: "Buscar palabra o significado…",
+    learnedEmpty: "Aún no hay palabras aprendidas. Empieza con \"Estudiar 10 palabras\".",
+    learnedNoResults: "Ninguna palabra coincide con la búsqueda.",
+    learnedTotal: "{count} palabras en total",
+    exportProgress: "Exportar partida",
+    importProgressBtn: "Importar partida",
+    exportDone: "Copia de seguridad descargada.",
+    importProgressDone: "Importación completa. Progreso restaurado.",
+    importProgressInvalid: "Archivo de guardado no válido. No se cambió nada.",
+    confirmImportProgress: "Importar sobrescribirá el progreso local de todas las cuentas en este navegador. ¿Continuar?",
+    backupHint: "El progreso vive en este navegador; borrar los datos lo reinicia. Exporta una copia JSON de seguridad.",
+    listenPrompt: "Escucha y elige la palabra correcta",
+    replayAudio: "Repetir audio",
+    darkMode: "Modo oscuro",
+    lightMode: "Modo claro",
   },
 };
 
@@ -2343,7 +2560,21 @@ function loadState() {
   return fallback;
 }
 
+// saveState 改為 debounce 寫入：高頻呼叫只會在停下來 250ms 後真正 stringify + 寫盤一次，
+// 避免 store 變大後每答一題都全量序列化卡 UI。頁面隱藏 / 關閉前會強制 flush。
+let saveStateTimer = null;
+let saveStateWarned = false;
+
 function saveState() {
+  if (saveStateTimer) clearTimeout(saveStateTimer);
+  saveStateTimer = setTimeout(saveStateNow, 250);
+}
+
+function saveStateNow() {
+  if (saveStateTimer) {
+    clearTimeout(saveStateTimer);
+    saveStateTimer = null;
+  }
   const STORE_KEY = "vocab-arcana-store";
   let store = {};
   try {
@@ -2361,7 +2592,104 @@ function saveState() {
   }
   try {
     localStorage.setItem(STORE_KEY, JSON.stringify(store));
+  } catch (error) {
+    warnSaveFailed(error);
+  }
+}
+
+// 儲存失敗（多半是 localStorage quota 滿）不再靜默：console 記錄 + 顯示一次性警告橫幅
+function warnSaveFailed(error) {
+  console.error("[saveState] failed to persist progress:", error);
+  if (saveStateWarned) return;
+  saveStateWarned = true;
+  try {
+    const note = document.createElement("div");
+    note.className = "save-warning";
+    note.setAttribute("role", "alert");
+    note.textContent = t("saveFailed");
+    document.body.appendChild(note);
+    setTimeout(() => note.remove(), 10000);
   } catch {}
+}
+
+window.addEventListener("beforeunload", () => {
+  if (saveStateTimer) saveStateNow();
+});
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "hidden" && saveStateTimer) saveStateNow();
+});
+
+// ===== 主題（日間 / 夜間）=====
+// 主題是全瀏覽器共用設定（登入頁也要生效），所以獨立存一個 key，不放進 state。
+const THEME_KEY = "vocab-arcana-theme";
+
+function currentTheme() {
+  try {
+    return localStorage.getItem(THEME_KEY) === "dark" ? "dark" : "light";
+  } catch {
+    return "light";
+  }
+}
+
+function applyTheme() {
+  document.body.classList.toggle("theme-dark", currentTheme() === "dark");
+}
+
+function toggleTheme() {
+  try {
+    localStorage.setItem(THEME_KEY, currentTheme() === "dark" ? "light" : "dark");
+  } catch {}
+  applyTheme();
+  render();
+}
+
+// ===== 匯出 / 匯入進度（JSON 存檔）=====
+function exportProgressFile() {
+  saveStateNow(); // 先 flush 未寫入的 debounce 存檔
+  let raw = "";
+  try {
+    raw = localStorage.getItem("vocab-arcana-store") || "";
+  } catch {}
+  if (!raw) raw = JSON.stringify({ activeUserId: null, users: {} });
+  const stamp = todayKey().replaceAll("-", "");
+  const blob = new Blob([raw], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `vocab-arcana-save-${stamp}.json`;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 2000);
+  toast = t("exportDone");
+  render();
+}
+
+function importProgressFile(file) {
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    let parsed = null;
+    try {
+      parsed = JSON.parse(String(reader.result || ""));
+    } catch {}
+    // 最低限度驗證：必須是有 users 物件的 store 結構
+    if (!parsed || typeof parsed !== "object" || !parsed.users || typeof parsed.users !== "object") {
+      toast = t("importProgressInvalid");
+      render();
+      return;
+    }
+    if (!confirm(t("confirmImportProgress"))) return;
+    try {
+      localStorage.setItem("vocab-arcana-store", JSON.stringify(parsed));
+    } catch (error) {
+      warnSaveFailed(error);
+      return;
+    }
+    // 重新載入讓 loadState 走一次完整流程（含 migrate）
+    location.reload();
+  };
+  reader.readAsText(file);
 }
 
 // 從 user 物件算出穩定的 user id（mock 模式用 name 為 key）
@@ -2489,36 +2817,42 @@ function appShell(content) {
     <div class="shell">
       <header class="topbar">
         <div class="brand">
-          <div class="mark">VA</div>
+          <span class="mark" aria-hidden="true">Aa</span>
           <div>
             <h1>Vocab Arcana</h1>
             <p>${t("subtitle")}</p>
           </div>
         </div>
         <div class="controls">
-          <select class="select" data-action="native">
-            ${nativeLanguages.map((lang) => `<option value="${lang.value}" ${state.native === lang.value ? "selected" : ""}>${lang.label}</option>`).join("")}
-          </select>
-          ${canUseAdmin() ? `<button class="btn ghost" data-action="admin">${t("admin")}</button>` : ""}
-          ${state.user ? `<button class="btn secondary" data-action="signout">${t("signout")}</button>` : ""}
+          <label class="select-wrap">
+            <span class="sr-only">${t("native")}</span>
+            <select class="select" data-action="native">
+              ${nativeLanguages.map((lang) => `<option value="${lang.value}" ${state.native === lang.value ? "selected" : ""}>${lang.label}</option>`).join("")}
+            </select>
+          </label>
+          ${canUseAdmin() ? `<button class="btn ghost small" data-action="admin">${t("admin")}</button>` : ""}
+          ${state.user ? `<button class="btn ghost small" data-action="signout">${t("signout")}</button>` : ""}
         </div>
       </header>
       ${state.rewardNotice ? `
-        <section class="reward-modal" role="dialog" aria-modal="true" aria-label="${state.rewardNotice.title}">
+        <section class="reward-modal" role="dialog" aria-modal="true" aria-label="${t("itemRewardTitle")}">
           <div class="reward-backdrop" data-action="dismiss-reward"></div>
           <div class="reward-dialog">
-            <strong>${state.rewardNotice.title}</strong>
-            <p>${state.rewardNotice.items}</p>
+            <span class="eyebrow">${t("itemRewardTitle")}</span>
+            <strong>${escapeHtml(state.rewardNotice.items)}</strong>
             <div class="actions">
               <button class="btn" data-action="dismiss-reward">${t("claimReward")}</button>
             </div>
           </div>
         </section>
       ` : ""}
-      ${content}
+      <div class="screen-area">
+        ${content}
+      </div>
     </div>
   `;
 }
+
 
 function render() {
   if (!builtInWordsLoaded) {
@@ -2558,6 +2892,7 @@ function render() {
   if (screen === "custom-library-view") app.innerHTML = renderCustomLibraryView();
   if (screen === "study") app.innerHTML = renderStudy();
   if (screen === "weak") app.innerHTML = renderWeak();
+  if (screen === "learned-words") app.innerHTML = renderLearnedWords();
   if (screen === "monster-preview") app.innerHTML = renderMonsterPreview();
   if (screen === "minigame") app.innerHTML = renderMonsterBattle();
   if (screen === "inventory") app.innerHTML = renderInventory();
@@ -2610,7 +2945,18 @@ async function loadRuntimeConfig() {
   }
 }
 
+// PWA：註冊 service worker（file:// 或不支援的環境自動略過）
+function registerServiceWorker() {
+  if (!("serviceWorker" in navigator)) return;
+  if (!/^https?:$/.test(location.protocol)) return;
+  navigator.serviceWorker.register("./sw.js").catch((error) => {
+    console.warn("[sw] register failed:", error);
+  });
+}
+
 async function bootstrap() {
+  applyTheme();
+  registerServiceWorker();
   await loadRuntimeConfig();
   words = await loadBuiltInWords();
   migrateState();
@@ -2624,36 +2970,35 @@ async function bootstrap() {
 
 function renderLogin() {
   return appShell(`
-    <section class="layout">
-      <div class="hero">
-        <div>
-          <div class="eyebrow">Adaptive vocabulary RPG</div>
-          <h2>${t("introTitle")}</h2>
-          <p class="hero-copy">${t("introCopy")}</p>
-          <div class="actions">
-            <div id="googleSignInButton" class="google-signin-slot"></div>
-            ${runtimeConfig.localTestLoginEnabled ? `<button class="btn secondary" data-action="local-test-login">${t("mock")}</button>` : ""}
-          </div>
-        </div>
-        <div class="stats">
-          <div class="stat"><strong>7</strong><span>${t("adventurerRank")}</span></div>
-          <div class="stat"><strong>10</strong><span>${t("statWords")}</span></div>
-          <div class="stat"><strong>7</strong><span>${t("weekly")}</span></div>
-        </div>
+    <section class="login">
+      <div class="panel login-intro">
+        <h2 class="login-word"><span class="marker">vocabulary</span></h2>
+        <p class="login-phonetic">/vəˈkæbjəˌleri/ <span class="tag">noun</span></p>
+        <p class="login-meaning">${t("loginLead")}</p>
+        <p class="hero-copy">${t("introCopy")}</p>
       </div>
-      <aside class="panel">
-        <h3>${t("setup")}</h3>
-        <div class="form-grid">
-          <div class="field">
-            <label>${t("name")}</label>
-            <input class="input" id="nameInput" value="${t("traveler")}" />
-          </div>
-          <p class="muted">${t("firebaseNote")}</p>
+      <aside class="panel login-side">
+        <ol class="login-steps">
+          <li>${t("loginStep1")}</li>
+          <li>${t("loginStep2")}</li>
+          <li>${t("loginStep3")}</li>
+        </ol>
+        <p class="muted">${t("loginStepNote")}</p>
+        <div class="login-actions">
+          <div id="googleSignInButton" class="google-signin-slot"></div>
+          ${runtimeConfig.localTestLoginEnabled ? `
+            <div class="field">
+              <label for="nameInput">${t("loginNameHint")}</label>
+              <input class="input" id="nameInput" value="${t("traveler")}" />
+            </div>
+            <button class="btn secondary" data-action="local-test-login">${t("mock")}</button>
+          ` : ""}
         </div>
       </aside>
     </section>
   `);
 }
+
 
 function mountGoogleSignInButton() {
   const slot = document.querySelector("#googleSignInButton");
@@ -2749,7 +3094,9 @@ function renderQuiz(kind) {
   const remaining = getQuizRemainingSeconds();
   activeQuiz.timer = setInterval(updateQuizTimer, 1000);
   const isCloze = current.type === "cloze";
-  const questionText = isCloze ? clozePrompt(current) : current.word;
+  const isListen = current.type === "listen";
+  const questionText = isListen ? t("listenPrompt") : isCloze ? clozePrompt(current) : current.word;
+  if (isListen) scheduleListenAutoplay(current.word, kind, activeQuiz.index);
   const title =
     kind === "daily" ? t("daily")
     : kind === "weekly" ? t("weeklyTitle")
@@ -2765,11 +3112,11 @@ function renderQuiz(kind) {
     <section class="panel quiz-wrap">
       <div class="quiz-head">
         <div>
-          <div class="eyebrow">${kind === "review" ? t("review") : kind === "daily" ? t("daily") : kind === "weekly" ? t("weekly") : t("test")}</div>
+          <span class="eyebrow">${msg("questionProgress", { current: activeQuiz.index + 1, total: activeQuiz.questions.length })}</span>
           <h2 class="page-title">${heading}</h2>
-          <p class="muted">${kind === "daily" ? msg("questionProgress", { current: activeQuiz.index + 1, total: activeQuiz.questions.length }) : `${msg("questionProgress", { current: activeQuiz.index + 1, total: activeQuiz.questions.length })} · ${helper}`}</p>
+          ${kind === "daily" ? "" : `<p class="muted">${helper}</p>`}
         </div>
-        <div class="timer" id="timer">${formatTime(remaining)}</div>
+        <div class="timer lcd" id="timer" aria-label="timer">${formatTime(remaining)}</div>
       </div>
       ${kind === "placement" ? `
         <div class="goal-switch">
@@ -2780,17 +3127,20 @@ function renderQuiz(kind) {
       <div class="meter"><span style="width:${(activeQuiz.index / activeQuiz.questions.length) * 100}%"></span></div>
       <div class="question">
         <div>
-          <div class="${isCloze ? "sentence" : "word"}">${questionText}</div>
-          <div class="phonetic">${isCloze ? t("clozeHint") : current.phonetic}</div>
+          <div class="${isCloze || isListen ? "sentence" : "word"}">${escapeHtml(questionText)}</div>
+          <div class="phonetic">${isListen
+            ? `<button class="btn secondary" data-action="speak-word" data-word="${escapeHtml(current.word)}">${speakerIcon()} ${t("replayAudio")}</button>`
+            : isCloze ? t("clozeHint") : escapeHtml(current.phonetic || "")}</div>
         </div>
       </div>
-      <div class="answers">
-        ${current.choices.map((option) => `<button class="answer" data-quiz-answer="${option}" data-correct="${current.correct}">${option}</button>`).join("")}
+      <div class="answers ${current.type === "meaning" ? "answers-zh" : "answers-en"}">
+        ${current.choices.map((option) => `<button class="answer" data-quiz-answer="${escapeHtml(option)}" data-correct="${escapeHtml(current.correct)}">${escapeHtml(option)}</button>`).join("")}
       </div>
-      <div class="toast">${toast}</div>
-      ${quizEffect ? `<div class="quiz-effect ${quizEffect}">${quizEffect === "good" ? t("correctFx") : t("wrongFx")}</div>` : ""}
-      <div class="actions">
+      ${toast ? `<div class="toast">${toast}</div>` : ""}
+      ${quizEffect ? `<div class="quiz-effect ${quizEffect}" aria-live="polite">${quizEffect === "good" ? t("correctFx") : t("wrongFx")}</div>` : ""}
+      <div class="actions quiz-foot">
         <button class="btn secondary" data-action="back">${backButtonLabel()}</button>
+        <span class="key-hint">${t("answerKeyHint")}</span>
       </div>
     </section>
   `);
@@ -2814,16 +3164,15 @@ function renderQuizSummary() {
       : "";
   return appShell(`
     <section class="panel">
-      <div class="eyebrow">${kindLabel} · ${t("quizSummary")}</div>
+      <span class="eyebrow">${kindLabel}</span>
       <h2 class="page-title">${t("quizSummaryTitle")}</h2>
-      <div class="actions top-return-actions">
-        <button class="btn" data-action="dashboard">${t("backMap")}</button>
-      </div>
       ${passedNote}
-      <div class="stats">
-        <div class="stat"><strong>${summary.correct}/${summary.total}</strong><span>${t("correct")}</span></div>
-        <div class="stat"><strong>${accuracy}%</strong><span>${t("accuracy")}</span></div>
-        <div class="stat"><strong>${mistakes.length}</strong><span>${t("wrongCount") || "錯題"}</span></div>
+      <div class="summary-score">
+        <p class="summary-big"><span class="lcd">${accuracy}</span><span>%</span></p>
+        <dl class="readout">
+          <div><dt>${t("correct")}</dt><dd class="lcd">${summary.correct}/${summary.total}</dd></div>
+          <div><dt>${t("wrongCount") || "錯題"}</dt><dd class="lcd">${mistakes.length}</dd></div>
+        </dl>
       </div>
       <div class="wrong-review">
         <h3>${t("wrongReview") || "錯題回顧"}</h3>
@@ -2831,12 +3180,15 @@ function renderQuizSummary() {
           ? `<ul class="word-bank">${mistakes.map((item) => `
               <li class="word-bank-row">
                 <div class="word-bank-main">
-                  <strong>${item.word || ""}</strong>
+                  <strong>${escapeHtml(item.word || "")}</strong>
                 </div>
-                <div class="word-bank-meaning">${t("correctAnswer") || "正解"}：${item.correct || ""}</div>
+                <div class="word-bank-meaning">${t("correctAnswer") || "正解"}：${escapeHtml(item.correct || "")}</div>
               </li>
             `).join("")}</ul>`
           : `<p class="muted">${t("noWrongAnswers") || "沒有錯題"}</p>`}
+      </div>
+      <div class="actions">
+        <button class="btn" data-action="dashboard">${t("backMap")}</button>
       </div>
     </section>
   `);
@@ -2854,11 +3206,13 @@ function renderDashboard() {
   const profile = activeProfile();
   const level = currentRankLevel();
   const label = levelLabel(level);
-  const today = todayKey();
-  const todayCount = todayStudyWords(studySourceForLibrary(), currentStudyLibraryId()).length;
-  const todayComplete = todayCount >= 10;
+  // 「今天的 10 個字」只算真的學會的（之前是算當日鎖定的字數，一打開字卡就顯示 10/10）
+  const learnedNow = new Set(profile.learned || []);
+  const todayLocked = todayStudyWords(studySourceForLibrary(), currentStudyLibraryId());
+  const todayComplete = todayStudyComplete();
+  const todayTotal = todayLocked.length || 10;
+  const todayCount = todayComplete ? todayTotal : todayLocked.filter((item) => learnedNow.has(item.word)).length;
   const learnedPercent = getLearnedPercent();
-  const progress = learnedPercent;
   const rank = getPlayerRank();
   const xp = state.xp || 0;
   const nextNeed = xpNeededForRank(rank);
@@ -2872,6 +3226,16 @@ function renderDashboard() {
   const pendingBattleTitle = state.pendingBattleTitle || null;
   const limitedBattleTitle = state.limitedBattleTitle?.expiresWeekKey > currentWeekKey() ? state.limitedBattleTitle : null;
   const equipped = achievementBadgeMeta(state.equippedTitle) || achievementBadgeMeta(state.completedAchievements?.[state.completedAchievements.length - 1]) || { icon: "crown", title: t("noTitle"), done: false };
+  const dailyOpen = dailyTestAvailable();
+  const weeklyOpen = weeklyTestAvailable();
+  const reviewOpen = learnedPercent >= 60;
+  const itemTotal = battleItems().reduce((sum, item) => sum + (state.inventory[item.id] || 0), 0);
+  const menuRow = (action, title, note, value = "", disabled = false) => `
+    <button class="menu-row" data-action="${action}" ${disabled ? "disabled" : ""}>
+      <span class="menu-row-title">${title}</span>
+      ${note ? `<span class="menu-row-note">${note}</span>` : ""}
+      ${value !== "" ? `<span class="menu-row-value">${value}</span>` : ""}
+    </button>`;
   return appShell(`
     ${showWeeklyNotice ? `
       <div class="modal-backdrop" data-action="dismiss-weekly-notice">
@@ -2898,94 +3262,86 @@ function renderDashboard() {
       </div>
     ` : ""}
     <section class="dashboard">
-      <div class="panel game-panel">
-        <div class="eyebrow">${t("dashboard")}</div>
-        <div class="page-head">
-          <div>
-            <h2 class="page-title">${playerDisplayName()} · ${label.name}</h2>
-          </div>
-          <button class="dashboard-badge" data-action="achievements" title="${equipped.title || t("noTitle")}">
-            ${badgeSvg(equipped.icon, equipped.done, equipped.tierIndex || 0)}
-          </button>
+      ${toast ? `<div class="quest-alert small" role="status"><span>${toast}</span></div>` : ""}
+      <header class="panel status-panel">
+        <div class="status-who">
+          <span class="eyebrow">${t("dashboard")}</span>
+          <h2 class="page-title">${escapeHtml(playerDisplayName())}</h2>
+          <p class="status-title">${label.name}${rankTierTitle(state.rankTier || 1) !== label.name ? `<span>${t("rankLabel")}：${rankTierTitle(state.rankTier || 1)}</span>` : ""}</p>
         </div>
-        <div class="goal-switch">
-          <span>${t("activeGoal")}</span>
-          ${orderedUserGoals().map((goal) => `<button class="chip ${activeGoal() === goal ? "active" : ""}" data-active-goal="${goal}">${goalLabel(goal)}</button>`).join("")}
-          ${unselectedGoals().map((goal) => `<button class="chip add" data-add-goal="${goal}">+ ${goalLabel(goal)}</button>`).join("")}
+        <dl class="readout">
+          <div><dt>${t("adventurerRank")}</dt><dd class="lcd">Lv.${rank}</dd></div>
+          <div><dt>${t("xp")}</dt><dd class="lcd">${xp}</dd></div>
+          <div><dt>${t("streak")}</dt><dd class="lcd">${state.streakDays || 0}</dd></div>
+        </dl>
+        <div class="status-xp">
+          <div class="meter" role="progressbar" aria-valuemin="0" aria-valuemax="${nextNeed}" aria-valuenow="${currentXp}"><span style="width:${xpProgress()}%"></span></div>
+          <small>${t("nextLevel")} ${currentXp}/${nextNeed}</small>
         </div>
-        <p class="hero-copy">${msg("dashboardCopy", { goal: activeLibraryLabel() })}</p>
-        <div class="hud">
-          <div class="hud-item">
-            <span>${t("adventurerRank")}</span>
-            <strong>Lv.${rank}</strong>
-          </div>
-          <div class="hud-item">
-            <span>${t("xp")}</span>
-            <strong>${xp}</strong>
-          </div>
-          <div class="hud-item">
-            <span>${t("nextLevel")}</span>
-            <strong>${currentXp}/${nextNeed}</strong>
-          </div>
-          <div class="hud-meter"><span style="width:${xpProgress()}%"></span></div>
-        </div>
-        ${showLevelUpAlert ? `<div class="quest-alert"><strong>${t("levelUp")} Lv.${pendingLevel.from} -> Lv.${pendingLevel.to}</strong><button class="btn" data-action="claim-level-loot">${t("claimLevelLoot")}</button></div>` : ""}
-        ${pendingBattleTitle ? `<div class="quest-alert"><strong>${msg("battleTitleReady", { title: battleRankTitle(pendingBattleTitle.rank) })}</strong><button class="btn" data-action="claim-battle-title">${t("claimBattleTitle")}</button></div>` : ""}
-        ${limitedBattleTitle ? `<div class="quest-alert small"><strong>${t("limitedTitle")}</strong><span>${msg("battleTitleActive", { title: battleRankTitle(limitedBattleTitle.rank) })}</span></div>` : ""}
-        ${state.streakRewardKey ? `<div class="quest-alert small"><strong>${t("streak")} ${state.streakDays}</strong><span>${msg("streakReward", { reward: t(state.streakRewardKey) })}</span></div>` : ""}
-        <div class="action-zones">
-          <div class="action-zone learning-zone">
-            <h3>${t("learningActions")}</h3>
-            <div class="actions">
-              <button class="btn learning" data-action="study">${t("learn")}</button>
-              <button class="btn learning" data-action="daily" ${dailyTestAvailable() ? "" : "disabled"}>${t("daily")}</button>
-              <button class="btn learning secondary" data-action="weak">${t("weak")} (${profile.weak.length})</button>
-              <button class="btn learning secondary" data-action="custom-hub">${t("customHub")}${state.customLibraries.length ? ` (${state.customLibraries.length})` : ""}</button>
-              <div class="paired-actions">
-                <button class="btn learning secondary" data-action="weekly" ${weeklyTestAvailable() ? "" : "disabled"}>${t("weekly")}</button>
-                <button class="btn learning secondary" data-action="review" ${learnedPercent >= 60 ? "" : "disabled"}>${t("review")}</button>
-              </div>
-              ${todayLockComplete() ? `<button class="btn learning secondary" data-action="next-round">${t("nextRound")}</button>` : ""}
-            </div>
-          </div>
-          <div class="action-zone adventure-zone">
-            <h3>${t("adventureActions")}</h3>
-            <div class="actions">
-              <button class="btn adventure" data-action="inventory">${t("inventory")}</button>
-              <button class="btn adventure" data-action="achievements">${t("achievements")}</button>
-              <button class="btn adventure" data-action="ranking">${t("ranking")}</button>
-              <button class="btn secondary" data-action="reset">${t("reset")}</button>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="grid dashboard-summary">
-        <article class="card level-card ${todayComplete ? "complete" : ""}">
-          <h3>${t("todayProgress")}</h3>
-          <p class="muted">${msg("todayProgressCopy", { today: todayCount, total: profile.learned.length })}</p>
-          <p class="muted">${dueCount > 0 ? `${t("srsDue")}：${dueCount}` : t("srsAllClear")}</p>
-          <p class="muted">${learnedPercent >= 60 ? msg("reviewReady", { percent: learnedPercent }) : t("reviewLocked")}</p>
-          <div class="meter"><span style="width:${Math.min(100, todayCount * 10)}%"></span></div>
-        </article>
-        <article class="card level-card">
-          <h3>${label.name}</h3>
-          <p class="muted">${label.tone}</p>
-          <p class="muted">${t("adventurerRank")}：${rankTierTitle(state.rankTier || 1)}</p>
-        </article>
-        <button class="card level-card summary-link-card" data-action="ranking">
-          <h3>${t("ranking")}</h3>
-          <p class="muted">${t("recentXp")}：${weeklyXpTotal()}</p>
-          <p class="muted">${t("killRanking")}：${weeklyKillTotal()}</p>
+        <button class="dashboard-badge" data-action="achievements" title="${equipped.title || t("noTitle")}" aria-label="${t("achievements")}">
+          ${badgeSvg(equipped.icon, equipped.done, equipped.tierIndex || 0)}
         </button>
+      </header>
+      <nav class="goal-switch" aria-label="${t("activeGoal")}">
+        ${orderedUserGoals().map((goal) => `<button class="chip ${activeGoal() === goal ? "active" : ""}" data-active-goal="${goal}" ${activeGoal() === goal ? 'aria-current="true"' : ""}>${goalLabel(goal)}</button>`).join("")}
+        ${unselectedGoals().map((goal) => `<button class="chip add" data-add-goal="${goal}">+ ${goalLabel(goal)}</button>`).join("")}
+      </nav>
+      ${showLevelUpAlert ? `<div class="quest-alert"><strong>${t("levelUp")} Lv.${pendingLevel.from} → Lv.${pendingLevel.to}</strong><button class="btn" data-action="claim-level-loot">${t("claimLevelLoot")}</button></div>` : ""}
+      ${pendingBattleTitle ? `<div class="quest-alert"><strong>${msg("battleTitleReady", { title: battleRankTitle(pendingBattleTitle.rank) })}</strong><button class="btn" data-action="claim-battle-title">${t("claimBattleTitle")}</button></div>` : ""}
+      ${limitedBattleTitle ? `<div class="quest-alert small"><strong>${t("limitedTitle")}</strong><span>${msg("battleTitleActive", { title: battleRankTitle(limitedBattleTitle.rank) })}</span></div>` : ""}
+      <div class="dash-grid">
+        <section class="panel today-panel ${todayComplete ? "complete" : ""}">
+          <span class="eyebrow">${activeLibraryLabel()}</span>
+          <h3>${t("todayWords")}</h3>
+          <p class="today-count"><span class="lcd">${todayCount}</span><span>/ ${todayTotal}</span></p>
+          <div class="meter"><span style="width:${Math.min(100, Math.round((todayCount / todayTotal) * 100))}%"></span></div>
+          <p class="muted">${dueCount > 0 ? `${t("srsDue")} ${dueCount}` : t("srsAllClear")}${state.streakRewardKey ? `，${msg("streakReward", { reward: t(state.streakRewardKey) })}` : ""}</p>
+          ${todayLocked.length
+            ? `<ul class="today-words" lang="en">${todayLocked.map((item) => `<li class="${learnedNow.has(item.word) ? "done" : ""}">${escapeHtml(item.word)}</li>`).join("")}</ul>`
+            : `<p class="muted today-words-empty">${t("todayWordsEmpty")}</p>`}
+          <div class="actions">
+            <button class="btn" data-action="study">${t("learn")}</button>
+            <button class="btn ${dailyOpen ? "" : "secondary"}" data-action="daily" ${dailyOpen ? "" : "disabled"}>${t("daily")}</button>
+            ${todayLockComplete() ? `<button class="btn secondary" data-action="next-round">${t("nextRound")}</button>` : ""}
+          </div>
+        </section>
+        <section class="panel menu-panel">
+          <h3>${t("reviewZone")}</h3>
+          <div class="menu-list">
+            ${menuRow("weak", t("weak"), "", profile.weak.length)}
+            ${menuRow("learned-words", t("learnedWords"), "", profile.learned.length)}
+            ${menuRow("weekly", t("weekly"), weeklyOpen ? "" : t("weeklyLockedNote"), "", !weeklyOpen)}
+            ${menuRow("review", t("review"), reviewOpen ? msg("reviewReady", { percent: learnedPercent }) : t("reviewLockedNote"), `${learnedPercent}%`, !reviewOpen)}
+            ${menuRow("custom-hub", t("customHub"), "", state.customLibraries.length || "")}
+          </div>
+        </section>
+        <section class="panel menu-panel adventure-panel">
+          <h3>${t("adventureZone")}</h3>
+          <div class="menu-list">
+            ${menuRow("inventory", t("inventory"), "", itemTotal)}
+            ${menuRow("achievements", t("achievements"), equipped.title || t("noTitle"))}
+            ${menuRow("ranking", t("ranking"), `${t("recentXp")} ${weeklyXpTotal()}，${t("killRanking")} ${weeklyKillTotal()}`)}
+          </div>
+        </section>
       </div>
+      <footer class="dash-footer">
+        <div class="dash-footer-keys">
+          <button class="btn ghost small" data-action="export-progress">${t("exportProgress")}</button>
+          <button class="btn ghost small" data-action="import-progress">${t("importProgressBtn")}</button>
+          <button class="btn ghost small" data-action="toggle-theme">${currentTheme() === "dark" ? t("lightMode") : t("darkMode")}</button>
+          <button class="btn ghost small danger" data-action="reset">${t("reset")}</button>
+          <input type="file" id="importProgressFile" accept="application/json,.json" hidden />
+        </div>
+        <p class="backup-hint">${t("backupHint")}</p>
+      </footer>
     </section>
   `);
 }
 
+
 function renderCustomStudySelect() {
   return appShell(`
     <section class="panel">
-      <div class="eyebrow">${t("customLibrary")}</div>
       <h2 class="page-title">${t("customHubTitle")}</h2>
       <div class="actions top-return-actions">
         <button class="btn secondary" data-action="back">${backButtonLabel()}</button>
@@ -3007,8 +3363,8 @@ function renderCustomStudySelect() {
             return `
               <article class="card admin-card library-card ${complete ? "complete" : ""}">
                 <div class="library-header">
-                  <strong>${library.name}</strong>
-                  <p class="muted">${(library.words || []).length} 字${broken > 0 ? ` · <span style="color:#c45a43">${broken} 字釋義不全</span>` : ""}</p>
+                  <strong>${escapeHtml(library.name)}</strong>
+                  <p class="muted">${(library.words || []).length} 字${broken > 0 ? `，<span class="warn-text">${broken} 字釋義不全</span>` : ""}</p>
                 </div>
                 <div class="library-tools">
                   <button class="btn small" data-start-custom-study="${library.id}">${t("startLearningCustom")}</button>
@@ -3039,6 +3395,7 @@ function renderCustomLibraryView() {
         <button class="btn secondary" data-action="back">${backButtonLabel()}</button>
       </div>
       <p class="hero-copy">${t("viewLibraryCopy")}</p>
+      ${toast ? `<div class="toast" role="status">${toast}</div>` : ""}
       ${libraries.length ? `
         ${libraries.map((library) => {
           const profile = activeProfile();
@@ -3046,7 +3403,7 @@ function renderCustomLibraryView() {
           return `
           <article class="card library-view-card ${complete ? "complete" : ""}">
             <div class="library-view-head">
-              <h3>${library.name}</h3>
+              <h3>${escapeHtml(library.name)}</h3>
               <p class="muted">${(library.words || []).length} 字</p>
             </div>
             <div class="library-add-box">
@@ -3060,9 +3417,9 @@ function renderCustomLibraryView() {
               ${(library.words || []).map((item) => `
                 <li class="word-bank-row">
                   <div class="word-bank-main">
-                    <strong>${item.word}</strong>
-                    ${item.phonetic ? `<span class="phonetic-inline">${item.phonetic}</span>` : ""}
-                    ${item.pos ? `<span class="tag tag-pos">${item.pos}</span>` : ""}
+                    <strong>${escapeHtml(item.word)}</strong>
+                    ${item.phonetic ? `<span class="phonetic-inline">${escapeHtml(item.phonetic)}</span>` : ""}
+                    ${item.pos ? `<span class="tag tag-pos">${escapeHtml(item.pos)}</span>` : ""}
                   </div>
                   <div class="word-bank-meaning">${displayMeaning(item) || `<span class="muted">${t("noMeaning")}</span>`}</div>
                   ${renderCambridgeExample(item)}
@@ -3072,6 +3429,64 @@ function renderCustomLibraryView() {
           </article>
         `;}).join("")}
       ` : `<p class="muted">${t("noNewStudyWords")}</p>`}
+    </section>
+  `);
+}
+
+// ===== 學過的單字（需求.txt #5）=====
+// 列出目前學習目標所有學過的單字，附搜尋（單字或字義）。
+let learnedSearchQuery = "";
+
+function learnedWordEntries() {
+  const profile = activeProfile();
+  return (profile.learned || [])
+    .map((text) => {
+      const item = findWord(text) || { word: text, meaning: "", phonetic: "", pos: "" };
+      return { ...item, learnedDate: profile.learnedLog?.[text] || "" };
+    })
+    .sort((a, b) => String(b.learnedDate).localeCompare(String(a.learnedDate)) || String(a.word).localeCompare(String(b.word)));
+}
+
+function learnedWordsListHtml() {
+  const query = learnedSearchQuery.trim().toLowerCase();
+  const all = learnedWordEntries();
+  const entries = query
+    ? all.filter((item) =>
+        String(item.word || "").toLowerCase().includes(query) ||
+        String(item.meaning || "").toLowerCase().includes(query))
+    : all;
+  if (!entries.length) {
+    return `<p class="muted">${all.length ? t("learnedNoResults") : t("learnedEmpty")}</p>`;
+  }
+  return `
+    <ul class="word-bank">
+      ${entries.map((item) => `
+        <li class="word-bank-row">
+          <div class="word-bank-main">
+            <strong>${escapeHtml(item.word)}</strong>
+            ${item.phonetic ? `<span class="phonetic-inline">${escapeHtml(item.phonetic)}</span>` : ""}
+            ${item.pos ? `<span class="tag tag-pos">${escapeHtml(item.pos)}</span>` : ""}
+            ${item.learnedDate ? `<span class="learned-date">${escapeHtml(item.learnedDate)}</span>` : ""}
+            <button class="speak-btn" data-action="speak-word" data-word="${escapeHtml(item.word)}" title="${t("speak")}" aria-label="${t("speak")}">${speakerIcon()}</button>
+          </div>
+          <div class="word-bank-meaning">${displayMeaning(item) || `<span class="muted">${t("noMeaning")}</span>`}</div>
+        </li>
+      `).join("")}
+    </ul>
+  `;
+}
+
+function renderLearnedWords() {
+  const total = learnedWordEntries().length;
+  return appShell(`
+    <section class="panel">
+      <h2 class="page-title">${t("learnedWordsTitle")} <span class="title-count">${total}</span></h2>
+      <div class="actions top-return-actions">
+        <button class="btn secondary" data-action="back">${backButtonLabel()}</button>
+      </div>
+      <p class="hero-copy">${t("learnedWordsCopy")}</p>
+      <input class="input learned-search" type="search" data-learned-search placeholder="${t("learnedSearchPlaceholder")}" value="${escapeHtml(learnedSearchQuery)}" />
+      <div id="learnedWordsList">${learnedWordsListHtml()}</div>
     </section>
   `);
 }
@@ -3119,26 +3534,37 @@ function renderStudy() {
     const phonetic = phoneticText(current);
     return appShell(`
       <section class="flash-stage">
-        <article class="flashcard flashcard-textonly" data-card-swipe>
+        <article class="panel flashcard" data-card-swipe>
+          <header class="flash-head">
+            <span class="eyebrow">${t("previewEyebrow")}</span>
+            <ol class="card-dots" aria-label="${msg("cardProgress", { current: studySession.previewIndex + 1, total: studySession.words.length })}">
+              ${studySession.words.map((_, index) => `<li class="${index === studySession.previewIndex ? "on" : index < studySession.previewIndex ? "seen" : ""}"></li>`).join("")}
+            </ol>
+            <span class="flash-count lcd">${studySession.previewIndex + 1}/${studySession.words.length}</span>
+          </header>
           <div class="flash-copy">
-            <div class="eyebrow">${t("previewEyebrow")} · ${msg("cardProgress", { current: studySession.previewIndex + 1, total: studySession.words.length })}</div>
-            <h2>${current.word}</h2>
-            <p class="phonetic">${phonetic}</p>
-            <div class="card-tags">
-              <span class="tag">${current.pos}</span>
-              ${phonetic ? `<span class="tag phonetic-tag">${phonetic}</span>` : ""}
-            </div>
-            <h3>${displayMeaning(current)}</h3>
+            <h2 class="headword"><span class="marker">${escapeHtml(current.word)}</span></h2>
+            <p class="flash-meta">
+              ${phonetic ? `<span class="phonetic">${escapeHtml(phonetic)}</span>` : ""}
+              ${current.pos && current.pos !== "word" ? `<span class="tag">${escapeHtml(current.pos)}</span>` : ""}
+              <button class="speak-btn" data-action="speak-word" data-word="${escapeHtml(current.word)}" title="${t("speak")}" aria-label="${t("speak")}">${speakerIcon()}</button>
+            </p>
+            <h3 class="flash-meaning">${displayMeaning(current)}</h3>
             ${renderCambridgeExample(current)}
-            <p class="muted">${t("cardHint")}</p>
           </div>
-          <div class="actions">
-            <button class="btn secondary icon-btn" data-action="speak-word" data-word="${current.word}" title="${t("speak")}">🔊</button>
-            <button class="btn secondary" data-action="prev-card">${t("previousCard")}</button>
-            <button class="btn" data-action="next-card">${t("nextCard")}</button>
-            <button class="btn" data-action="start-study-quiz">${t("previewDone")}</button>
-            <button class="btn secondary flashcard-back" data-action="back">${backButtonLabel()}</button>
-          </div>
+          <footer class="flash-foot">
+            <div class="actions">
+              <button class="btn secondary" data-action="prev-card" ${studySession.previewIndex === 0 ? "disabled" : ""}>${t("previousCard")}</button>
+              ${studySession.previewIndex < studySession.words.length - 1
+                ? `<button class="btn" data-action="next-card">${t("nextCard")}</button>`
+                : `<button class="btn" data-action="start-study-quiz">${t("previewDone")}</button>`}
+            </div>
+            <div class="actions">
+              ${studySession.previewIndex < studySession.words.length - 1 ? `<button class="btn ghost small" data-action="start-study-quiz">${t("previewDone")}</button>` : ""}
+              <button class="btn ghost small" data-action="back">${backButtonLabel()}</button>
+            </div>
+            <p class="key-hint"><span class="touch-only">${t("cardHint")}</span><span class="pointer-only">${t("keyHint")}</span></p>
+          </footer>
         </article>
       </section>
     `);
@@ -3152,23 +3578,24 @@ function renderStudy() {
     <section class="panel quiz-wrap">
       <div class="quiz-head">
         <div>
-          <div class="eyebrow">Recall battle</div>
-          <h2 class="page-title">${t("recallTitle")}</h2>
-          <p class="muted">${msg("questionProgress", { current: studySession.index + 1, total: studySession.questions.length })}</p>
+          <span class="eyebrow">${msg("questionProgress", { current: studySession.index + 1, total: studySession.questions.length })}</span>
+          <h2 class="page-title">${studySession.mode === "weak" ? t("weakTrain") : t("recallTitle")}</h2>
         </div>
       </div>
       <div class="question">
         <div>
-          <div class="${isCloze || isWordChoice ? "sentence" : "word"}">${studyQuestionText}</div>
-          <div class="phonetic">${isWordChoice ? t("chooseStudyWord") : isCloze ? t("clozeHint") : current.phonetic}</div>
+          <div class="${isCloze || isWordChoice ? "sentence" : "word"}">${escapeHtml(studyQuestionText)}</div>
+          <div class="phonetic">${isWordChoice ? t("chooseStudyWord") : isCloze ? t("clozeHint") : escapeHtml(current.phonetic || "")}</div>
         </div>
       </div>
-      <div class="battle-options">
-        ${current.choices.map((option) => `<button class="answer" data-study-answer="${option}" data-correct="${current.correct}">${option}</button>`).join("")}
+      <div class="meter"><span style="width:${(studySession.index / studySession.questions.length) * 100}%"></span></div>
+      <div class="answers ${isWordChoice ? "answers-en" : "answers-zh"}">
+        ${current.choices.map((option) => `<button class="answer" data-study-answer="${escapeHtml(option)}" data-correct="${escapeHtml(current.correct)}">${escapeHtml(option)}</button>`).join("")}
       </div>
-      <div class="toast">${toast}</div>
-      <div class="actions">
+      ${toast ? `<div class="toast">${toast}</div>` : ""}
+      <div class="actions quiz-foot">
         <button class="btn secondary" data-action="back">${backButtonLabel()}</button>
+        <span class="key-hint">${t("answerKeyHint")}</span>
       </div>
       ${celebrate ? `<div class="celebrate">${t("correctFx")}</div>` : ""}
     </section>
@@ -3178,27 +3605,27 @@ function renderStudy() {
 function renderWeak() {
   const profile = activeProfile();
   // 用 allWords() 找弱點字（同時涵蓋內建與自訂庫），不再被當前目標篩掉
-  const weakWords = allWords().filter((item) => profile.weak.includes(item.word));
+  const weakSet = new Set(profile.weak || []);
+  const weakWords = uniqueWordObjects(allWords().filter((item) => weakSet.has(item.word)));
   const weakComplete = !weakWords.length;
   return appShell(`
     ${renderCardModal()}
     <section class="panel ${weakComplete ? "complete" : ""}">
-      <div class="eyebrow">${t("weak")}</div>
-      <h2 class="page-title">${t("weakTitle")}</h2>
+      <h2 class="page-title">${t("weakTitle")} <span class="title-count">${weakWords.length}</span></h2>
+      <p class="hero-copy">${weakWords.length ? t("weakCopyFilled") : t("weakCopyEmpty")}</p>
       <div class="actions weak-actions">
-        <button class="btn" data-action="weak-train">${t("weakTrain") || "弱點加強"}</button>
+        ${weakWords.length ? `<button class="btn" data-action="weak-train">${t("weakTrain") || "弱點加強"}</button>` : ""}
         <button class="btn secondary" data-action="back">${backButtonLabel()}</button>
       </div>
-      <p class="hero-copy">${weakWords.length ? t("weakCopyFilled") : t("weakCopyEmpty")}</p>
-      <div class="grid">
+      <div class="grid weak-grid">
         ${weakWords
           .map(
             (item) => {
               const phonetic = phoneticText(item);
               return `
-              <button class="card weak-card" data-show-card-word="${item.word}">
-                <h3>${item.image} ${item.word}</h3>
-                ${phonetic ? `<p class="phonetic">${phonetic}</p>` : ""}
+              <button class="card weak-card" data-show-card-word="${escapeHtml(item.word)}">
+                <h3>${escapeHtml(item.word)}</h3>
+                ${phonetic ? `<p class="phonetic">${escapeHtml(phonetic)}</p>` : ""}
                 <p><strong>${displayMeaning(item)}</strong></p>
                 ${renderCambridgeExample(item, "muted")}
               </button>
@@ -3218,19 +3645,18 @@ function renderCardModal() {
   const phonetic = phoneticText(item);
   return `
     <div class="modal-backdrop" data-action="close-card-modal">
-      <article class="modal-card flashcard-textonly" onclick="event.stopPropagation()">
+      <article class="modal-card word-modal" role="dialog" aria-modal="true" aria-label="${escapeHtml(item.word)}" onclick="event.stopPropagation()">
         <div class="flash-copy">
-          <h2>${item.word}</h2>
-          <p class="phonetic">${phonetic}</p>
-          <div class="card-tags">
-            ${item.pos ? `<span class="tag">${item.pos}</span>` : ""}
-            ${phonetic ? `<span class="tag phonetic-tag">${phonetic}</span>` : ""}
-          </div>
-          <h3>${displayMeaning(item)}</h3>
+          <h2 class="headword"><span class="marker">${escapeHtml(item.word)}</span></h2>
+          <p class="flash-meta">
+            ${phonetic ? `<span class="phonetic">${escapeHtml(phonetic)}</span>` : ""}
+            ${item.pos && item.pos !== "word" ? `<span class="tag">${escapeHtml(item.pos)}</span>` : ""}
+            <button class="speak-btn" data-action="speak-word" data-word="${escapeHtml(item.word)}" title="${t("speak")}" aria-label="${t("speak")}">${speakerIcon()}</button>
+          </p>
+          <h3 class="flash-meaning">${displayMeaning(item)}</h3>
           ${renderCambridgeExample(item)}
         </div>
         <div class="actions">
-          <button class="btn secondary icon-btn" data-action="speak-word" data-word="${item.word}" title="${t("speak")}">🔊</button>
           <button class="btn" data-action="close-card-modal">${t("backPrevious")}</button>
         </div>
       </article>
@@ -3248,18 +3674,28 @@ function hasNativeMeaningSource(item) {
   return sources.includes(`cambridge-${state.native || "zh-Hant"}`);
 }
 
+// 轉義使用者輸入 / 字典抓回的內容，避免 XSS 與 HTML 破版
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 function displayMeaning(item) {
   const meaning = compactMeaning(item?.meaning || "");
   if (!meaning) {
     requestDictionaryEntry(item);
     return "";
   }
-  if (hasNativeMeaningSource(item)) return meaning;
+  if (hasNativeMeaningSource(item)) return escapeHtml(meaning);
   if (isSpanishNative()) {
     requestDictionaryEntry(item);
     return "";
   }
-  if (hasNativeMeaningChars(meaning)) return meaning;
+  if (hasNativeMeaningChars(meaning)) return escapeHtml(meaning);
   requestDictionaryEntry(item);
   return "";
 }
@@ -3280,8 +3716,8 @@ function renderCambridgeExample(item, className = "") {
   const extraClass = className ? ` ${className}` : "";
   return `
     <p class="example-label">${t("exampleLabel")}</p>
-    <p class="example${extraClass}">${exampleText}</p>
-    ${item.exampleZh ? `<p class="example-zh muted">${item.exampleZh}</p>` : ""}
+    <p class="example${extraClass}">${escapeHtml(exampleText)}</p>
+    ${item.exampleZh ? `<p class="example-zh muted">${escapeHtml(item.exampleZh)}</p>` : ""}
   `;
 }
 
@@ -3386,8 +3822,8 @@ function renderInventory() {
         ${items.map((item) => `
           <article class="item-card inventory-card">
             ${assetImage(treasureImagePath(item.id), item.name, "item-art")}
-            <strong>${item.icon} ${item.name}</strong>
-            <span class="item-count">x${state.inventory[item.id] || 0}</span>
+            <strong>${item.name}</strong>
+            <span class="item-count lcd">×${state.inventory[item.id] || 0}</span>
             <small>${item.effect}</small>
           </article>
         `).join("")}
@@ -3412,11 +3848,11 @@ function renderMonsterPreview() {
     <section class="monster-preview panel">
       <div class="monster-preview-copy">
         <div class="eyebrow">${t("monsterPreview")}</div>
-        <h2 class="page-title">${monster.name} ${monster.icon}</h2>
+        <h2 class="page-title">${monster.name}</h2>
         <p class="hero-copy">${t("monsterPreviewCopy")}</p>
         <div class="stats">
           <div class="stat"><strong>${monster.maxHp}</strong><span>${t("monsterHp")}</span></div>
-          <div class="stat"><strong>${monster.attack}</strong><span>${t("playerHp")} - ${t("dangerLevel")}</span></div>
+          <div class="stat"><strong>${monster.attack}</strong><span>${t("monsterAttack")}</span></div>
           <div class="stat"><strong>${"★".repeat(danger)}</strong><span>${t("dangerLevel")}</span></div>
         </div>
         <div class="wrong-review">
@@ -3445,38 +3881,44 @@ function renderMonsterBattle() {
   const monsterHpPct = Math.max(0, Math.min(100, Math.round((Math.max(0, monster.hp) / Math.max(1, monster.maxHp)) * 100)));
   return appShell(`
     <section class="panel retro-game battle-layout ${won ? "battle-victory" : ""} ${lost ? "battle-loss" : ""}">
+      <div class="battle-stage">
+        <div class="monster-art ${won ? "defeated" : ""} ${lost ? "fallen" : ""} ${battle.lastHit ? "hit" : ""}">${monsterArt(monster)}</div>
+        ${battle.lastHit ? `<div class="damage-pop">-${battle.lastHit}</div>` : ""}
+        ${battle.lastTaken ? `<div class="damage-pop enemy-damage">${t("playerHp")} -${battle.lastTaken}</div>` : ""}
+        ${won ? `<div class="battle-fx victory-fx">${t("victory")}</div>` : ""}
+        ${lost ? `<div class="battle-fx loss-fx">${t("battleLost")}</div>` : ""}
+      </div>
+      <div class="battle-side">
       <div class="battle-hud">
-        <div class="battle-meter-card">
-          <div class="battle-meter-head"><strong>${t("playerHp")}</strong><span>${battle.playerHp}/100</span></div>
-          <div class="battle-meter"><span style="width:${playerHpPct}%"></span></div>
-        </div>
         <div class="battle-meter-card monster-meter-card">
-          <div class="battle-meter-head"><strong>${t("monsterHp")}</strong><span>${Math.max(0, monster.hp)}/${monster.maxHp}</span></div>
+          <div class="battle-meter-head"><strong>${t("monsterHp")}</strong><span class="lcd">${Math.max(0, monster.hp)}/${monster.maxHp}</span></div>
           <div class="battle-meter"><span style="width:${monsterHpPct}%"></span></div>
+        </div>
+        <div class="battle-meter-card">
+          <div class="battle-meter-head"><strong>${t("playerHp")}</strong><span class="lcd">${battle.playerHp}/100</span></div>
+          <div class="battle-meter"><span style="width:${playerHpPct}%"></span></div>
         </div>
       </div>
       <div class="battle-title-row">
         <div>
-          <div class="eyebrow">${t("monsterBattle")}</div>
-          <h2 class="page-title">${monster.name} ${monster.icon}</h2>
-          <p class="hero-copy">${won ? t("victory") : lost ? t("battleLost") : battle.log || t("noItems")}</p>
+          <span class="eyebrow">${t("monsterBattle")}</span>
+          <h2 class="page-title">${monster.name}</h2>
+          <p class="hero-copy battle-log">${won ? t("victory") : lost ? t("battleLost") : battle.log || (battleItems().some((item) => (state.inventory[item.id] || 0) > 0) ? t("battleReady") : t("noItems"))}</p>
         </div>
         <div class="actions battle-actions">
           ${won ? `<button class="btn" data-action="claim-battle">${t("claimReward")}</button>` : ""}
           <button class="btn secondary" data-action="back">${backButtonLabel()}</button>
         </div>
       </div>
-      <div class="monster-art ${won ? "defeated" : ""} ${lost ? "fallen" : ""} ${battle.lastHit ? "hit" : ""}">${monsterArt(monster)}</div>
-      ${battle.lastHit ? `<div class="damage-pop">-${battle.lastHit}</div>` : ""}
-      ${battle.lastTaken ? `<div class="damage-pop enemy-damage">${t("playerHp")} -${battle.lastTaken}</div>` : ""}
-      ${won ? `<div class="battle-fx victory-fx">${t("victory")}</div>` : ""}
-      ${lost ? `<div class="battle-fx loss-fx">${t("battleLost")}</div>` : ""}
       <div class="item-grid battle-item-grid">
-        ${battleItems().map((item) => `<button class="item-card battle-item-card" data-use-item="${item.id}" ${won || lost || (state.inventory[item.id] || 0) <= 0 ? "disabled" : ""}>${assetImage(treasureImagePath(item.id), item.name, "item-art")}<strong>${item.icon} ${item.name}</strong><span class="item-count">x${state.inventory[item.id] || 0}</span><small>${item.effect}</small></button>`).join("")}
+        ${battleItems().map((item) => `<button class="item-card battle-item-card" data-use-item="${item.id}" ${won || lost || (state.inventory[item.id] || 0) <= 0 ? "disabled" : ""}>${assetImage(treasureImagePath(item.id), item.name, "item-art")}<strong>${item.name}</strong><span class="item-count lcd">×${state.inventory[item.id] || 0}</span><small>${item.effect}</small></button>`).join("")}
+      </div>
       </div>
     </section>
   `);
 }
+
+let importDraft = { name: "", text: "" };
 
 function renderImport() {
   const limit = customLibraryLimit();
@@ -3492,7 +3934,7 @@ function renderImport() {
       <div class="form-grid">
         <div class="field">
           <label>${t("libraryName")}</label>
-          <input class="input" id="libraryName" value="${t("customLibrary")}" />
+          <input class="input" id="libraryName" value="${escapeHtml(importDraft.name || t("customLibrary"))}" />
         </div>
         <div class="field">
           <label>${t("photoInput")}</label>
@@ -3501,7 +3943,7 @@ function renderImport() {
         </div>
         <div class="field">
           <label>${t("wordInput")}</label>
-          <textarea class="textarea" id="wordImportText" rows="10" placeholder="${t("englishOnlyPlaceholder")}"></textarea>
+          <textarea class="textarea" id="wordImportText" rows="10" placeholder="${t("englishOnlyPlaceholder")}">${escapeHtml(importDraft.text)}</textarea>
         </div>
       </div>
       <div class="actions">
@@ -3518,7 +3960,6 @@ function renderAchievements() {
   const equipped = achievementBadgeMeta(state.equippedTitle) || achievementBadgeMeta(state.completedAchievements?.[state.completedAchievements.length - 1]) || { icon: "crown", done: false, title: t("noTitle"), name: t("noTitle") };
   return appShell(`
     <section class="panel">
-      <div class="eyebrow">${t("achievements")}</div>
       <div class="page-head">
         <div>
           <h2 class="page-title">${t("achievements")}</h2>
@@ -3538,7 +3979,7 @@ function renderAchievements() {
                   <div class="achievement-summary-head">
                     <div class="achievement-icon">${badgeSvg(group.icon, group.complete, group.tiers.length - 1)}</div>
                     <div>
-                      <h3>${group.label}</h3>
+                      <h3>${group.heading}<span class="ach-count lcd">${group.count}</span></h3>
                       <p class="muted">${t("achNextTarget")}：${group.complete ? t("achAllComplete") : group.next.name}</p>
                     </div>
                   </div>
@@ -3626,7 +4067,7 @@ function renderRanking() {
     return items.map((item, index) => `
       <div class="rank-row ${item.isPlayer ? "active" : ""}">
         <strong>${ranks[index]}</strong>
-        <span>${item.isPlayer ? `${item.name} (${t("rankYou")})` : item.name}</span>
+        <span>${item.isPlayer ? `${escapeHtml(item.name)} (${t("rankYou")})` : escapeHtml(item.name)}</span>
         <b>${item[key]}</b>
       </div>
     `).join("");
@@ -3635,7 +4076,6 @@ function renderRanking() {
   const playerKillRank = computeRanks(killRows, "weekKills")[killRows.findIndex((item) => item.isPlayer)] || "-";
   return appShell(`
     <section class="panel">
-      <div class="eyebrow">${t("ranking")}</div>
       <div class="page-head ranking-head">
         <div>
           <h2 class="page-title">${t("ranking")}</h2>
@@ -3948,7 +4388,9 @@ function achievementGroups() {
       next,
       complete: locked.length === 0,
       progress: locked.length ? Math.min(100, Math.round((def.value / next.goal) * 100)) : 100,
-      label: `${def.label}: ${def.value}/${next.goal}`,
+      heading: def.label,
+      count: `${def.value}/${next.goal}`,
+      label: `${def.label} ${def.value}/${next.goal}`,
     };
   });
 }
@@ -4091,11 +4533,11 @@ const BADGE_VARIANTS = {
 };
 
 function badgeSvg(icon, done, tierIndex = 0) {
-  const color = done ? "#e7b64b" : "#8a8175";
   const variants = BADGE_VARIANTS[icon] || BADGE_VARIANTS.crown;
   const idx = Math.max(0, Math.min(variants.length - 1, tierIndex || 0));
   const mark = variants[idx];
-  return `<svg viewBox="0 0 128 128" aria-hidden="true"><path d="M64 8l49 28v56l-49 28-49-28V36z" fill="${color}" stroke="#4c2f1e" stroke-width="6"/><g fill="#4c2f1e" stroke="#4c2f1e" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">${mark}</g></svg>`;
+  // 顏色交給 CSS（.badge / .badge.is-done），日夜主題自動跟著換
+  return `<svg class="badge ${done ? "is-done" : ""}" viewBox="0 0 128 128" aria-hidden="true"><path class="badge-plate" d="M64 8l49 28v56l-49 28-49-28V36z" stroke-width="6"/><g class="badge-mark" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">${mark}</g></svg>`;
 }
 
 function renderAdmin() {
@@ -4406,6 +4848,37 @@ function bindActions() {
   document.querySelectorAll("[data-action='speak-word']").forEach((button) => {
     button.addEventListener("click", () => speakWord(button.dataset.word));
   });
+  document.querySelectorAll("[data-action='learned-words']").forEach((button) => {
+    button.addEventListener("click", () => {
+      learnedSearchQuery = "";
+      navigateTo("learned-words");
+      render();
+    });
+  });
+  document.querySelectorAll("[data-learned-search]").forEach((input) => {
+    input.addEventListener("input", (event) => {
+      learnedSearchQuery = event.target.value || "";
+      // 只更新列表區塊，避免整頁重 render 造成輸入框失焦
+      const list = document.querySelector("#learnedWordsList");
+      if (!list) return;
+      list.innerHTML = learnedWordsListHtml();
+      list.querySelectorAll("[data-action='speak-word']").forEach((button) => {
+        button.addEventListener("click", () => speakWord(button.dataset.word));
+      });
+    });
+  });
+  document.querySelectorAll("[data-action='export-progress']").forEach((button) => {
+    button.addEventListener("click", () => exportProgressFile());
+  });
+  document.querySelectorAll("[data-action='import-progress']").forEach((button) => {
+    button.addEventListener("click", () => document.querySelector("#importProgressFile")?.click());
+  });
+  document.querySelectorAll("#importProgressFile").forEach((input) => {
+    input.addEventListener("change", (event) => importProgressFile(event.target.files?.[0] || null));
+  });
+  document.querySelectorAll("[data-action='toggle-theme']").forEach((button) => {
+    button.addEventListener("click", () => toggleTheme());
+  });
   document.querySelectorAll("[data-card-swipe]").forEach((card) => {
     let startX = 0;
     card.addEventListener("touchstart", (event) => {
@@ -4507,7 +4980,7 @@ function bindActions() {
           addInventory(state.pendingLevelUp.loot || {});
           const rewardText = formatLoot(state.pendingLevelUp.loot || {});
           state.rewardNotice = { title: t("itemReward"), items: rewardText };
-          toast = msg("itemReward", { items: rewardText });
+          // 獎勵改由 rewardNotice 視窗顯示，不再同時出 toast
           state.pendingLevelUp.lootClaimed = true;
         }
       }
@@ -4559,16 +5032,35 @@ function bindActions() {
   });
   document.querySelectorAll("[data-action='reset']").forEach((button) => {
     button.addEventListener("click", () => {
-      localStorage.removeItem(STORAGE_KEY);
-      state = loadState();
-      migrateState();
-      selectedGoal = activeGoal();
-      navigateTo("login", { clearHistory: true, pushHistory: false });
-      stopActiveQuiz();
-      studySession = null;
+      if (!window.confirm(t("confirmReset"))) return;
+      resetCurrentAccountProgress();
       render();
     });
   });
+}
+
+// 清除「目前帳號」在本機的進度（多帳號 store 裡其他帳號不受影響），回到登入頁
+function resetCurrentAccountProgress() {
+  if (saveStateTimer) {
+    clearTimeout(saveStateTimer);
+    saveStateTimer = null;
+  }
+  const STORE_KEY = "vocab-arcana-store";
+  try {
+    const store = JSON.parse(localStorage.getItem(STORE_KEY) || "{}") || {};
+    const id = userKeyFor(state.user);
+    if (store.users && id) delete store.users[id];
+    store.activeUserId = null;
+    localStorage.setItem(STORE_KEY, JSON.stringify(store));
+    localStorage.removeItem(STORAGE_KEY);
+  } catch {}
+  state = loadState();
+  migrateState();
+  selectedGoal = "";
+  stopActiveQuiz();
+  studySession = null;
+  battle = null;
+  navigateTo("login", { clearHistory: true, pushHistory: false });
 }
 
 function applyLoginReward() {
@@ -4586,7 +5078,7 @@ function applyLoginReward() {
   const loot = rewardKey === "reward7" ? { bomb: 2, potion: 2 } : rewardKey === "reward5" ? { bomb: 1, potion: 1 } : rewardKey === "reward3" ? { sword: 1, potion: 1 } : { sword: 1 };
   addInventory(loot);
   state.rewardNotice = { title: t("itemReward"), items: formatLoot(loot) };
-  toast = msg("itemReward", { items: formatLoot(loot) });
+  // 獎勵改由 rewardNotice 視窗顯示，不再同時出 toast
 }
 
 function switchActiveGoal(goal) {
@@ -4639,11 +5131,8 @@ function runAdminAction(action) {
     toast = t("adminSkipDay");
   }
   if (action === "admin-clear") {
-    localStorage.removeItem(STORAGE_KEY);
-    state = loadState();
-    migrateState();
-    selectedGoal = activeGoal();
-    navigateTo("login", { clearHistory: true, pushHistory: false });
+    if (!window.confirm(t("confirmReset"))) return;
+    resetCurrentAccountProgress();
   }
   saveState();
   render();
@@ -4697,7 +5186,7 @@ function claimLevelLoot() {
     addInventory(state.pendingLevelUp.loot || {});
     const rewardText = formatLoot(state.pendingLevelUp.loot || {});
     state.rewardNotice = { title: t("itemReward"), items: rewardText };
-    toast = msg("itemReward", { items: rewardText });
+    // 獎勵改由 rewardNotice 視窗顯示，不再同時出 toast
     state.pendingLevelUp.lootClaimed = true;
   }
   if (canBattlePendingLevelUp()) {
@@ -4741,15 +5230,15 @@ function claimBattleReward() {
 }
 
 function monsterImagePath(monster) {
-  return `assets/generated/monsters/${monster.id}.png`;
+  return `assets/generated/monsters/${monster.id}.webp`;
 }
 
 function treasureImagePath(itemId) {
-  return `assets/generated/treasures/${itemId}.png`;
+  return `assets/generated/treasures/${itemId}.webp`;
 }
 
 function assetImage(src, alt, className) {
-  return `<img class="${className}" src="${src}" alt="${alt}" loading="lazy" onerror="this.style.display='none'; this.dataset.missing='true';" />`;
+  return `<img class="${className}" src="${src}" alt="${escapeHtml(alt)}" loading="lazy" onerror="this.style.display='none'; this.parentElement && this.parentElement.classList.add('img-missing');" />`;
 }
 
 function monsterArt(monster) {
@@ -4893,14 +5382,17 @@ async function saveImportedLibrary() {
   const requested = document.querySelector("#libraryName")?.value?.trim() || t("customLibrary");
   const name = uniqueLibraryName(requested);
   const raw = document.querySelector("#wordImportText")?.value || "";
+  // 先記下草稿：查詢過程會重新 render，失敗時輸入框內容不能消失
+  importDraft = { name: requested, text: raw };
   toast = t("importProgressPrefix") || "查詢字典中…";
   render();
   const imported = await parseImportedWords(raw);
   if (!imported.length) {
-    toast = t("importCopy");
+    toast = raw.trim() ? t("importNoneFound") : t("importCopy");
     render();
     return;
   }
+  importDraft = { name: "", text: "" };
   const id = `custom-${Date.now()}`;
   const library = { id, name, words: imported.map((item) => ({ ...item, library: id })) };
   state.customLibraries = [...state.customLibraries, library];
@@ -4959,7 +5451,7 @@ async function addWordsToLibrary(libraryId) {
   render();
   const imported = (await parseImportedWords(raw)).filter((item) => !existing.has(String(item.word || "").toLowerCase()));
   if (!imported.length) {
-    toast = t("importCopy");
+    toast = raw.trim() ? t("importNoneFound") : t("importCopy");
     render();
     return;
   }
@@ -5042,10 +5534,33 @@ async function refetchCustomLibrary(libraryId) {
   render();
 }
 
+// 線上字典查不到（GitHub Pages 沒有 /api、或離線）時，改用內建 1.7 萬字的資料
+function builtInEntryFor(wordText) {
+  const item = words.find((candidate) => candidate.word === wordText && hasText(candidate.meaning));
+  if (!item) return null;
+  return {
+    meaning: item.meaning,
+    example: cambridgeExampleText(item),
+    exampleZh: item.exampleZh || "",
+    phonetic: isUsablePhonetic(item.phonetic) ? item.phonetic : "",
+    pos: item.pos || "word",
+    sources: ["built-in"],
+  };
+}
+
 async function lookupWord(wordText, index, stats) {
   try {
-    const response = await fetch(dictionaryLookupUrl(wordText));
-    const entry = await response.json();
+    let entry = {};
+    try {
+      const response = await fetch(dictionaryLookupUrl(wordText));
+      entry = response.ok ? (await response.json()) || {} : {};
+    } catch {
+      entry = {};
+    }
+    if (!(entry.meaning && String(entry.meaning).trim())) {
+      const fallback = builtInEntryFor(wordText);
+      if (fallback) entry = { ...fallback, ...Object.fromEntries(Object.entries(entry).filter(([, value]) => hasText(value))), meaning: fallback.meaning };
+    }
     const hasMeaning = !!(entry.meaning && entry.meaning.trim());
     const hasExample = !!(entry.example && entry.example.trim());
     const hasSources = Array.isArray(entry.sources) && entry.sources.length > 0;
@@ -5218,6 +5733,10 @@ function clozePrompt(item) {
 }
 
 function questionTypeForItem(item, requestedType) {
+  if (requestedType === "listen") {
+    // 聽音選字：需要 TTS 支援 + 有單字文字；不支援時退回 meaning
+    return hasText(item.word) && "speechSynthesis" in window ? "listen" : hasText(item.meaning) ? "meaning" : "word";
+  }
   if (requestedType === "cloze") {
     return hasText(item.word) && hasText(cambridgeExampleText(item)) ? "cloze" : hasText(item.meaning) ? "meaning" : "word";
   }
@@ -5240,9 +5759,13 @@ function createQuiz(kind) {
     // 週測驗：混合 meaning + cloze
     // 總複習：混合 meaning + cloze
     // placement：交替 meaning / cloze（若有 cloze）
+    const canListen = hasText(item.word) && "speechSynthesis" in window;
     let type;
     if (kind === "daily") {
       type = "meaning";
+    } else if ((kind === "weekly" || kind === "review") && canListen && index % 3 === 2) {
+      // 週測驗 / 總複習：每 3 題混一題「聽音選字」練聽力
+      type = "listen";
     } else if (forceMeaning || !canCloze) {
       type = "meaning";
     } else {
@@ -5323,8 +5846,9 @@ function buildDailyWords() {
   if (!dailyTestAvailable()) return [];
   const todayWords = todayStudyWords(source, libraryId).slice(0, 10);
   const seen = new Set(todayWords.map((item) => item.word));
+  const sourceWords = new Set(source.map((candidate) => candidate.word));
   const reviewWords = uniqueWordObjects(
-    getWordsLearnedBefore(todayKey()).map((wordText) => findWord(wordText)).filter((item) => item && source.some((candidate) => candidate.word === item.word) && !seen.has(item.word)),
+    getWordsLearnedBefore(todayKey()).map((wordText) => findWord(wordText)).filter((item) => item && sourceWords.has(item.word) && !seen.has(item.word)),
   );
   const dueReview = srsDueWords(profile, reviewWords).filter((item) => !seen.has(item.word));
   const reviewPool = uniqueWordObjects([...dueReview, ...reviewWords]).filter((item) => !seen.has(item.word));
@@ -5343,18 +5867,25 @@ function todayStudyWords(source = studySourceForLibrary(), libraryId = currentSt
   state.dailyStudy = state.dailyStudy || {};
   const locked = state.dailyStudy[dailyStudyKey(libraryId)];
   if (!Array.isArray(locked) || !locked.length) return [];
+  const sourceWords = new Set(source.map((candidate) => candidate.word));
   return uniqueWordObjects(
     locked
       .map((wordText) => findWord(wordText))
-      .filter((item) => item && source.some((candidate) => candidate.word === item.word)),
+      .filter((item) => item && sourceWords.has(item.word)),
   );
 }
 
 function getLearnedPercent() {
-  const source = wordsForGoal(activeGoal(), words);
+  // 修正：自訂庫模式下應以當前學習來源為分母，不能寫死內建字庫
+  const source = studySourceForLibrary();
   if (!source.length) return 0;
-  const learned = activeProfile().learned.filter((wordText) => source.some((item) => item.word === wordText));
-  return Math.round((new Set(learned).size / source.length) * 100);
+  const learnedSet = new Set(activeProfile().learned || []);
+  const sourceWords = new Set(source.map((item) => item.word));
+  let learnedCount = 0;
+  sourceWords.forEach((wordText) => {
+    if (learnedSet.has(wordText)) learnedCount += 1;
+  });
+  return Math.round((learnedCount / sourceWords.size) * 100);
 }
 
 // 段位 → 各 tier 抽中權重
@@ -5403,7 +5934,15 @@ function weightedSampleUnique(pool, count) {
 
 function buildQuestion(item, type, source = quizChoicePool()) {
   const resolvedType = questionTypeForItem(item, type);
-  const choices = resolvedType === "word" || resolvedType === "cloze" ? buildWordChoices(item, source) : buildMeaningChoices(item, source);
+  const choices = resolvedType === "word" || resolvedType === "cloze" || resolvedType === "listen" ? buildWordChoices(item, source) : buildMeaningChoices(item, source);
+  if (resolvedType === "listen") {
+    return {
+      ...item,
+      type: resolvedType,
+      correct: item.word,
+      choices,
+    };
+  }
   if (resolvedType === "word") {
     return {
       ...item,
@@ -5430,15 +5969,17 @@ function buildQuestion(item, type, source = quizChoicePool()) {
 }
 
 function answerQuiz(answer, correct) {
-  activeQuiz.answers += 1;
+  if (!activeQuiz || activeQuiz.finishing) return;
   const current = activeQuiz.questions[activeQuiz.index];
+  if (!current) return;
+  activeQuiz.answers += 1;
   const isCorrect = answer === correct;
   if (isCorrect) {
     activeQuiz.score += current.level * 8 + 4;
     activeQuiz.correct += 1;
     recordCorrect();
     addXp(activeQuiz.kind === "daily" ? 12 : 8);
-    toast = activeQuiz.kind === "daily" ? t("correctFx") : "";
+    toast = "";
     if (activeQuiz.kind === "daily") {
       celebrate = false;
       quizEffect = "good";
@@ -5454,7 +5995,7 @@ function answerQuiz(answer, correct) {
     addWeak(current.word);
     recordWrong();
     addXp(2);
-    toast = activeQuiz.kind === "daily" ? t("wrongFx") : "";
+    toast = "";
     if (activeQuiz.kind === "daily") {
       celebrate = false;
       quizEffect = "bad";
@@ -5472,6 +6013,7 @@ function answerQuiz(answer, correct) {
   activeQuiz.index += 1;
   const shouldFinish = activeQuiz.index >= activeQuiz.questions.length || getQuizRemainingSeconds() <= 0;
   if (activeQuiz.kind === "daily" && shouldFinish) {
+    activeQuiz.finishing = true;
     if (quizFxTimer) clearTimeout(quizFxTimer);
     quizFxTimer = setTimeout(() => finishQuiz(), 700);
     return;
@@ -5481,6 +6023,7 @@ function answerQuiz(answer, correct) {
 }
 
 function finishQuiz() {
+  if (!activeQuiz) return;
   const profile = activeProfile();
   // 統一打包本次結算摘要供 renderQuizSummary 使用
   const summary = {
@@ -5714,6 +6257,40 @@ function moveCard(step) {
   render();
 }
 
+function speakerIcon() {
+  return `<svg class="icon" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z" fill="currentColor"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>`;
+}
+
+// 鍵盤操作：字卡 ← → 換卡、空白鍵朗讀；測驗數字鍵 1–4 作答；Esc 關閉字卡視窗
+document.addEventListener("keydown", (event) => {
+  if (event.defaultPrevented || event.altKey || event.ctrlKey || event.metaKey) return;
+  const target = event.target;
+  if (target && (target.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName))) return;
+  if (event.key === "Escape" && cardModalWord) {
+    cardModalWord = null;
+    render();
+    return;
+  }
+  if (screen === "study" && studySession?.phase === "preview") {
+    if (event.key === "ArrowRight") { event.preventDefault(); moveCard(1); return; }
+    if (event.key === "ArrowLeft") { event.preventDefault(); moveCard(-1); return; }
+    if (event.key === " ") {
+      event.preventDefault();
+      const current = studySession.words[studySession.previewIndex];
+      if (current) speakWord(current.word);
+      return;
+    }
+  }
+  if (/^[1-9]$/.test(event.key)) {
+    const options = document.querySelectorAll("[data-quiz-answer], [data-study-answer]");
+    const button = options[Number(event.key) - 1];
+    if (button && !button.disabled) {
+      event.preventDefault();
+      button.click();
+    }
+  }
+});
+
 function speakWord(wordText) {
   if (!("speechSynthesis" in window)) return;
   window.speechSynthesis.cancel();
@@ -5723,14 +6300,26 @@ function speakWord(wordText) {
   window.speechSynthesis.speak(utterance);
 }
 
+// 聽音選字題：進入該題時自動播一次發音（同一題重 render 不重播）
+let lastListenAutoplayKey = "";
+function scheduleListenAutoplay(wordText, kind, index) {
+  const key = `${kind}:${index}:${wordText}`;
+  if (lastListenAutoplayKey === key) return;
+  lastListenAutoplayKey = key;
+  setTimeout(() => speakWord(wordText), 350);
+}
+
 function answerStudy(answer, correct) {
+  if (!studySession || studySession.phase !== "quiz") return;
   const profile = activeProfile();
   const current = studySession.questions[studySession.index];
+  if (!current) return;
   studySession.mistakes = studySession.mistakes || [];
   if (answer === correct) {
     toast = t("hitStudy");
     profile.learned = Array.from(new Set([...profile.learned, current.word]));
-    profile.learnedLog[current.word] = todayKey();
+    // 弱點加強答對時保留原本的學習日期，避免舊字被誤算成「本週新學」
+    if (studySession.mode !== "weak" || !profile.learnedLog[current.word]) profile.learnedLog[current.word] = todayKey();
     studySession.correct += 1;
     recordCorrect();
     addXp(10 + getWordTier(current));
@@ -5787,17 +6376,6 @@ function recordWrong() {
   state.achievements.currentCombo = 0;
 }
 
-function getStudyPool() {
-  const profile = activeProfile();
-  const level = { id: wordDifficultyLevelId() };
-  const source = wordsForGoal(activeGoal(), words);
-  const weakWords = source.filter((item) => profile.weak.includes(item.word));
-  const goalWords = source.filter((item) => item.goal.includes(activeGoal()) && item.level <= Math.min(5, level.id + 1));
-  const oldWords = getWordsLearnedBefore(todayKey()).map((wordText) => findWord(wordText)).filter(Boolean);
-  const combined = [...weakWords, ...weakWords, ...weakWords, ...oldWords, ...goalWords];
-  return combined.length ? uniqueWordObjects(combined) : source;
-}
-
 function getLevel(score) {
   return levels.reduce((matched, level) => (score >= level.min ? level : matched), levels[0]);
 }
@@ -5832,8 +6410,20 @@ function getWordsLearnedBefore(date) {
   return profile.learned.filter((wordText) => profile.learnedLog[wordText] && profile.learnedLog[wordText] < date);
 }
 
+// 單字索引：allWords() 每次都會複製 1.7 萬筆陣列，迴圈內反覆呼叫會拖慢整頁 render。
+// 以「內建字陣列 + 各自訂庫字數」當簽章，資料變動時才重建。
+let wordIndexCache = { source: null, signature: "", map: new Map() };
 function findWord(wordText) {
-  return allWords().find((item) => item.word === wordText);
+  const libraries = state.customLibraries || [];
+  const signature = libraries.map((library) => `${library.id}:${(library.words || []).length}`).join("|");
+  if (wordIndexCache.source !== words || wordIndexCache.signature !== signature) {
+    const map = new Map();
+    allWords().forEach((item) => {
+      if (item && !map.has(item.word)) map.set(item.word, item);
+    });
+    wordIndexCache = { source: words, signature, map };
+  }
+  return wordIndexCache.map.get(wordText);
 }
 
 function buildWordChoices(item, source = quizChoicePool()) {
@@ -6001,3 +6591,4 @@ function shuffle(items) {
 }
 
 bootstrap();
+// v0.2.3 maintenance pass: escapeHtml + custom-library progress fix (2026-07-07)

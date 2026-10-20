@@ -4,6 +4,151 @@
 
 ---
 
+## 階段 26（2026-10-18）by Claude — 修 bug + 全站改版（電子辭典風）
+
+### 一、Bug 修正（`app.js`）
+
+1. **日期換日時間錯誤**：`todayKey()` 用 `toISOString()`（UTC），台灣早上 8 點前會被當成前一天，每日鎖定的 10 字、連續登入、每日測驗都在 08:00 才換日。改成本地日期。
+2. **「重置進度」沒有作用**：只刪了舊版 key `vocab-arcana-progress`，多帳號 store 原封不動，按下去等於登出，而且沒有確認。新增 `resetCurrentAccountProgress()`：確認後只清除目前帳號（其他帳號不受影響）；管理員「清除本機進度」共用同一支。
+3. **每日測驗最後一題連點會 crash**：最後一題答完有 700ms 延遲才結算，期間再點會讀到 `questions[index]` 為 undefined。`answerQuiz` / `finishQuiz` / `answerStudy` 加防護（`activeQuiz.finishing`、空題目直接 return）。計時器歸零與延遲結算同時觸發也不會再雙重結算。
+4. **獎勵視窗標題顯示 `{items}`**：標題直接用了含佔位符的 `itemReward`。新增 `itemRewardTitle`，同時移除與視窗重複的 toast。
+5. **戰鬥開場明明有道具卻顯示「沒有道具」**：改為有道具時顯示 `battleReady` 提示。
+6. **首頁「今日已學」一打開字卡就顯示 10/10**：原本算的是當日鎖定字數，改為鎖定字中真正學會的數量。
+7. **弱點池同一個字重複出現**（同字在不同目標各一筆）：`renderWeak` 以 `uniqueWordObjects` 去重。
+8. **弱點加強答對會改寫原本的學習日期**，舊字被算進「本週新學」影響週測驗：弱點模式保留原日期。
+9. **效能**：`findWord()` 每次都複製 1.7 萬筆陣列再線性搜尋，學過的字一多整頁會卡。改為索引 Map（自訂庫變動時自動重建）；`getLearnedPercent` / `todayStudyWords` / `buildDailyWords` 的巢狀 `some()` 改 Set。
+10. **匯入單字在沒有 /api（GitHub Pages）或離線時全部失敗**，而且失敗後輸入框被清空：新增 `builtInEntryFor()`，線上字典查不到時改用內建字庫的釋義/詞性/例句；查詢中保留草稿 `importDraft`；全部查不到時顯示 `importNoneFound`。
+11. **匯入說明寫「英文, 中文意思, 例句」**，但解析器只收英文單字（逗號、空白都當分隔），照說明輸入會把例句拆成一堆單字匯入。說明改成「每行一個英文單字」。
+12. 學習字卡音標重複出現兩次、英文殘留標籤 `Recall battle` / `Adaptive vocabulary RPG`、成就標題半形冒號、怪物名稱後的奇怪符號（♧ 等）、弱點卡前的隨機 emoji：都已清掉。
+13. 自訂庫頁、首頁原本不顯示 toast（匯入成功訊息看不到），已補上。
+
+### 二、新增
+- **鍵盤操作**：字卡 ← → 換卡、空白鍵朗讀；所有測驗數字鍵 1–4 作答；Esc 關閉字卡視窗。
+- 字卡上方的 10 格進度點、最後一張才出現「開始背誦測驗」主按鍵。
+- 首頁今日面板列出今天的 10 個字（學會的會淡掉）。
+
+### 三、美編（`styles.css` 全部重寫，`index.html`、圖示）
+- 概念：電子辭典。深灰藍機身＋灰綠液晶螢幕（`.panel` 外圈 bezel）＋實體按鍵（按下會下沉）。唯一的強調是主單字底下的螢光筆線（`.marker`）。移除了舊版的金色餘燼粒子、羊皮紙、Cinzel 標題、光澤掃光等效果。
+- 顏色全部集中在 `:root` 與 `body.theme-dark` 兩組變數，夜間模式＝液晶背光。
+- 字型自帶在 `assets/fonts/`（SIL OFL）：英文 Atkinson Hyperlegible（為辨識度設計，I/l/1 分得清楚，適合背單字）、大數字用點陣字 Doto；中文用系統字型。不再連 Google Fonts，離線 PWA 也有字型。Atkinson 排除了數字，中文句子裡的數字走系統字型。
+- 首頁重排：狀態列（段位/經驗/連登）→ 目標切換 → 今日面板＋複習/冒險選單，存檔設定移到頁尾的小字按鍵。
+- 圖片：怪物與道具 PNG 每張 1.3–3.8MB，另存 720px 的 `.webp`（約 20–150KB），程式改讀 webp；原 PNG 保留未刪。
+- 觸控裝置不套 hover 樣式（避免點過的選項一直反白）；375px 寬無橫向捲動；`prefers-reduced-motion` 關閉動畫。
+
+### 四、注意
+- `sw.js` 的 `CACHE_VERSION` 已升到 `vocab-arcana-v2`，舊快取會自動汰換。之後改版請記得再 bump。
+- `server.js` 只加了 `.webp`、`.woff2` 的 MIME。
+- 已用 Playwright 跑過：登入 → 選目標 → 10 張字卡 → 背誦測驗 → 每日測驗 → 結算 → 弱點池/字卡視窗/弱點加強 → 學過的單字搜尋 → 匯入 → 自訂庫 → 管理員開怪 → 戰鬥到結束，桌面 1280 / 手機 390 / 夜間模式皆無 console error。
+
+---
+
+## 階段 25（2026-07-13）by Claude — 收斂交接報告未修項 + 低成本建議全做
+
+依 `交接報告-2026-07-07.md` 的「已知未修」與「未來建議」清單收尾。
+
+### A. saveState debounce + 失敗警告（`app.js`）
+
+- `saveState()` 改為 debounce 250ms 後才真正 stringify + 寫盤（`saveStateNow()`），避免 store 變大後每答一題全量序列化卡 UI（交接報告已知未修 #3）
+- `beforeunload` / `visibilitychange(hidden)` 會強制 flush，不丟進度
+- 寫入失敗（quota 滿）不再靜默：console.error + 一次性 `.save-warning` 警告橫幅（新 CSS），i18n 五語 `saveFailed`
+
+### B. innerHTML escape 補掃（交接報告已知未修 #4）
+
+補上先前漏掉的注入點：dashboard 標題的 `playerDisplayName()`（Google 名稱可含 HTML）、排行榜列的玩家名、學習測驗題目 `studyQuestionText` 與音標、renderQuiz 題目與音標。其餘經掃描：monster/item/i18n 為內建可信資料，維持原樣。
+
+### C.「學過的單字」頁面 + 搜尋（需求.txt #5，先前完全沒做）
+
+- Dashboard 學習區新增「學過的單字 (N)」按鈕 → 新 screen `learned-words`
+- `renderLearnedWords()`：列出當前目標所有學過的字（新→舊排序），每列含音標/詞性/學習日期/釋義/發音鈕
+- 即時搜尋（單字或字義），搜尋只更新列表區塊避免輸入框失焦
+- i18n 五語新增 learnedWords 系列 key
+
+### D. 匯出 / 匯入進度（未來建議）
+
+- Dashboard 冒險區新增「匯出存檔 / 匯入存檔」
+- 匯出：flush 後把整份 `vocab-arcana-store` 下載成 `vocab-arcana-save-YYYYMMDD.json`
+- 匯入：驗證 store 結構 → confirm 覆蓋 → 寫入後 `location.reload()` 走完整 loadState/migrate
+- 匯入會覆蓋**所有帳號**的本機進度（confirm 文案有講明）
+
+### E. 夜間模式（未來建議）
+
+- Dashboard 新增「夜間模式 / 日間模式」切換；設定存 `vocab-arcana-theme`（全瀏覽器共用，登入頁也生效），boot 時套用
+- `styles.css` 檔尾新增 `body.theme-dark` 區塊：只覆蓋底色/文字色變數與主要表面（panel/card/answer/input/modal/word-bank），版式動畫不動
+
+### F. PWA（未來建議）
+
+- 新檔：`manifest.webmanifest`、`sw.js`、`assets/app-icon.svg`、`assets/app-icon-maskable.svg`
+- `index.html` 加 manifest link + theme-color + favicon；`bootstrap()` 註冊 SW（file:// 自動略過）
+- SW 策略：App Shell cache-first、`/api/*` network-first（離線可回看查過的字）、其餘 stale-while-revalidate
+- `server.js` MIME 表加 `.webmanifest` / `.ico`
+- **改版時記得 bump `sw.js` 的 `CACHE_VERSION`**，否則使用者拿到舊快取
+
+### G. 聽音選字題型（未來建議 / ROADMAP 3-7 部分）
+
+- 新題型 `listen`：週測驗與總複習每 3 題出 1 題（需瀏覽器支援 speechSynthesis，否則自動退回 meaning）
+- 進題自動播一次發音（同題重 render 不重播），題面顯示「聽發音選單字」+ 重播按鈕，選項為英文單字
+- 改動：`createQuiz` / `questionTypeForItem` / `buildQuestion` / `renderQuiz` / 新 `scheduleListenAutoplay()`
+
+### H. 其他
+
+- **修潛在 crash**：`findWord` 過去只在檔尾定義，本次確認存在（沙盒掛載截斷曾誤判為未定義）；未新增重複定義
+- `.gitignore` 補 `tmp/`、`*.lnk`；已 `git rm --cached` 移出 `tmp/imagegen/*` 與 `OS (C).lnk`（**這些變更已 staged，commit 前請留意**）
+- ROADMAP 過期狀態全面核對更新（0-1/0-2/0-4/0-5/0-6/1-1/1-2/1-9/2-2/2-11/3-1~3-4/3-7）
+
+### 驗證狀態（重要）
+
+沙盒掛載同步中途卡住（老問題）：`node --check` 對「含本次全部新增區塊、截斷於原始檔尾」的版本通過；檔尾未動、經直接讀取確認完整（6348 行、`bootstrap()` 收尾）。**請在本機再跑一次 `node --check app.js` 與 `node --check server.js` 後再上線**，並照下列清單過一輪：
+
+1. Dashboard：看到「學過的單字 (N)」「匯出存檔」「匯入存檔」「夜間模式」四顆新按鈕
+2. 學過的單字：列表正確、搜尋即時過濾、發音鈕可用
+3. 匯出 → 下載 JSON；匯入該檔 → confirm → reload 後進度不變
+4. 夜間模式切換後重整頁面仍保持；登入頁也是深色
+5. 週測驗/總複習：第 3、6、9… 題為聽音選字，自動發音 + 可重播
+6. DevTools > Application：Manifest 正常、SW activated；斷網重整頁面仍可載入
+7. 把 localStorage 塞爆（DevTools 手動塞大 value）後答題 → 應出現儲存失敗警告橫幅
+
+---
+
+## 階段 24（2026-07-10）by Claude — 修登入失效（server 設定 fallback）
+
+**根因**：`server.js` 的 `/api/config` 只讀環境變數。直接 `node server.js`（無環境變數）時回傳空的 `googleClientId`、`localTestLoginEnabled:false`，前端因此停用 Google 按鈕、隱藏本機測試/管理員登入。`data/runtime-config.json` 只在「沒有 server」時才被前端 fallback 讀到，形同虛設。
+
+**修法**（`server.js` + `data/runtime-config.json`）：
+
+- 設定優先序改為：環境變數 > `data/runtime-config.json` > 預設。新增 `loadRuntimeConfigFile()`
+- `/api/config` 回傳合併後設定；未設 `GOOGLE_CLIENT_ID` 環境變數時自動回 `staticGoogleLogin:true`（前端解析 token，不經 server 驗證）
+- `LOCAL_TEST_LOGIN` 一度改為預設開啟，後依站主要求改回**預設關閉**（`LOCAL_TEST_LOGIN=1` 才開、僅 localhost 生效）；管理員一律走 Google 登入 + adminEmails 名單，一般訪客看不到任何管理員按鈕
+- `runtime-config.json` 的 `adminEmails` 加入站主 email；server 端驗證的 `isAdmin` 也會查這份名單
+
+---
+
+## 階段 23（2026-07-10）by Claude — 全站遊戲化美編（GAME UI v2）
+
+只動 `styles.css`：檔尾新增「GAME UI v2」區塊（約 240 行），全部為附加/覆蓋規則，要回滾整段刪掉即可。內容：
+
+- **氛圍**：全畫面飄浮金色餘燼（body::before 動畫）+ 螢幕暗角 vignette（body::after）
+- **頂欄 → HUD**：深色橫幅 + 金框 + Cinzel 金色漸層標題 + 徽章呼吸光暈
+- **按鈕**：hover 光澤掃過動畫（btn::after sweep）
+- **進度條 → HP/XP 條**：加高、內凹槽、每 20% 刻度分段、填充條流動光澤
+- **答題選項 → RPG 對話選單**：羊皮紙底、hover 出現 ▸ 游標 + 右移 + 金色光暈
+- **戰鬥頁**：火光暗角加重、怪物待機上下浮動（idleBob）
+- **通知/任務提示**：遊戲系統公告風深色金框橫幅
+- **無障礙**：`prefers-reduced-motion: reduce` 全部動畫關閉
+
+注意：本次 sandbox 掛載同步再度卡住，CSS 未經瀏覽器實測，請開頁面確認：①餘燼粒子是否太搶眼（調 body::before 的 opacity）②手機版 topbar backdrop-filter 效能 ③答題選項 ▸ 與長文字排版。
+
+---
+
+## 階段 22（2026-07-07）by Claude — 維護修正（詳見 `交接報告-2026-07-07.md`）
+
+- 修 `getLearnedPercent()`：自訂庫模式下進度分母錯用內建字庫 → 改 `studySourceForLibrary()`
+- 新增 `escapeHtml()` 並套用於字典抓回內容 / 使用者輸入的所有主要 innerHTML 注入點（防 XSS / 破版）
+- 刪除死程式碼 `getStudyPool()`（無呼叫點、邏輯過時忽略自訂庫）
+- `index.html` 加 loading 佔位與 `<noscript>`，避免白屏
+- 未來功能 / 排版 / 美編建議與驗收清單 → 見 `交接報告-2026-07-07.md`
+
+---
+
 ## 階段 21（2026-05-17）by Claude — 例句翻譯配對修正 + 字卡 lag + 多語字典
 
 ### 根因：例句配到別句的翻譯

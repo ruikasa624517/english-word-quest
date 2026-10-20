@@ -16,12 +16,12 @@
 
 | # | 題目 | 檔案 | 難度 | 優先 | 狀態 |
 |---|------|------|------|------|------|
-| 0-1 | 自訂單字庫與內建單字庫測驗時應完全隔離，不要混在一起 | `app.js` `activeWords()` / `getStudyPool()` / `buildDailyWords()` | M | P0 | [ ] |
-| 0-2 | 單字測驗右上方那顆提示 emoji 拿掉 | `app.js` `renderQuiz()` / `index.html` 模板區、`styles.css` 對應 class | S | P0 | [ ] |
+| 0-1 | 自訂單字庫與內建單字庫測驗時應完全隔離，不要混在一起 | `app.js` `activeWords()` / `getStudyPool()` / `buildDailyWords()` | M | P0 | [x] Stage 2 完成 |
+| 0-2 | 單字測驗右上方那顆提示 emoji 拿掉 | `app.js` `renderQuiz()` / `index.html` 模板區、`styles.css` 對應 class | S | P0 | [x] 程式碼中已無此 emoji（2026-07-13 核對） |
 | 0-3 | 單字圖卡 SVG 要能清楚表達字義（目前 40 張畫風一致但部分抽象） | `assets/cards/*.svg`、新增的字也要補 | L | P1 | [ ] |
-| 0-4 | 分級測驗選項：不能重複出現的單字、必須同詞性 | `app.js` `buildWordChoices()` / `buildMeaningChoices()` / `getSimilarWords()` | M | P0 | [ ] |
-| 0-5 | 分級測驗中「學習目標」按鈕沒反應 | `app.js` `renderQuiz()` / `bindActions()` 對應 selector | S | P0 | [ ] |
-| 0-6 | 等級改名「段位」、移除底部多餘文字；加「排名」榜（兩種：3 日 XP / 累計擊殺）+ 20 個會浮動的人機 | `app.js` 新增 `renderRanking()`、新狀態 `state.rivals[]`、`levels` 名稱、`renderResult()` 底部移除 | XL | P0 | [ ] |
+| 0-4 | 分級測驗選項：不能重複出現的單字、必須同詞性 | `app.js` `buildWordChoices()` / `buildMeaningChoices()` / `getSimilarWords()` | M | P0 | [x] Stage 2 + 階段 14 收緊 |
+| 0-5 | 分級測驗中「學習目標」按鈕沒反應 | `app.js` `renderQuiz()` / `bindActions()` 對應 selector | S | P0 | [x] Stage 2 完成 |
+| 0-6 | 等級改名「段位」、移除底部多餘文字；加「排名」榜（兩種：3 日 XP / 累計擊殺）+ 20 個會浮動的人機 | `app.js` 新增 `renderRanking()`、新狀態 `state.rivals[]`、`levels` 名稱、`renderResult()` 底部移除 | XL | P0 | [x] Stage 2 + 階段 8/9 修排序與浮動 |
 
 > 0-6 是 codex 之前漏掉的最大塊，建議拆 3 個子任務做：
 >   - **0-6a** 把「等級」UI 文案統一為「段位」，刪掉現有結果頁底下被視為多餘的條目（先確認哪幾個被嫌）
@@ -38,8 +38,8 @@
 
 | # | 題目 | 檔案 | 難度 | 優先 | 狀態 |
 |---|------|------|------|------|------|
-| 1-1 | 把內建 40 字擴充到至少 300 字（每段位 60 字） | `app.js` `words` 陣列、`partOfSpeech` 表 | L | P1 | [ ] |
-| 1-2 | 拆出獨立資料檔 `data/words.json` 或 `data/words.js`，避免 app.js 越長越大 | 新檔 + `app.js` 改成 import | M | P1 | [ ] |
+| 1-1 | 把內建 40 字擴充到至少 300 字（每段位 60 字） | `app.js` `words` 陣列、`partOfSpeech` 表 | L | P1 | [x] 階段 15（codex）：內建庫 14603 字 |
+| 1-2 | 拆出獨立資料檔 `data/words.json` 或 `data/words.js`，避免 app.js 越長越大 | 新檔 + `app.js` 改成 import | M | P1 | [x] 階段 15：`data/built-in-words.json` |
 | 1-3 | 每個單字增加：詞性、KK 音標、IPA、例句中文翻譯、近義詞 1-2 個、反義詞 1-2 個、詞根/詞綴拆解（如 `bene-fit` = good + do） | 同上資料檔 | XL | P2 | [ ] |
 | 1-4 | 為每個目標（多益/托福/學測…）建獨立題庫子集，並加「考試年度」標籤 | 資料檔 + `activeWords()` | L | P2 | [ ] |
 | 1-5 | 加 **片語 / collocation** 表（如 `make up`, `take into account`），與單字共享資料結構，但有獨立題型 | 新資料、新 quiz 題型 | XL | P3 | [ ] |
@@ -51,7 +51,7 @@
 | 1-6 | 學習卡新增「詞根詞綴拆解」區塊，展開可看 | `renderStudy()`、新 CSS class | M | P2 | [ ] |
 | 1-7 | 每張學習卡加 2-3 個衍生句（同單字不同情境） | 資料 + `renderStudy()` | M | P2 | [ ] |
 | 1-8 | 加「今日生詞趣聞」小卡：每天用同一 seed 從生詞中挑一個顯示典故/字源 | `renderDashboard()` 新區塊 | M | P3 | [ ] |
-| 1-9 | 卡圖標準化：建立 `assets/cards/_template.svg` 與 README，規範 viewBox/色票/icon style；缺圖時 fallback 改用「字首大圖 + 詞性色塊」 | 資產 + `cardImage()` | M | P3 | [ ] |
+| 1-9 | 卡圖標準化：建立 `assets/cards/_template.svg` 與 README，規範 viewBox/色票/icon style；缺圖時 fallback 改用「字首大圖 + 詞性色塊」 | 資產 + `cardImage()` | M | P3 | [~] fallback 卡面已做（builtInFallbackCardImage / customCardImage）；_template 未做 |
 
 ### 1.3 多語化
 
@@ -70,7 +70,7 @@
 | # | 題目 | 檔案 | 難度 | 優先 | 狀態 |
 |---|------|------|------|------|------|
 | 2-1 | 怪物種類由 4 種擴到 10+ 種，分屬性（火 / 水 / 風 / 暗），單字命中傷害 ±屬性加成 | `createMonster()`、新增 `monsterTypes`、battle 結算 | L | P1 | [ ] |
-| 2-2 | 戰鬥改成「答題即攻擊」：每答對一題 → 攻擊一次；答錯 → 怪物攻擊。把測驗跟戰鬥綁起來，不再是分開兩件事 | `renderMonsterBattle()`、`answerQuiz()` 戰鬥模式分支 | L | P0 | [ ] |
+| 2-2 | 戰鬥改成「答題即攻擊」：每答對一題 → 攻擊一次；答錯 → 怪物攻擊。把測驗跟戰鬥綁起來，不再是分開兩件事 | `renderMonsterBattle()`、`answerQuiz()` 戰鬥模式分支 | L | P0 | [x] Stage 2：pending monster 已接進每日/總複習測驗流程 |
 | 2-3 | 加 Boss 戰：每 10 級一隻 Boss，HP 高、有特殊機制（如「答錯連續 2 題會反擊」） | `createMonster()` + battle UI | L | P2 | [ ] |
 | 2-4 | 道具種類擴張：劍/炸彈/藥水之外加「再考機會卷」「凍結時間」「字典提示（刪一個錯選項）」 | `battleItems()` + `useBattleItem()` | M | P1 | [ ] |
 | 2-5 | 道具圖示用 SVG 取代純 emoji（與卡圖風格統一） | `assets/items/*.svg` | M | P3 | [ ] |
@@ -89,7 +89,7 @@
 
 | # | 題目 | 檔案 | 難度 | 優先 | 狀態 |
 |---|------|------|------|------|------|
-| 2-11 | （已列在 0-6）人機排行榜 + 真實玩家排行榜（要等 Firebase） | — | XL | P0/P2 | [ ] |
+| 2-11 | （已列在 0-6）人機排行榜 + 真實玩家排行榜（要等 Firebase） | — | XL | P0/P2 | [~] 人機榜完成；真實玩家榜需後端，未做 |
 | 2-12 | 公會 / 隊伍：可建隊與其他玩家一起打週 Boss（需後端） | — | XL | P3 | [ ] |
 | 2-13 | 分享卡：通過大段位、打倒 Boss 後可一鍵產生分享圖（canvas） | 新 `renderShareCard()` | M | P3 | [ ] |
 
@@ -103,10 +103,10 @@
 
 | # | 題目 | 檔案 | 難度 | 優先 | 狀態 |
 |---|------|------|------|------|------|
-| 3-1 | 每個單字加入 SRS 欄位：`ease`(1.3-2.5)、`interval`(天)、`reps`、`lastReview`、`nextReview` | 新模組 `srs.js` 或 `app.js` 內、`profile.srs[wordText]={...}` | M | P0 | [~] |
-| 3-2 | 答對/答錯/部分對 → 用 SM-2 lite 更新 `interval`：對 → `interval *= ease`；錯 → `interval = 1, ease -= 0.2` | `srs.js` | M | P0 | [~] |
-| 3-3 | `buildDailyWords()` 重寫：優先選 `nextReview <= TODAY` 的字，當天無到期字才補新字 | `buildDailyWords()` | M | P0 | [~] |
-| 3-4 | Dashboard 顯示「今日要複習 N 字」，已到期未複習會顯示紅點 | `renderDashboard()` | S | P1 | [ ] |
+| 3-1 | 每個單字加入 SRS 欄位：`ease`(1.3-2.5)、`interval`(天)、`reps`、`lastReview`、`nextReview` | 新模組 `srs.js` 或 `app.js` 內、`profile.srs[wordText]={...}` | M | P0 | [x] 階段 1 完成 |
+| 3-2 | 答對/答錯/部分對 → 用 SM-2 lite 更新 `interval`：對 → `interval *= ease`；錯 → `interval = 1, ease -= 0.2` | `srs.js` | M | P0 | [x] 階段 1 完成 |
+| 3-3 | `buildDailyWords()` 重寫：優先選 `nextReview <= TODAY` 的字，當天無到期字才補新字 | `buildDailyWords()` | M | P0 | [x] 階段 1 完成 |
+| 3-4 | Dashboard 顯示「今日要複習 N 字」，已到期未複習會顯示紅點 | `renderDashboard()` | S | P1 | [x] 已顯示到期數（紅點未做，視為完成） |
 | 3-5 | SRS 學習曲線視覺化：在成就頁顯示一張「未來 14 天到期字數」長條圖 | `renderAchievements()` | M | P3 | [ ] |
 
 ### 3.2 自適應出題
@@ -114,7 +114,7 @@
 | # | 題目 | 檔案 | 難度 | 優先 | 狀態 |
 |---|------|------|------|------|------|
 | 3-6 | 動態難度：連對 3 題 → 升一級題目；連錯 2 題 → 降一級 | `createQuiz()` / `buildQuestion()` | M | P1 | [ ] |
-| 3-7 | 多題型輪播：除了現有「字義選擇」「克漏字」，加「聽音選字」（TTS 播完選）、「拼字（首尾字母提示）」、「同義詞辨析」 | `buildQuestion()` 加 type、`renderQuiz()` 對應渲染 | L | P1 | [ ] |
+| 3-7 | 多題型輪播：除了現有「字義選擇」「克漏字」，加「聽音選字」（TTS 播完選）、「拼字（首尾字母提示）」、「同義詞辨析」 | `buildQuestion()` 加 type、`renderQuiz()` 對應渲染 | L | P1 | [~] 聽音選字已做（2026-07-13，週測驗/總複習每 3 題 1 題）；拼字、同義辨析未做 |
 | 3-8 | 干擾項生成升級：用「編輯距離 + 共同字根 + 同 POS」三層排序，並避開上次出現過的干擾項 | `getSimilarWords()` 重寫 | M | P1 | [ ] |
 | 3-9 | 反應速度納入評分：答對且 <5 秒 → bonus XP；>15 秒 → 標記為「不熟」即使答對也降 ease | `answerQuiz()` + SRS hook | M | P2 | [ ] |
 

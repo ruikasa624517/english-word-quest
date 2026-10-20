@@ -1,5 +1,13 @@
 # Version History
 
+## v0.3.0
+
+- Electronic-dictionary redesign: slate device shell, sage LCD screens, physical keys, highlighter under the headword. styles.css rewritten; old ember/parchment/gold effects removed.
+- Self-hosted fonts (Atkinson Hyperlegible, Doto) under assets/fonts; no Google Fonts dependency.
+- Monster and item art served as WebP (≈1.6MB total instead of ≈45MB).
+- Fixes: local-date day rollover, reset button that did nothing, last-answer double-click crash, `{items}` in reward title, false "no items" battle text, today counter, duplicate weak words, findWord performance, import fallback to built-in dictionary.
+- Keyboard: ← → / Space on cards, 1–4 to answer, Esc closes the word dialog.
+
 ## v0.2.2
 
 - Added unique SVG card artwork for all 40 built-in words.

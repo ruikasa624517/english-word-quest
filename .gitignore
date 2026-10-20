@@ -16,3 +16,9 @@ Thumbs.db
 .vscode/
 .idea/
 *.swp
+
+# 圖像生成暫存
+tmp/
+
+# Windows 捷徑誤入
+*.lnk

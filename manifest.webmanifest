@@ -1,0 +1,26 @@
+{
+  "name": "Vocab Arcana",
+  "short_name": "Vocab Arcana",
+  "description": "遊戲化英文背單字：SRS 複習、怪物戰鬥、排行榜。",
+  "lang": "zh-Hant",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#233844",
+  "theme_color": "#233844",
+  "icons": [
+    {
+      "src": "./assets/app-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "./assets/app-icon-maskable.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}
