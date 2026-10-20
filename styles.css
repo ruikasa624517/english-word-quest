@@ -1564,35 +1564,17 @@ button.card:hover {
 }
 
 /* ---------- 戰鬥 ---------- */
-.battle-layout {
-  display: grid;
-  grid-template-columns: minmax(240px, 0.85fr) minmax(0, 1.15fr);
-  gap: 26px;
-  align-items: start;
-}
-
-.battle-stage,
-.monster-preview-art {
-  position: relative;
-  overflow: hidden;
-  border-radius: 10px;
-  background: #0f1714;
-  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.5);
-  aspect-ratio: 2 / 3;
-  max-height: 600px;
-}
-
-.monster-art,
-.generated-monster {
-  width: 100%;
-  height: 100%;
-}
 
 .monster-raster {
   display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+.generated-monster {
+  width: 100%;
+  height: 100%;
 }
 
 .generated-monster > svg {
@@ -1603,19 +1585,6 @@ button.card:hover {
 
 .generated-monster.img-missing > svg {
   display: block;
-}
-
-.monster-art.hit {
-  animation: monster-hit 280ms ease;
-}
-
-.monster-art.defeated {
-  filter: grayscale(1) brightness(0.55);
-  transition: filter 600ms ease;
-}
-
-.monster-art.fallen {
-  filter: saturate(0.6) brightness(0.8);
 }
 
 @keyframes monster-hit {
@@ -1639,45 +1608,9 @@ button.card:hover {
   animation: damage-pop 550ms ease-out both;
 }
 
-.damage-pop.enemy-damage {
-  top: auto;
-  bottom: 18%;
-  font-family: var(--font-ui);
-  font-size: 18px;
-  color: #ffb3a4;
-}
-
 @keyframes damage-pop {
   from { opacity: 0; transform: translate(-50%, 10px); }
   to { opacity: 1; transform: translate(-50%, 0); }
-}
-
-.battle-fx {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  padding: 14px 16px;
-  background: rgba(10, 16, 13, 0.86);
-  color: #f6e866;
-  font-size: 20px;
-  font-weight: 800;
-  text-align: center;
-}
-
-.battle-fx.loss-fx {
-  color: #ffb3a4;
-}
-
-.battle-side {
-  display: grid;
-  gap: 18px;
-  min-width: 0;
-}
-
-.battle-hud {
-  display: grid;
-  gap: 12px;
 }
 
 .battle-meter-head {
@@ -1705,70 +1638,6 @@ button.card:hover {
 
 .monster-meter-card .battle-meter > span {
   background: repeating-linear-gradient(90deg, var(--bad) 0 9px, transparent 9px 11px);
-}
-
-.battle-title-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 12px;
-}
-
-.battle-log {
-  min-height: 3.4em;
-}
-
-.battle-actions {
-  margin-top: 0;
-  flex: none;
-}
-
-.battle-item-grid {
-  grid-template-columns: 1fr;
-  margin-top: 0;
-}
-
-.battle-item-card {
-  grid-template-columns: 56px 1fr auto;
-  grid-template-areas:
-    "art name count"
-    "art effect count";
-  padding: 10px 14px 10px 10px;
-  border-color: var(--key-edge);
-  background: var(--key);
-  color: var(--key-ink);
-  box-shadow: 0 2px 0 var(--key-edge);
-}
-
-.battle-item-card .item-art {
-  width: 56px;
-  height: 56px;
-  margin: 0;
-}
-
-.battle-item-card:hover:not(:disabled) {
-  border-color: var(--ink);
-}
-
-.battle-item-card:active:not(:disabled) {
-  transform: translateY(2px);
-  box-shadow: none;
-}
-
-.battle-item-card:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
-}
-
-.monster-preview {
-  display: grid;
-  grid-template-columns: minmax(0, 1.2fr) minmax(220px, 0.8fr);
-  gap: 26px;
-  align-items: start;
-}
-
-.monster-preview .wrong-review {
-  margin-top: 8px;
 }
 
 /* ---------- 成就 ---------- */
@@ -2031,20 +1900,8 @@ button.card:hover {
       "adventure";
   }
 
-  .login,
-  .battle-layout,
-  .monster-preview {
+  .login {
     grid-template-columns: 1fr;
-  }
-
-  .battle-stage,
-  .monster-preview-art {
-    aspect-ratio: 4 / 3;
-    max-height: 340px;
-  }
-
-  .monster-preview-art {
-    order: -1;
   }
 
   .ranking-grid,
@@ -2085,11 +1942,6 @@ button.card:hover {
 
   .topbar .btn.small {
     padding: 0 8px;
-  }
-
-  .battle-fx {
-    font-size: 16px;
-    padding: 10px 12px;
   }
 
   .panel {
@@ -2281,4 +2133,380 @@ button.card:hover {
 .admin-keys .btn {
   white-space: normal;
   text-align: left;
+}
+
+/* ---------- 分級標籤 ---------- */
+.grade-tag {
+  font-style: normal;
+  border-style: dashed;
+}
+
+/* ---------- 登入：直接開始 ---------- */
+.login-start {
+  min-height: 50px;
+  font-size: 17px;
+}
+
+/* ---------- 首頁排版：今日＋月曆在左，複習＋冒險在右 ---------- */
+.dash-grid {
+  grid-template-areas:
+    "today review"
+    "calendar adventure";
+}
+
+.today-panel {
+  align-self: stretch;
+}
+
+.calendar-panel {
+  grid-area: calendar;
+}
+
+.calendar-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  margin-bottom: 12px;
+}
+
+.calendar-head h3 {
+  font-size: 15px;
+  color: var(--ink-2);
+}
+
+.calendar-head h3 span {
+  margin-left: 8px;
+  font-family: var(--font-num);
+  font-weight: 700;
+}
+
+.calendar-head p {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  font-size: 14px;
+}
+
+.calendar-head .lcd {
+  font-size: 30px;
+  line-height: 1;
+}
+
+.freeze-count {
+  margin-left: 10px;
+  padding: 1px 8px;
+  border: 1px dashed var(--rule);
+  border-radius: 999px;
+  font-size: 12px;
+  color: var(--ink-2);
+}
+
+.cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 4px;
+  margin-bottom: 12px;
+}
+
+.cal-weekday {
+  text-align: center;
+  font-size: 11px;
+  color: var(--ink-2);
+  padding-bottom: 2px;
+}
+
+.cal-cell {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  border-radius: 6px;
+  font-family: var(--font-num);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-2);
+  background: color-mix(in srgb, var(--field) 35%, transparent);
+}
+
+.cal-cell.empty {
+  background: none;
+}
+
+.cal-cell.future {
+  opacity: 0.45;
+}
+
+.cal-cell.today {
+  box-shadow: inset 0 0 0 2px var(--ink);
+  color: var(--ink);
+  font-weight: 700;
+}
+
+/* 蓋章：像集點卡上的圓形印章，微微歪一點 */
+.cal-cell.done {
+  background: var(--ink);
+  color: var(--screen);
+  font-weight: 700;
+  border-radius: 50%;
+  transform: rotate(-8deg);
+}
+
+.cal-cell.freeze {
+  background: none;
+  color: var(--ink);
+  border: 2px dashed var(--ink);
+  border-radius: 50%;
+}
+
+.calendar-panel .btn {
+  margin-bottom: 10px;
+}
+
+/* ---------- 答題打怪 ---------- */
+.quiz-battle {
+  display: grid;
+  grid-template-columns: 132px minmax(0, 1fr);
+  gap: 16px;
+  margin: 0 0 18px;
+  padding: 14px;
+  border: 1px solid var(--rule);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--field) 40%, transparent);
+}
+
+.quiz-battle-art {
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px;
+  background: #0f1714;
+  aspect-ratio: 2 / 3;
+  align-self: start;
+}
+
+.quiz-battle-art .generated-monster,
+.quiz-battle-art .monster-raster {
+  width: 100%;
+  height: 100%;
+}
+
+.quiz-battle-art.hit {
+  animation: monster-hit 280ms ease;
+}
+
+.quiz-battle-art.defeated {
+  filter: grayscale(1) brightness(0.55);
+}
+
+.quiz-battle-art .damage-pop {
+  top: 30%;
+  font-size: 34px;
+}
+
+.quiz-battle-body {
+  display: grid;
+  gap: 8px;
+  align-content: start;
+  min-width: 0;
+}
+
+.quiz-battle-name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 17px;
+}
+
+.quiz-battle .battle-meter {
+  height: 12px;
+}
+
+.battle-meter-head .taken {
+  margin-left: 8px;
+  color: var(--bad);
+  font-weight: 800;
+}
+
+.quiz-battle-log {
+  font-size: 14px;
+  color: var(--ink-2);
+  min-height: 1.6em;
+}
+
+.quiz-battle.is-won .quiz-battle-log,
+.quiz-battle.is-lost .quiz-battle-log {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.quiz-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.item-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 40px;
+  padding: 2px 12px 2px 4px;
+  border: 1px solid var(--key-edge);
+  border-radius: 999px;
+  background: var(--key);
+  color: var(--key-ink);
+  box-shadow: 0 2px 0 var(--key-edge);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.item-chip .item-art {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+}
+
+.item-chip b {
+  font-family: var(--font-num);
+  color: var(--ink-2);
+}
+
+.item-chip:active:not(:disabled) {
+  transform: translateY(2px);
+  box-shadow: none;
+}
+
+.item-chip:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.item-chip.armed {
+  background: var(--hl);
+  border-color: var(--hl);
+  color: var(--hl-ink);
+  opacity: 1;
+}
+
+/* ---------- 我的進度 ---------- */
+.progress-readout {
+  margin: 18px 0 8px;
+}
+
+.progress-readout dd {
+  font-size: 34px;
+}
+
+.progress-line {
+  margin-top: 10px;
+  font-weight: 700;
+  max-width: 40em;
+}
+
+.progress-sub {
+  margin: 26px 0 10px;
+  font-size: 14px;
+  color: var(--ink-2);
+}
+
+.week-bars {
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  gap: 8px;
+  align-items: end;
+  height: 180px;
+}
+
+.week-bar {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  align-items: end;
+  height: 100%;
+  text-align: center;
+}
+
+.week-bar-count {
+  font-family: var(--font-num);
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.week-bar-fill {
+  display: block;
+  min-height: 2px;
+  border-radius: 3px 3px 0 0;
+  background: repeating-linear-gradient(0deg, var(--ink-2) 0 6px, transparent 6px 8px);
+}
+
+.week-bar.now .week-bar-fill {
+  background: repeating-linear-gradient(0deg, var(--ink) 0 6px, transparent 6px 8px);
+}
+
+.week-bar-label {
+  margin-top: 6px;
+  font-family: var(--font-num);
+  font-size: 11px;
+  color: var(--ink-2);
+}
+
+@media (max-width: 860px) {
+  .dash-grid {
+    grid-template-areas:
+      "today"
+      "calendar"
+      "review"
+      "adventure";
+  }
+}
+
+@media (max-width: 640px) {
+  .quiz-battle {
+    grid-template-columns: 84px minmax(0, 1fr);
+    gap: 12px;
+    padding: 10px;
+  }
+
+  .item-chip span {
+    display: none;
+  }
+
+  .item-chip {
+    padding-right: 10px;
+  }
+
+  .week-bars {
+    height: 140px;
+    gap: 4px;
+  }
+}
+
+/* 面板裡的提示條不要內縮 */
+.panel .quest-alert {
+  margin: 12px 0;
+}
+
+.panel .quest-alert.small {
+  background: var(--screen-2);
+  color: var(--ink);
+}
+
+/* 登入頁：管理員鍵放在次要位置 */
+.login-actions [data-action="admin-login"] {
+  background: var(--key);
+  color: var(--key-ink);
+  border-color: var(--key-edge);
+  box-shadow: 0 3px 0 var(--key-edge);
+  margin-top: 8px;
+}
+
+/* 月曆格子不要隨欄寬變得太大 */
+.cal-cell {
+  aspect-ratio: auto;
+  height: 34px;
+  width: 34px;
+  justify-self: center;
+}
+
+.actions + .muted {
+  margin-top: 8px;
 }

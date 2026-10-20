@@ -168,7 +168,7 @@ const i18n = {
     battleMonster: "挑戰怪物",
     inventory: "道具袋",
     inventoryTitle: "背包",
-    inventoryCopy: "查看目前可用的討伐道具。",
+    inventoryCopy: "道具在週測驗和總複習打怪時使用：鐵劍讓下一題答對的傷害加倍，火焰瓶直接造成傷害，治療藥水回復生命。",
     emptyInventory: "背包是空的。登入、升級或完成挑戰可以取得道具。",
     learningActions: "學習",
     adventureActions: "冒險",
@@ -218,7 +218,7 @@ const i18n = {
     chooseStudyWord: "選出對應英文單字",
     viewWordLibrary: "查看記憶字卡",
     viewWordLibraryCopy: "只顯示已匯入的單字，不混入內建庫。",
-    weakTrain: "弱點加強",
+    weakTrain: "錯題加強",
     currentTitle: "目前稱號",
     limitedTitle: "限時稱號",
     claimBattleTitle: "領取打怪榜稱號",
@@ -253,6 +253,36 @@ const i18n = {
     deferBattle: "下次再說",
     itemReward: "獲得打怪道具：{items}",
     itemRewardTitle: "獲得道具",
+    guestStart: "直接開始",
+    googleOptional: "不用註冊，進度會存在這台裝置的瀏覽器裡。想在畫面上顯示自己的名字，也可以用 Google 帳號登入。",
+    battleWonContinue: "討伐成功！把剩下的題目做完就能領獎勵。",
+    battleLostContinue: "你倒下了，怪物逃走了。剩下的題目還是要做完，成績照常計算。",
+    swordReady: "鐵劍準備好了，下一題答對傷害加倍。",
+    bossTag: "升級頭目",
+    bossWaiting: "Lv.{level} 頭目「{name}」會出現在下一次週測驗或總複習。",
+    battleWonSummary: "打倒了「{name}」：經驗值 +{xp}，獲得 {loot}",
+    battleLostSummary: "這次沒打贏「{name}」，用掉的道具退還一半。",
+    battleEscapedSummary: "「{name}」還沒被打倒就逃走了，用掉的道具退還一半。",
+    studyStreak: "連續學習",
+    calendarTitle: "學習月曆",
+    calendarDays: "天連續學習",
+    freezeCount: "補簽 {count} 張",
+    useFreeze: "用一張補簽補昨天",
+    calendarNote: "完成每日測驗就會蓋章。連續學習每滿 7 天送一張補簽，最多存 2 張，可以補昨天漏掉的一格。",
+    freezeEarned: "連續學習 {days} 天，送你一張補簽。",
+    weekdayLetters: "日一二三四五六",
+    progressTitle: "我的進度",
+    progressNote: "長期記憶 {count} 個字",
+    progressLearned: "學過的字",
+    progressLongTerm: "長期記憶",
+    progressDue: "今天該複習",
+    progressHint: "長期記憶是指連續答對三次以上、複習間隔已經拉長的字。",
+    progressWeekCompare: "這 7 天學會 {now} 個字，前 7 天是 {prev} 個。",
+    progressRetention: "兩週以前學的 {total} 個字，現在有 {kept} 個不在弱點池，大約 {percent}%。",
+    progressRetentionEmpty: "學滿兩週以後，這裡會告訴你以前學的字還記得多少。",
+    progressWeeks: "每週學會的字數",
+    weakTrainCount: "錯題加強（{count} 個字）",
+    weakTrainNote: "混合這次和之前答錯的字，同一個字答對兩次就會移出。",
     slowSpeak: "慢速",
     speakExample: "朗讀例句",
     noQuizWords: "目前沒有可以考的字。先去「學習 10 字」學幾個字再回來。",
@@ -269,7 +299,7 @@ const i18n = {
     loginStep1: "翻完今天的 10 張字卡，聽發音、看例句",
     loginStep2: "背誦測驗：答對才算真的學會",
     loginStep3: "每日測驗把舊字和弱點字再拿出來考一次",
-    loginStepNote: "段位每升到 5 的倍數會遇到怪物，平常累積的道具就是那時候用的。",
+    loginStepNote: "週測驗和總複習會遇到怪物，答對就是攻擊，平常累積的道具也是在那時候用。",
     loginNameHint: "本機測試登入用的暱稱",
     todayWords: "今天的 10 個字",
     todayCount: "{today} / 10",
@@ -533,6 +563,36 @@ const i18n = {
     deferBattle: "Later",
     itemReward: "Gained battle items: {items}",
     itemRewardTitle: "Items received",
+    guestStart: "Start now",
+    googleOptional: "No sign-up needed; progress is saved in this browser. Sign in with Google if you want your name shown.",
+    battleWonContinue: "Monster defeated! Finish the remaining questions to claim the reward.",
+    battleLostContinue: "You fell and the monster escaped. Finish the remaining questions; your score still counts.",
+    swordReady: "Sword ready: your next correct answer deals double damage.",
+    bossTag: "Boss",
+    bossWaiting: "The Lv.{level} boss “{name}” will appear in your next weekly test or grand review.",
+    battleWonSummary: "Defeated “{name}”: +{xp} XP, received {loot}",
+    battleLostSummary: "You lost to “{name}” this time. Half of the items you used were returned.",
+    battleEscapedSummary: "“{name}” escaped before it was defeated. Half of the items you used were returned.",
+    studyStreak: "Study streak",
+    calendarTitle: "Study calendar",
+    calendarDays: "days in a row",
+    freezeCount: "{count} streak savers",
+    useFreeze: "Use a saver for yesterday",
+    calendarNote: "Finish the daily quiz to get a stamp. Every 7-day streak earns a saver (keep up to 2) that can fill in yesterday.",
+    freezeEarned: "{days}-day streak! You earned a streak saver.",
+    weekdayLetters: "SMTWTFS",
+    progressTitle: "My progress",
+    progressNote: "{count} words in long-term memory",
+    progressLearned: "Learned",
+    progressLongTerm: "Long-term",
+    progressDue: "Due today",
+    progressHint: "Long-term words are ones you've answered right three times in a row, so reviews are spaced further apart.",
+    progressWeekCompare: "{now} words learned in the last 7 days, {prev} in the 7 days before.",
+    progressRetention: "Of {total} words learned two or more weeks ago, {kept} are not in your weak words (about {percent}%).",
+    progressRetentionEmpty: "After two weeks, this shows how many older words you still remember.",
+    progressWeeks: "Words learned per week",
+    weakTrainCount: "Practice mistakes ({count} words)",
+    weakTrainNote: "Mixes this quiz's mistakes with older ones. A word leaves after two correct answers.",
     slowSpeak: "Slow",
     speakExample: "Read the example aloud",
     noQuizWords: "There are no words to test yet. Study a few words first.",
@@ -549,7 +609,7 @@ const i18n = {
     loginStep1: "Flip through today's 10 cards, hear each word, read the example",
     loginStep2: "Recall quiz: a word only counts once you get it right",
     loginStep3: "Daily quiz brings back older and weak words",
-    loginStepNote: "Every fifth level a monster shows up, and the items you've saved are for that fight.",
+    loginStepNote: "Weekly tests and grand reviews come with a monster: every correct answer is an attack, and that's where your saved items come in.",
     loginNameHint: "Nickname for local test login",
     todayWords: "Today's 10 words",
     todayCount: "{today} / 10",
@@ -813,6 +873,36 @@ const i18n = {
     deferBattle: "次回にする",
     itemReward: "討伐アイテムを獲得：{items}",
     itemRewardTitle: "アイテム獲得",
+    guestStart: "すぐに始める",
+    googleOptional: "登録不要。進捗はこのブラウザに保存されます。名前を表示したい場合は Google でログインできます。",
+    battleWonContinue: "討伐成功！残りの問題を終えると報酬がもらえます。",
+    battleLostContinue: "倒れてしまい、モンスターは逃げました。残りの問題も解いてください。成績は通常どおり記録されます。",
+    swordReady: "鉄剣の準備完了。次に正解するとダメージ2倍。",
+    bossTag: "ボス",
+    bossWaiting: "Lv.{level} のボス「{name}」が次の週テストか総復習に現れます。",
+    battleWonSummary: "「{name}」を討伐：経験値 +{xp}、{loot} を獲得",
+    battleLostSummary: "今回は「{name}」に負けました。使ったアイテムの半分を返却します。",
+    battleEscapedSummary: "「{name}」は倒される前に逃げました。使ったアイテムの半分を返却します。",
+    studyStreak: "連続学習",
+    calendarTitle: "学習カレンダー",
+    calendarDays: "日連続",
+    freezeCount: "補填 {count} 枚",
+    useFreeze: "補填券で昨日を埋める",
+    calendarNote: "デイリーテストを終えるとスタンプ。7日連続ごとに補填券1枚（最大2枚）で昨日を埋められます。",
+    freezeEarned: "{days}日連続！補填券を1枚獲得。",
+    weekdayLetters: "日月火水木金土",
+    progressTitle: "自分の進み具合",
+    progressNote: "長期記憶 {count} 語",
+    progressLearned: "学習済み",
+    progressLongTerm: "長期記憶",
+    progressDue: "今日の復習",
+    progressHint: "長期記憶は3回連続で正解し、復習間隔が長くなった単語です。",
+    progressWeekCompare: "この7日間で {now} 語、その前の7日間は {prev} 語。",
+    progressRetention: "2週間以上前に学んだ {total} 語のうち {kept} 語が苦手リストにありません（約 {percent}%）。",
+    progressRetentionEmpty: "2週間たつと、以前の単語をどれだけ覚えているかが表示されます。",
+    progressWeeks: "週ごとの習得語数",
+    weakTrainCount: "ミス復習（{count} 語）",
+    weakTrainNote: "今回と以前のミスを混ぜて出題。2回正解すると外れます。",
     slowSpeak: "ゆっくり",
     speakExample: "例文を読み上げる",
     noQuizWords: "テストできる単語がまだありません。先に単語を学習してください。",
@@ -829,7 +919,7 @@ const i18n = {
     loginStep1: "今日の10枚のカードをめくり、発音と例文を確認",
     loginStep2: "暗記テスト：正解して初めて覚えたことになる",
     loginStep3: "デイリーテストで古い単語と苦手な単語をもう一度",
-    loginStepNote: "レベルが5の倍数になるとモンスターが現れます。貯めたアイテムはその戦いで使います。",
+    loginStepNote: "週テストと総復習ではモンスターが登場し、正解が攻撃になります。貯めたアイテムもそこで使います。",
     loginNameHint: "ローカルテスト用のニックネーム",
     todayWords: "今日の10語",
     todayCount: "{today} / 10",
@@ -1093,6 +1183,36 @@ const i18n = {
     deferBattle: "다음으로",
     itemReward: "토벌 아이템 획득: {items}",
     itemRewardTitle: "아이템 획득",
+    guestStart: "바로 시작",
+    googleOptional: "가입 없이 시작해요. 진도는 이 브라우저에 저장되며, 이름을 표시하려면 Google로 로그인할 수 있어요.",
+    battleWonContinue: "토벌 성공! 남은 문제를 끝내면 보상을 받아요.",
+    battleLostContinue: "쓰러졌고 몬스터는 도망갔어요. 남은 문제도 풀어 주세요. 점수는 그대로 계산됩니다.",
+    swordReady: "철검 준비 완료. 다음 정답은 피해 2배.",
+    bossTag: "보스",
+    bossWaiting: "Lv.{level} 보스 「{name}」가 다음 주간 테스트나 총복습에 나타납니다.",
+    battleWonSummary: "「{name}」 토벌: 경험치 +{xp}, {loot} 획득",
+    battleLostSummary: "이번에는 「{name}」에게 졌어요. 사용한 아이템의 절반을 돌려드려요.",
+    battleEscapedSummary: "「{name}」가 쓰러지기 전에 도망갔어요. 사용한 아이템의 절반을 돌려드려요.",
+    studyStreak: "연속 학습",
+    calendarTitle: "학습 달력",
+    calendarDays: "일 연속",
+    freezeCount: "보충권 {count}장",
+    useFreeze: "보충권으로 어제 채우기",
+    calendarNote: "데일리 테스트를 끝내면 도장. 7일 연속마다 보충권 1장(최대 2장)으로 어제를 채울 수 있어요.",
+    freezeEarned: "{days}일 연속! 보충권 1장 획득.",
+    weekdayLetters: "일월화수목금토",
+    progressTitle: "내 진도",
+    progressNote: "장기 기억 {count}단어",
+    progressLearned: "학습한 단어",
+    progressLongTerm: "장기 기억",
+    progressDue: "오늘 복습",
+    progressHint: "장기 기억은 세 번 연속 맞혀 복습 간격이 길어진 단어입니다.",
+    progressWeekCompare: "최근 7일 {now}단어, 그 전 7일 {prev}단어.",
+    progressRetention: "2주 이상 전에 배운 {total}단어 중 {kept}단어가 약점에 없습니다(약 {percent}%).",
+    progressRetentionEmpty: "2주가 지나면 예전 단어를 얼마나 기억하는지 보여 줍니다.",
+    progressWeeks: "주별 학습 단어 수",
+    weakTrainCount: "오답 연습 ({count}단어)",
+    weakTrainNote: "이번과 이전 오답을 섞어 출제하며, 두 번 맞히면 빠집니다.",
     slowSpeak: "느리게",
     speakExample: "예문 읽기",
     noQuizWords: "아직 시험 볼 단어가 없습니다. 먼저 단어를 학습하세요.",
@@ -1109,7 +1229,7 @@ const i18n = {
     loginStep1: "오늘의 카드 10장을 넘기며 발음과 예문 확인",
     loginStep2: "암기 테스트: 맞혀야 외운 것으로 기록",
     loginStep3: "데일리 테스트로 예전 단어와 약점 단어를 다시",
-    loginStepNote: "레벨이 5의 배수가 되면 몬스터가 나타납니다. 모아 둔 아이템은 그때 씁니다.",
+    loginStepNote: "주간 테스트와 총복습에는 몬스터가 나오고, 정답이 곧 공격이에요. 모은 아이템도 그때 씁니다.",
     loginNameHint: "로컬 테스트용 닉네임",
     todayWords: "오늘의 10단어",
     todayCount: "{today} / 10",
@@ -1373,6 +1493,36 @@ const i18n = {
     deferBattle: "Para luego",
     itemReward: "Objeto obtenido: {items}",
     itemRewardTitle: "Objetos obtenidos",
+    guestStart: "Empezar ahora",
+    googleOptional: "Sin registro: el progreso se guarda en este navegador. Entra con Google si quieres ver tu nombre.",
+    battleWonContinue: "¡Monstruo derrotado! Termina las preguntas para recibir la recompensa.",
+    battleLostContinue: "Caíste y el monstruo escapó. Termina las preguntas; tu nota cuenta igual.",
+    swordReady: "Espada lista: tu próximo acierto hace el doble de daño.",
+    bossTag: "Jefe",
+    bossWaiting: "El jefe Lv.{level} «{name}» aparecerá en tu próxima prueba semanal o repaso general.",
+    battleWonSummary: "Derrotaste a «{name}»: +{xp} XP y {loot}",
+    battleLostSummary: "Esta vez perdiste contra «{name}». Se devolvió la mitad de los objetos usados.",
+    battleEscapedSummary: "«{name}» escapó antes de ser derrotado. Se devolvió la mitad de los objetos usados.",
+    studyStreak: "Racha",
+    calendarTitle: "Calendario",
+    calendarDays: "días seguidos",
+    freezeCount: "{count} comodines",
+    useFreeze: "Usar un comodín para ayer",
+    calendarNote: "Termina la prueba diaria para sellar el día. Cada racha de 7 días da un comodín (máx. 2) para cubrir ayer.",
+    freezeEarned: "¡Racha de {days} días! Ganaste un comodín.",
+    weekdayLetters: "DLMXJVS",
+    progressTitle: "Mi progreso",
+    progressNote: "{count} palabras en memoria a largo plazo",
+    progressLearned: "Aprendidas",
+    progressLongTerm: "Largo plazo",
+    progressDue: "Para hoy",
+    progressHint: "Largo plazo: palabras acertadas tres veces seguidas, con repasos más espaciados.",
+    progressWeekCompare: "{now} palabras en los últimos 7 días; {prev} en los 7 anteriores.",
+    progressRetention: "De {total} palabras aprendidas hace dos semanas o más, {kept} no están entre las débiles (≈{percent} %).",
+    progressRetentionEmpty: "Tras dos semanas verás cuántas palabras antiguas recuerdas.",
+    progressWeeks: "Palabras por semana",
+    weakTrainCount: "Repasar errores ({count} palabras)",
+    weakTrainNote: "Mezcla los errores de hoy y anteriores; una palabra sale tras dos aciertos.",
     slowSpeak: "Lento",
     speakExample: "Leer el ejemplo",
     noQuizWords: "Todavía no hay palabras para evaluar. Estudia algunas primero.",
@@ -1389,7 +1539,7 @@ const i18n = {
     loginStep1: "Pasa las 10 tarjetas de hoy, escucha cada palabra y lee el ejemplo",
     loginStep2: "Prueba de memoria: solo cuenta si aciertas",
     loginStep3: "La prueba diaria repasa palabras antiguas y débiles",
-    loginStepNote: "Cada cinco niveles aparece un monstruo, y los objetos que guardes son para esa pelea.",
+    loginStepNote: "Las pruebas semanales y el repaso general traen un monstruo: cada acierto es un ataque, y ahí usas tus objetos.",
     loginNameHint: "Apodo para el inicio de sesión local",
     todayWords: "Las 10 palabras de hoy",
     todayCount: "{today} / 10",
@@ -1528,6 +1678,11 @@ function srsUpdate(wordText, isCorrect, opts = {}) {
   const profile = activeProfile();
   const entry = srsEnsureEntry(profile, wordText);
   const fast = opts.fast === true; // 答對且夠快 → 加分
+  if (isCorrect && entry.reps > 0 && entry.nextReview && entry.nextReview > todayKey()) {
+    // 還沒到期就答對（同一天在不同測驗又遇到）：只記錄，不拉長間隔
+    entry.lastReview = todayKey();
+    return entry;
+  }
   if (isCorrect) {
     entry.reps += 1;
     if (entry.reps === 1) entry.interval = 1;
@@ -1826,7 +1981,6 @@ let studySession = null;
 let viewingLibraryId = null; // 查看單字庫頁面：null 表示看全部，有值表示只看那個庫
 let cardModalWord = null; // 點擊弱點/查字時開的字卡 modal（null 表示不顯示）
 let miniGame = null;
-let battle = null;
 let toast = "";
 let celebrate = false;
 let quizEffect = null;
@@ -1869,7 +2023,6 @@ function goBack() {
   stopActiveQuiz();
   studySession = null;
   miniGame = null;
-  battle = null;
   toast = "";
   render();
 }
@@ -2003,48 +2156,9 @@ function customCardImage(item) {
   return `data:image/svg+xml,${bg}`;
 }
 
-let wordTierCacheKey = "";
-let wordTierCache = new Map();
-
-function wordTierItemKey(item) {
-  return `${item?.library || "core"}::${String(item?.word || "").toLowerCase()}`;
-}
-
-function wordTierSignature() {
-  const custom = (state.customLibraries || [])
-    .map((lib) => `${lib.id}:${(lib.words || []).map((word) => `${word.word}:${word.level || ""}`).join(",")}`)
-    .join("|");
-  return `${words.length}:${custom}`;
-}
-
-function rebuildWordTierCache(signature) {
-  const grouped = new Map();
-  allWords().forEach((candidate) => {
-    const level = candidate.level || 1;
-    if (!grouped.has(level)) grouped.set(level, []);
-    grouped.get(level).push(candidate);
-  });
-  wordTierCache = new Map();
-  grouped.forEach((list) => {
-    const ordered = [...list].sort((a, b) => {
-      if (a.word.length !== b.word.length) return a.word.length - b.word.length;
-      return a.word.localeCompare(b.word);
-    });
-    ordered.forEach((candidate, index) => {
-      const tier = Math.min(5, Math.floor((index / Math.max(1, ordered.length)) * 5) + 1);
-      wordTierCache.set(wordTierItemKey(candidate), tier);
-      if (!candidate.library && !wordTierCache.has(String(candidate.word || "").toLowerCase())) {
-        wordTierCache.set(String(candidate.word || "").toLowerCase(), tier);
-      }
-    });
-  });
-  wordTierCacheKey = signature;
-}
-
+// 單字難度（1–5）：內建字已依官方分級整理（scripts/apply-official-levels.py），直接用 level
 function getWordTier(item) {
-  const signature = wordTierSignature();
-  if (signature !== wordTierCacheKey) rebuildWordTierCache(signature);
-  return wordTierCache.get(wordTierItemKey(item)) || wordTierCache.get(String(item?.word || "").toLowerCase()) || 1;
+  return clamp(Math.round(Number(item?.level) || 1), 1, 5);
 }
 
 function getPlayerRank() {
@@ -2093,10 +2207,8 @@ function addXp(amount) {
   const before = getPlayerRank();
   state.xp = (state.xp || 0) + amount;
   state.xpLog = state.xpLog || {};
-  state.weeklyXpLog = state.weeklyXpLog || {};
   const today = todayKey();
   state.xpLog[today] = (state.xpLog[today] || 0) + amount;
-  state.weeklyXpLog[today] = (state.weeklyXpLog[today] || 0) + amount;
   const after = getPlayerRank();
   if (after > before) {
     const monsterLevel = milestoneLevelBetween(before, after);
@@ -2124,154 +2236,7 @@ function customLibraryLimit(goal = activeGoal()) {
   return CUSTOM_LIBRARY_LIMITS[goal] || DEFAULT_CUSTOM_LIBRARY_LIMIT;
 }
 
-function ensureRivals() {
-  const names = [
-    "夜澤翼", "Mika_01", "霧島澪", "Kaze", "月森琉",
-    "WhiteFox", "星川希", "WindRune", "Nori", "柚木遙",
-    "朝霧悠真", "Rin", "海堂蒼", "LunaByte", "Haru_7",
-    "橘凜音", "Mori", "三澤葵", "LittleNorth", "Sora.n",
-  ];
-  const existing = Array.isArray(state.rivals) ? state.rivals : [];
-  // 已建立過 → 補上缺漏的 strengthBias 欄位（舊資料相容）
-  if (existing.length === names.length) {
-    let patched = false;
-    state.rivals = existing.map((rival, index) => {
-      if (rival.strengthBias !== undefined) return rival;
-      patched = true;
-      const seed = hashText(rival.name || names[index]);
-      return { ...rival, strengthBias: ((seed % 71) / 100) - 0.35 };
-    });
-    if (patched) saveState();
-    return;
-  }
-  // 首次建立：給每個對手一個「個性」 — 強度偏移與每日基準
-  state.rivals = names.map((name, index) => {
-    const saved = existing[index];
-    const seed = hashText(name);
-    return {
-      name,
-      // strengthBias: -0.35 ~ +0.35，決定這個對手長期 trend 是落在玩家之上還是之下
-      strengthBias: saved?.strengthBias ?? (((seed % 71) / 100) - 0.35),
-      dailyBase: saved?.dailyBase ?? 10 + (seed % 9) * 2,
-      xp: saved?.xp ?? 0,
-      kills: saved?.kills ?? 0,
-      weeklyXp: saved?.weeklyXp ?? 0,
-      weeklyKills: saved?.weeklyKills ?? 0,
-    };
-  });
-}
-
-function ensureRankingWeek() {
-  const current = currentWeekKey();
-  if (!state.rankingWeekKey) state.rankingWeekKey = current;
-  if (state.rankingWeekKey === current) return;
-  if (state.limitedBattleTitle?.expiresWeekKey && state.limitedBattleTitle.expiresWeekKey <= current) {
-    state.limitedBattleTitle = null;
-  }
-  const player = {
-    isPlayer: true,
-    name: state.user?.name || t("rankYou"),
-    weekXp: weeklyXpTotal(),
-    weekKills: weeklyKillTotal(),
-  };
-  const rivals = state.rivals.map((rival, index) => ({
-    ...rival,
-    weekXp: rival.weeklyXp || 0,
-    weekKills: rival.weeklyKills || 0,
-    recentXp: rivalWeeklyXp(rival, index),
-  }));
-  const xpRows = leaderboardRows(player, rivals, "weekXp");
-  const killRows = leaderboardRows(player, rivals, "weekKills");
-  const playerIndex = xpRows.findIndex((item) => item.isPlayer);
-  if (playerIndex > -1) {
-    // 用「同分同名次」邏輯計算實際名次再判定升降
-    const playerScore = xpRows[playerIndex].weekXp || 0;
-    // 嚴格優於玩家分數的人數 + 1 = 玩家名次
-    const playerRank = xpRows.filter((r) => (r.weekXp || 0) > playerScore).length + 1;
-    // 嚴格輸給玩家的人數 = 後面的位置數
-    const behindCount = xpRows.filter((r) => (r.weekXp || 0) < playerScore).length;
-    if (playerRank <= 3) state.rankTier = Math.min(RANK_TITLES.length, (state.rankTier || 1) + 1);
-    if (behindCount < 3) state.rankTier = Math.max(1, (state.rankTier || 1) - 1);
-  }
-  const playerKillIndex = killRows.findIndex((item) => item.isPlayer);
-  if (playerKillIndex > -1 && (killRows[playerKillIndex].weekKills || 0) > 0) {
-    const playerKills = killRows[playerKillIndex].weekKills || 0;
-    const playerKillRank = killRows.filter((row) => (row.weekKills || 0) > playerKills).length + 1;
-    state.pendingBattleTitle = {
-      rank: playerKillRank,
-      earnedWeekKey: state.rankingWeekKey,
-      claimWeekKey: current,
-      expiresWeekKey: nextWeekKey(current),
-    };
-  } else {
-    state.pendingBattleTitle = null;
-  }
-  state.rivals = state.rivals.map((rival) => ({
-    ...rival,
-    weeklyXp: 0,
-    weeklyKills: 0,
-  }));
-  state.weeklyXpLog = {};
-  state.weeklyKillLog = {};
-  state.rankingWeekKey = current;
-  saveState();
-}
-
 // 每次開排行榜都跑：把對手分數往玩家附近拉，並加上隨機浮動讓排名會洗牌
-function driftRivalsTowardPlayer() {
-  ensureRivals();
-  ensureRankingWeek();
-  const playerXp = Math.max(weeklyXpTotal() || 0, 60);
-  const playerKills = Math.max(weeklyKillTotal() || 0, 1);
-  // 每個玩家 session 內，對手浮動的時間 seed —— 每 10 分鐘換一組，避免一秒一變
-  const timeSlot = Math.floor(Date.now() / (10 * 60 * 1000));
-  state.rivals = state.rivals.map((rival, index) => {
-    const seed = hashText(`${rival.name}:${index}:${timeSlot}`);
-    // 對手目標 XP：玩家 ± 35% 範圍，以 strengthBias 偏移
-    const baseTarget = playerXp * (1 + rival.strengthBias * 0.55);
-    // 加入 ±15% 隨機浮動
-    const noise = ((seed % 31) - 15) / 100; // -0.15 ~ +0.15
-    const xpTarget = Math.round(baseTarget * (1 + noise));
-    // 慢慢朝目標移動（70/30 lerp），避免一次跳太多
-    const newXp = Math.round(rival.weeklyXp * 0.35 + xpTarget * 0.65);
-    // 卡在玩家 ±30% 區間內，保持可追趕
-    const xpFloor = Math.max(0, Math.round(playerXp * 0.7));
-    const xpCeil = Math.round(playerXp * 1.3) + 18;
-    // Kills 邏輯類似但範圍較小
-    const killBase = playerKills * (1 + rival.strengthBias * 0.45);
-    const killNoise = (((seed >> 5) % 21) - 10) / 100;
-    const killTarget = Math.max(0, Math.round(killBase * (1 + killNoise)));
-    const newKills = Math.round(rival.weeklyKills * 0.35 + killTarget * 0.65);
-    const killFloor = Math.max(0, playerKills - 3);
-    const killCeil = playerKills + 4;
-    return {
-      ...rival,
-      xp: rival.xp || 0,
-      kills: rival.kills || 0,
-      weeklyXp: clamp(newXp, xpFloor, xpCeil),
-      weeklyKills: clamp(newKills, killFloor, killCeil),
-    };
-  });
-  state.lastRivalAdvanceDate = todayKey();
-  saveState();
-}
-
-function recentXpTotal() {
-  state.xpLog = state.xpLog || {};
-  return recentDates(3).reduce((sum, date) => sum + (state.xpLog[date] || 0), 0);
-}
-
-function weeklyXpTotal() {
-  state.weeklyXpLog = state.weeklyXpLog || {};
-  const current = currentWeekKey();
-  return Object.entries(state.weeklyXpLog).reduce((sum, [date, amount]) => (currentWeekKey(date) === current ? sum + amount : sum), 0);
-}
-
-function weeklyKillTotal() {
-  state.weeklyKillLog = state.weeklyKillLog || {};
-  const current = currentWeekKey();
-  return Object.entries(state.weeklyKillLog).reduce((sum, [date, amount]) => (currentWeekKey(date) === current ? sum + amount : sum), 0);
-}
 
 function recentDates(days) {
   return Array.from({ length: days }, (_, index) => {
@@ -2281,37 +2246,8 @@ function recentDates(days) {
   });
 }
 
-function hashText(text) {
-  let hash = 0;
-  for (let index = 0; index < text.length; index += 1) {
-    hash = (hash * 31 + text.charCodeAt(index)) >>> 0;
-  }
-  return hash;
-}
-
 function clamp(value, min, max) {
   return Math.max(min, Math.min(max, value));
-}
-
-// 舊版每日只跑一次的 advanceRivals 已由 driftRivalsTowardPlayer 取代
-// 保留 export 名稱 advanceRivals 作為相容 alias，內部直接呼叫 drift
-function advanceRivals() {
-  driftRivalsTowardPlayer();
-}
-
-// 顯示用的「最近 XP」：不再是固定值，而是隨玩家 3 天 XP 浮動
-function rivalWeeklyXp(rival, index) {
-  const playerRecent = Math.max(weeklyXpTotal(), 30);
-  const timeSlot = Math.floor(Date.now() / (10 * 60 * 1000));
-  const seed = hashText(`recent:${rival.name}:${index}:${timeSlot}`);
-  // 對手的「最近 XP」 = 玩家近期 × (1 + strengthBias*0.7 + noise)
-  const noise = ((seed % 41) - 20) / 100; // -0.20 ~ +0.20
-  const factor = 1 + (rival.strengthBias || 0) * 0.7 + noise;
-  const value = Math.round((rival.weeklyXp || 0) * 0.35 + playerRecent * factor * 0.65);
-  // 範圍：玩家本週 XP 的 60%-140%，讓追趕感比較明確
-  const floor = Math.max(5, Math.round(playerRecent * 0.6));
-  const ceil = Math.round(playerRecent * 1.4) + 16;
-  return clamp(value, floor, ceil);
 }
 
 function levelLoot(level) {
@@ -2458,24 +2394,18 @@ function migrateState() {
     if (state.dailyTests && !Object.keys(profile.dailyTests).length) profile.dailyTests = state.dailyTests;
   }
   if (!state.xpLog) state.xpLog = {};
-  if (!state.weeklyXpLog) state.weeklyXpLog = {};
-  if (!state.weeklyKillLog) state.weeklyKillLog = {};
-  if (!state.rivals) state.rivals = [];
-  if (!("lastRankPenaltyDate" in state)) state.lastRankPenaltyDate = null;
-  if (!("lastRivalAdvanceDate" in state)) state.lastRivalAdvanceDate = null;
-  if (!("rankingWeekKey" in state) || !state.rankingWeekKey) state.rankingWeekKey = currentWeekKey();
   if (typeof state.rankTier !== "number") state.rankTier = 1;
-  if (!("pendingBattleTitle" in state)) state.pendingBattleTitle = null;
-  if (!("limitedBattleTitle" in state)) state.limitedBattleTitle = null;
-  if (state.limitedBattleTitle?.expiresWeekKey && state.limitedBattleTitle.expiresWeekKey <= currentWeekKey()) state.limitedBattleTitle = null;
   if (!state.studyHistory) state.studyHistory = {};
   if (!state.dailyStudy) state.dailyStudy = {};
   if (!state.dailyStudyCompleted) state.dailyStudyCompleted = {};
   if (!state.completedAchievements) state.completedAchievements = [];
   if (!state.equippedTitle) state.equippedTitle = "";
-  ensureRivals();
-  ensureRankingWeek();
-  advanceRivals();
+  // 舊版的排行榜對手與打怪榜稱號已移除
+  delete state.rivals;
+  delete state.rankingWeekKey;
+  delete state.weeklyXpLog;
+  delete state.pendingBattleTitle;
+  delete state.limitedBattleTitle;
   // SRS 相容遷移：所有 profile 都跑一次
   Object.entries(state.goalProfiles).forEach(([goal, p]) => {
     if (goal === "__unselected__") return;
@@ -2530,15 +2460,7 @@ function loadState() {
     dailyTests: {},
     xp: 0,
     xpLog: {},
-    weeklyXpLog: {},
-    weeklyKillLog: {},
-    rankingWeekKey: "",
     rankTier: 1,
-    pendingBattleTitle: null,
-    limitedBattleTitle: null,
-    rivals: [],
-    lastRivalAdvanceDate: null,
-    lastRankPenaltyDate: null,
     pendingLevelUp: null,
     lastLoginDate: null,
     streakDays: 0,
@@ -2811,15 +2733,7 @@ function freshState() {
     dailyTests: {},
     xp: 0,
     xpLog: {},
-    weeklyXpLog: {},
-    weeklyKillLog: {},
-    rankingWeekKey: null,
     rankTier: 1,
-    pendingBattleTitle: null,
-    limitedBattleTitle: null,
-    rivals: [],
-    lastRivalAdvanceDate: null,
-    lastRankPenaltyDate: null,
     pendingLevelUp: null,
     lastLoginDate: null,
     streakDays: 0,
@@ -2886,7 +2800,6 @@ function appShell(content) {
   `;
 }
 
-
 function render() {
   if (!builtInWordsLoaded) {
     const app = document.querySelector("#app");
@@ -2906,16 +2819,14 @@ function render() {
     clearInterval(miniGame.timer);
     miniGame.timer = null;
   }
-  if (state.user) ensureRankingWeek();
   if (state.user && !hasSelectedGoal() && screen !== "dashboard" && screen !== "login") {
     screen = "dashboard";
     stopActiveQuiz();
     studySession = null;
-    battle = null;
-  }
+    }
   const app = document.querySelector("#app");
   if (screen === "login") app.innerHTML = renderLogin();
-  if (screen === "placement" || screen === "result") screen = "dashboard";
+  if (["placement", "result", "monster-preview", "minigame"].includes(screen)) screen = "dashboard";
   if (screen === "daily") app.innerHTML = renderQuiz("daily");
   if (screen === "weekly") app.innerHTML = renderQuiz("weekly");
   if (screen === "review") app.innerHTML = renderQuiz("review");
@@ -2926,12 +2837,11 @@ function render() {
   if (screen === "study") app.innerHTML = renderStudy();
   if (screen === "weak") app.innerHTML = renderWeak();
   if (screen === "learned-words") app.innerHTML = renderLearnedWords();
-  if (screen === "monster-preview") app.innerHTML = renderMonsterPreview();
-  if (screen === "minigame") app.innerHTML = renderMonsterBattle();
   if (screen === "inventory") app.innerHTML = renderInventory();
   if (screen === "import") app.innerHTML = renderImport();
   if (screen === "achievements") app.innerHTML = renderAchievements();
-  if (screen === "ranking") app.innerHTML = renderRanking();
+  if (screen === "ranking") screen = "progress";
+  if (screen === "progress") app.innerHTML = renderProgress();
   if (screen === "admin") app.innerHTML = renderAdmin();
   bindActions();
 }
@@ -3063,6 +2973,8 @@ function renderLogin() {
         </ol>
         <p class="muted">${t("loginStepNote")}</p>
         <div class="login-actions">
+          <button class="btn login-start" data-action="guest-start">${t("guestStart")}</button>
+          <p class="muted">${t("googleOptional")}</p>
           <div id="googleSignInButton" class="google-signin-slot"></div>
           ${isLocalHost() ? `
             <button class="btn" data-action="admin-login">${t("adminLogin")}</button>
@@ -3080,7 +2992,6 @@ function renderLogin() {
     </section>
   `);
 }
-
 
 function mountGoogleSignInButton() {
   const slot = document.querySelector("#googleSignInButton");
@@ -3216,6 +3127,7 @@ function renderQuiz(kind) {
           ${orderedUserGoals().map((goal) => `<button class="chip ${activeGoal() === goal ? "active" : ""}" data-active-goal="${goal}">${goalLabel(goal)}</button>`).join("")}
         </div>
       ` : ""}
+      ${activeQuiz.battle ? renderQuizBattle(activeQuiz.battle) : ""}
       <div class="meter"><span style="width:${(activeQuiz.index / activeQuiz.questions.length) * 100}%"></span></div>
       <div class="question">
         <div>
@@ -3250,6 +3162,9 @@ function renderQuizSummary() {
     : t("daily");
   const accuracy = summary.total ? Math.round((summary.correct / summary.total) * 100) : 0;
   const mistakes = Array.isArray(summary.mistakes) ? summary.mistakes : [];
+  // 這次答錯、而且還留在弱點池的字（分級測驗不算）
+  const weakNow = new Set(activeProfile().weak || []);
+  const weakLeft = summary.kind === "placement" ? [] : [...new Set(mistakes.map((item) => item.word))].filter((wordText) => weakNow.has(wordText));
   const passedNote =
     summary.kind === "review" && summary.extra?.passed
       ? `<p class="hero-copy">${summary.extra.message || t("reviewPassed")}</p>`
@@ -3259,6 +3174,7 @@ function renderQuizSummary() {
       <span class="eyebrow">${kindLabel}</span>
       <h2 class="page-title">${t("quizSummaryTitle")}</h2>
       ${passedNote}
+      ${summary.battle ? `<div class="quest-alert ${summary.battle.result === "won" ? "" : "small"}"><strong>${summary.battle.result === "won" ? msg("battleWonSummary", { name: escapeHtml(summary.battle.name), xp: summary.battle.xp, loot: summary.battle.loot }) : summary.battle.result === "lost" ? msg("battleLostSummary", { name: escapeHtml(summary.battle.name) }) : msg("battleEscapedSummary", { name: escapeHtml(summary.battle.name) })}</strong></div>` : ""}
       <div class="summary-score">
         <p class="summary-big"><span class="lcd">${accuracy}</span><span>%</span></p>
         <dl class="readout">
@@ -3274,14 +3190,16 @@ function renderQuizSummary() {
                 <div class="word-bank-main">
                   <strong>${escapeHtml(item.word || "")}</strong>
                 </div>
-                <div class="word-bank-meaning">${t("correctAnswer") || "正解"}：${escapeHtml(item.correct || "")}</div>
+                <div class="word-bank-meaning">${escapeHtml(compactMeaning(entryForActiveGoal(item.word)?.meaning || "") || item.correct || "")}</div>
               </li>
             `).join("")}</ul>`
           : `<p class="muted">${t("noWrongAnswers") || "沒有錯題"}</p>`}
       </div>
       <div class="actions">
-        <button class="btn" data-action="dashboard">${t("backMap")}</button>
+        ${weakLeft.length ? `<button class="btn" data-action="weak-train" data-recent="${escapeHtml(weakLeft.join("|"))}">${msg("weakTrainCount", { count: Math.min(WEAK_TRAINING_SIZE, Math.max(weakLeft.length, activeProfile().weak.length)) })}</button>` : ""}
+        <button class="btn ${weakLeft.length ? "secondary" : ""}" data-action="dashboard">${t("backMap")}</button>
       </div>
+      ${weakLeft.length ? `<p class="muted">${t("weakTrainNote")}</p>` : ""}
     </section>
   `);
 }
@@ -3293,8 +3211,6 @@ function renderResult() {
 
 function renderDashboard() {
   if (!hasSelectedGoal()) return renderGoalGate();
-  ensureRivals();
-  ensureRankingWeek();
   const profile = activeProfile();
   const level = currentRankLevel();
   const label = levelLabel(level);
@@ -3312,11 +3228,8 @@ function renderDashboard() {
   const dueCount = srsDueCount();
   const pendingLevel = state.pendingLevelUp || null;
   const showWeeklyNotice = shouldShowWeeklyNotice();
-  const canBattlePendingMonster = canBattlePendingLevelUp();
-  const showMonsterChallenge = !!(canBattlePendingMonster && !pendingLevel?.deferred);
-  const showLevelUpAlert = !!(pendingLevel && !pendingLevel.monster && !pendingLevel.lootClaimed && !pendingLevel.deferred);
-  const pendingBattleTitle = state.pendingBattleTitle || null;
-  const limitedBattleTitle = state.limitedBattleTitle?.expiresWeekKey > currentWeekKey() ? state.limitedBattleTitle : null;
+  const showLevelUpAlert = !!(pendingLevel && !pendingLevel.lootClaimed);
+  const waitingBoss = canBattlePendingLevelUp() && pendingLevel.lootClaimed ? pendingLevel.monster : null;
   const equipped = achievementBadgeMeta(state.equippedTitle) || achievementBadgeMeta(state.completedAchievements?.[state.completedAchievements.length - 1]) || { icon: "crown", title: t("noTitle"), done: false };
   const dailyOpen = dailyTestAvailable();
   const weeklyOpen = weeklyTestAvailable();
@@ -3341,18 +3254,6 @@ function renderDashboard() {
         </div>
       </div>
     ` : ""}
-    ${showMonsterChallenge ? `
-      <div class="modal-backdrop">
-        <div class="modal-card" onclick="event.stopPropagation()">
-          <h2>${t("monsterPreview")}</h2>
-          <p>${t("monsterPreviewCopy")}</p>
-          <div class="actions">
-            <button class="btn" data-action="start-monster-battle">${t("startBattle")}</button>
-            <button class="btn secondary" data-action="defer-battle">${t("deferBattle")}</button>
-          </div>
-        </div>
-      </div>
-    ` : ""}
     <section class="dashboard">
       ${toast ? `<div class="quest-alert small" role="status"><span>${toast}</span></div>` : ""}
       <header class="panel status-panel">
@@ -3364,7 +3265,7 @@ function renderDashboard() {
         <dl class="readout">
           <div><dt>${t("adventurerRank")}</dt><dd class="lcd">Lv.${rank}</dd></div>
           <div><dt>${t("xp")}</dt><dd class="lcd">${xp}</dd></div>
-          <div><dt>${t("streak")}</dt><dd class="lcd">${state.streakDays || 0}</dd></div>
+          <div><dt>${t("studyStreak")}</dt><dd class="lcd">${studyStreak()}</dd></div>
         </dl>
         <div class="status-xp">
           <div class="meter" role="progressbar" aria-valuemin="0" aria-valuemax="${nextNeed}" aria-valuenow="${currentXp}"><span style="width:${xpProgress()}%"></span></div>
@@ -3379,8 +3280,7 @@ function renderDashboard() {
         ${unselectedGoals().map((goal) => `<button class="chip add" data-add-goal="${goal}">+ ${goalLabel(goal)}</button>`).join("")}
       </nav>
       ${showLevelUpAlert ? `<div class="quest-alert"><strong>${t("levelUp")} Lv.${pendingLevel.from} → Lv.${pendingLevel.to}</strong><button class="btn" data-action="claim-level-loot">${t("claimLevelLoot")}</button></div>` : ""}
-      ${pendingBattleTitle ? `<div class="quest-alert"><strong>${msg("battleTitleReady", { title: battleRankTitle(pendingBattleTitle.rank) })}</strong><button class="btn" data-action="claim-battle-title">${t("claimBattleTitle")}</button></div>` : ""}
-      ${limitedBattleTitle ? `<div class="quest-alert small"><strong>${t("limitedTitle")}</strong><span>${msg("battleTitleActive", { title: battleRankTitle(limitedBattleTitle.rank) })}</span></div>` : ""}
+      ${waitingBoss ? `<div class="quest-alert small"><span>${msg("bossWaiting", { level: pendingLevel.monsterLevel || pendingLevel.to, name: escapeHtml(waitingBoss.name) })}</span></div>` : ""}
       <div class="dash-grid">
         <section class="panel today-panel ${todayComplete ? "complete" : ""}">
           <span class="eyebrow">${activeLibraryLabel()}</span>
@@ -3397,9 +3297,11 @@ function renderDashboard() {
             ${todayLockComplete() ? `<button class="btn secondary" data-action="next-round">${t("nextRound")}</button>` : ""}
           </div>
         </section>
+        ${renderCalendar()}
         <section class="panel menu-panel">
           <h3>${t("reviewZone")}</h3>
           <div class="menu-list">
+            ${profile.weak.length ? menuRow("weak-train", t("weakTrain"), t("weakTrainNote"), Math.min(WEAK_TRAINING_SIZE, profile.weak.length)) : ""}
             ${menuRow("weak", t("weak"), "", profile.weak.length)}
             ${menuRow("learned-words", t("learnedWords"), "", profile.learned.length)}
             ${menuRow("weekly", t("weekly"), weeklyOpen ? "" : t("weeklyLockedNote"), "", !weeklyOpen)}
@@ -3412,7 +3314,7 @@ function renderDashboard() {
           <div class="menu-list">
             ${menuRow("inventory", t("inventory"), "", itemTotal)}
             ${menuRow("achievements", t("achievements"), equipped.title || t("noTitle"))}
-            ${menuRow("ranking", t("ranking"), `${t("recentXp")} ${weeklyXpTotal()}，${t("killRanking")} ${weeklyKillTotal()}`)}
+            ${menuRow("progress", t("progressTitle"), msg("progressNote", { count: longTermCount(profile) }))}
           </div>
         </section>
       </div>
@@ -3429,7 +3331,6 @@ function renderDashboard() {
     </section>
   `);
 }
-
 
 function renderCustomStudySelect() {
   return appShell(`
@@ -3639,6 +3540,7 @@ function renderStudy() {
             <p class="flash-meta">
               ${phonetic ? `<span class="phonetic">${escapeHtml(phonetic)}</span>` : ""}
               ${current.pos && current.pos !== "word" ? `<span class="tag">${escapeHtml(current.pos)}</span>` : ""}
+              ${current.grade ? `<span class="tag grade-tag">${escapeHtml(current.grade)}</span>` : ""}
               ${speakButtons(current.word)}
             </p>
             <h3 class="flash-meaning">${displayMeaning(current)}</h3>
@@ -3730,9 +3632,15 @@ function renderWeak() {
 }
 
 // 顯示字卡 modal（弱點點擊、查單字按鈕等共用）
+// 同一個字在不同考試目標各有一筆（釋義、分級不同），優先拿目前目標的那一筆
+function entryForActiveGoal(wordText) {
+  const goal = activeGoal();
+  return words.find((item) => item.word === wordText && item.goal.includes(goal)) || findWord(wordText);
+}
+
 function renderCardModal() {
   if (!cardModalWord) return "";
-  const item = findWord(cardModalWord);
+  const item = entryForActiveGoal(cardModalWord);
   if (!item) return "";
   const phonetic = phoneticText(item);
   return `
@@ -3743,6 +3651,7 @@ function renderCardModal() {
           <p class="flash-meta">
             ${phonetic ? `<span class="phonetic">${escapeHtml(phonetic)}</span>` : ""}
             ${item.pos && item.pos !== "word" ? `<span class="tag">${escapeHtml(item.pos)}</span>` : ""}
+            ${item.grade ? `<span class="tag grade-tag">${escapeHtml(item.grade)}</span>` : ""}
             ${speakButtons(item.word)}
           </p>
           <h3 class="flash-meaning">${displayMeaning(item)}</h3>
@@ -3940,93 +3849,135 @@ function renderInventory() {
   `);
 }
 
-function activeMonsterForPreview() {
-  if (!canBattlePendingLevelUp()) return null;
-  return state.pendingLevelUp.monster;
-}
-
-function renderMonsterPreview() {
-  const monster = activeMonsterForPreview();
-  if (!monster) {
-    navigateTo("dashboard", { pushHistory: false });
-    return renderDashboard();
-  }
-  const danger = Math.min(5, Math.max(1, Math.ceil(monster.attack / 10)));
-  return appShell(`
-    <section class="monster-preview panel">
-      <div class="monster-preview-copy">
-        <div class="eyebrow">${t("monsterPreview")}</div>
-        <h2 class="page-title">${monster.name}</h2>
-        <p class="hero-copy">${t("monsterPreviewCopy")}</p>
-        <div class="stats">
-          <div class="stat"><strong>${monster.maxHp}</strong><span>${t("monsterHp")}</span></div>
-          <div class="stat"><strong>${monster.attack}</strong><span>${t("monsterAttack")}</span></div>
-          <div class="stat"><strong>${"★".repeat(danger)}</strong><span>${t("dangerLevel")}</span></div>
-        </div>
-        <div class="wrong-review">
-          <h3>${t("monsterTrait")}</h3>
-          <p class="muted">${monster.trait}</p>
-        </div>
-        <div class="actions">
-          <button class="btn" data-action="start-monster-battle">${t("startBattle")}</button>
-          <button class="btn secondary" data-action="defer-battle">${t("deferBattle")}</button>
-        </div>
-      </div>
-      <div class="monster-preview-art">${monsterArt(monster)}</div>
-    </section>
-  `);
-}
-
-function renderMonsterBattle() {
-  if (!battle) {
-    const monster = state.pendingLevelUp?.monster || createMonster(getPlayerRank());
-    battle = { monster: { ...monster }, playerHp: 100, log: "", usedItems: {}, lastHit: null, lastTaken: null };
-  }
-  const monster = battle.monster;
-  const won = monster.hp <= 0;
-  const lost = battle.lost === true;
-  const playerHpPct = Math.max(0, Math.min(100, battle.playerHp));
-  const monsterHpPct = Math.max(0, Math.min(100, Math.round((Math.max(0, monster.hp) / Math.max(1, monster.maxHp)) * 100)));
-  return appShell(`
-    <section class="panel retro-game battle-layout ${won ? "battle-victory" : ""} ${lost ? "battle-loss" : ""}">
-      <div class="battle-stage">
-        <div class="monster-art ${won ? "defeated" : ""} ${lost ? "fallen" : ""} ${battle.lastHit ? "hit" : ""}">${monsterArt(monster)}</div>
-        ${battle.lastHit ? `<div class="damage-pop">-${battle.lastHit}</div>` : ""}
-        ${battle.lastTaken ? `<div class="damage-pop enemy-damage">${t("playerHp")} -${battle.lastTaken}</div>` : ""}
-        ${won ? `<div class="battle-fx victory-fx">${t("victory")}</div>` : ""}
-        ${lost ? `<div class="battle-fx loss-fx">${t("battleLost")}</div>` : ""}
-      </div>
-      <div class="battle-side">
-      <div class="battle-hud">
-        <div class="battle-meter-card monster-meter-card">
-          <div class="battle-meter-head"><strong>${t("monsterHp")}</strong><span class="lcd">${Math.max(0, monster.hp)}/${monster.maxHp}</span></div>
-          <div class="battle-meter"><span style="width:${monsterHpPct}%"></span></div>
-        </div>
-        <div class="battle-meter-card">
-          <div class="battle-meter-head"><strong>${t("playerHp")}</strong><span class="lcd">${battle.playerHp}/100</span></div>
-          <div class="battle-meter"><span style="width:${playerHpPct}%"></span></div>
-        </div>
-      </div>
-      <div class="battle-title-row">
-        <div>
-          <span class="eyebrow">${t("monsterBattle")}</span>
-          <h2 class="page-title">${monster.name}</h2>
-          <p class="hero-copy battle-log">${won ? t("victory") : lost ? t("battleLost") : battle.log || (battleItems().some((item) => (state.inventory[item.id] || 0) > 0) ? t("battleReady") : t("noItems"))}</p>
-        </div>
-        <div class="actions battle-actions">
-          ${won ? `<button class="btn" data-action="claim-battle">${t("claimReward")}</button>` : ""}
-          <button class="btn secondary" data-action="back">${backButtonLabel()}</button>
-        </div>
-      </div>
-      <div class="item-grid battle-item-grid">
-        ${battleItems().map((item) => `<button class="item-card battle-item-card" data-use-item="${item.id}" ${won || lost || (state.inventory[item.id] || 0) <= 0 ? "disabled" : ""}>${assetImage(treasureImagePath(item.id), item.name, "item-art")}<strong>${item.name}</strong><span class="item-count lcd">×${state.inventory[item.id] || 0}</span><small>${item.effect}</small></button>`).join("")}
-      </div>
-      </div>
-    </section>
-  `);
-}
-
 let importDraft = { name: "", text: "" };
+
+// ===== 我的進度：跟自己比 =====
+function longTermCount(profile = activeProfile()) {
+  return Object.values(profile.srs || {}).filter((entry) => (entry.reps || 0) >= 3).length;
+}
+
+function learnedOnDates(profile, dates) {
+  const set = new Set(dates);
+  return Object.values(profile.learnedLog || {}).filter((date) => set.has(date)).length;
+}
+
+// ===== 學習月曆與補簽 =====
+// 完成每日測驗就蓋章；連續學習每滿 7 天送一張補簽（最多存 2 張），可以補「昨天」漏掉的那一格
+const MAX_STREAK_FREEZES = 2;
+
+function stampToday() {
+  state.stamps = state.stamps || {};
+  const today = todayKey();
+  if (state.stamps[today]) return;
+  state.stamps[today] = "done";
+  const streak = studyStreak();
+  if (streak > 0 && streak % 7 === 0 && (state.streakFreezes || 0) < MAX_STREAK_FREEZES) {
+    state.streakFreezes = (state.streakFreezes || 0) + 1;
+    toast = msg("freezeEarned", { days: streak });
+  }
+}
+
+function studyStreak() {
+  const stamps = state.stamps || {};
+  let day = todayKey();
+  if (!stamps[day]) day = srsAddDays(day, -1);
+  let count = 0;
+  while (stamps[day]) {
+    count += 1;
+    day = srsAddDays(day, -1);
+  }
+  return count;
+}
+
+function canUseFreeze() {
+  const stamps = state.stamps || {};
+  const yesterday = srsAddDays(todayKey(), -1);
+  return (state.streakFreezes || 0) > 0 && !stamps[yesterday] && !!stamps[srsAddDays(todayKey(), -2)];
+}
+
+function useStreakFreeze() {
+  if (!canUseFreeze()) return;
+  state.stamps[srsAddDays(todayKey(), -1)] = "freeze";
+  state.streakFreezes -= 1;
+}
+
+function renderCalendar() {
+  const stamps = state.stamps || {};
+  const today = todayKey();
+  const [year, month] = today.split("-").map(Number);
+  const first = new Date(Date.UTC(year, month - 1, 1));
+  const daysInMonth = new Date(Date.UTC(year, month, 0)).getUTCDate();
+  const blanks = first.getUTCDay();
+  const cells = [];
+  for (let i = 0; i < blanks; i += 1) cells.push(`<span class="cal-cell empty"></span>`);
+  for (let day = 1; day <= daysInMonth; day += 1) {
+    const key = `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+    const mark = stamps[key];
+    const classes = ["cal-cell", mark === "done" ? "done" : "", mark === "freeze" ? "freeze" : "", key === today ? "today" : "", key > today ? "future" : ""].filter(Boolean).join(" ");
+    cells.push(`<span class="${classes}" title="${key}">${day}</span>`);
+  }
+  return `
+    <section class="panel calendar-panel">
+      <div class="calendar-head">
+        <h3>${t("calendarTitle")}<span>${year}／${month}</span></h3>
+        <p><strong class="lcd">${studyStreak()}</strong> ${t("calendarDays")}<span class="freeze-count">${msg("freezeCount", { count: state.streakFreezes || 0 })}</span></p>
+      </div>
+      <div class="cal-grid" aria-label="${t("calendarTitle")}">
+        ${t("weekdayLetters").split("").map((letter) => `<span class="cal-weekday">${letter}</span>`).join("")}
+        ${cells.join("")}
+      </div>
+      ${canUseFreeze() ? `<button class="btn secondary small" data-action="use-freeze">${t("useFreeze")}</button>` : ""}
+      <p class="muted">${t("calendarNote")}</p>
+    </section>
+  `;
+}
+
+function renderProgress() {
+  const profile = activeProfile();
+  const learned = profile.learned || [];
+  const learnedSet = new Set(learned);
+  const dueToday = Object.entries(profile.srs || {}).filter(([wordText, entry]) => learnedSet.has(wordText) && entry.nextReview && entry.nextReview <= todayKey()).length;
+  const last14 = recentDates(14);
+  const thisWeek = learnedOnDates(profile, last14.slice(0, 7));
+  const prevWeek = learnedOnDates(profile, last14.slice(7));
+  const cutoff = srsAddDays(todayKey(), -14);
+  const older = learned.filter((wordText) => profile.learnedLog?.[wordText] && profile.learnedLog[wordText] <= cutoff);
+  const weakSet = new Set(profile.weak || []);
+  const kept = older.filter((wordText) => !weakSet.has(wordText)).length;
+  const weeks = Array.from({ length: 8 }, (_, index) => {
+    const start = srsAddDays(currentWeekKey(), -7 * (7 - index));
+    const dates = Array.from({ length: 7 }, (_, day) => srsAddDays(start, day));
+    return { label: `${Number(start.slice(5, 7))}/${Number(start.slice(8, 10))}`, count: learnedOnDates(profile, dates) };
+  });
+  const maxWeek = Math.max(10, ...weeks.map((week) => week.count));
+  return appShell(`
+    <section class="panel progress-panel">
+      <div class="page-head">
+        <h2 class="page-title">${t("progressTitle")}</h2>
+        <button class="btn secondary" data-action="back">${backButtonLabel()}</button>
+      </div>
+      <dl class="readout progress-readout">
+        <div><dt>${t("progressLearned")}</dt><dd class="lcd">${learned.length}</dd></div>
+        <div><dt>${t("progressLongTerm")}</dt><dd class="lcd">${longTermCount(profile)}</dd></div>
+        <div><dt>${t("progressDue")}</dt><dd class="lcd">${dueToday}</dd></div>
+        <div><dt>${t("weak")}</dt><dd class="lcd">${weakSet.size}</dd></div>
+      </dl>
+      <p class="muted">${t("progressHint")}</p>
+      <p class="progress-line">${msg("progressWeekCompare", { now: thisWeek, prev: prevWeek })}</p>
+      <p class="progress-line">${older.length ? msg("progressRetention", { total: older.length, kept, percent: Math.round((kept / older.length) * 100) }) : t("progressRetentionEmpty")}</p>
+      <h3 class="progress-sub">${t("progressWeeks")}</h3>
+      <div class="week-bars" role="img" aria-label="${t("progressWeeks")}">
+        ${weeks.map((week, index) => `
+          <div class="week-bar ${index === weeks.length - 1 ? "now" : ""}">
+            <span class="week-bar-count">${week.count}</span>
+            <span class="week-bar-fill" style="height:${Math.round((week.count / maxWeek) * 100)}%"></span>
+            <span class="week-bar-label">${week.label}</span>
+          </div>
+        `).join("")}
+      </div>
+    </section>
+  `);
+}
 
 function renderImport() {
   const limit = customLibraryLimit();
@@ -4136,79 +4087,6 @@ function renderAchievements() {
   `);
 }
 
-function renderRanking() {
-  ensureRivals();
-  ensureRankingWeek();
-  driftRivalsTowardPlayer();
-  // 「3 天 XP」榜：玩家用 recentXpTotal()；對手用 rivalRecentXp() 模擬最近表現
-  // 排序鍵直接等於顯示值，不再額外加 noise，避免顯示順序看起來亂跳
-  const player = {
-    name: state.user?.name || t("rankYou"),
-    isPlayer: true,
-    weekXp: weeklyXpTotal(),
-    weekKills: weeklyKillTotal(),
-  };
-  const rivals = state.rivals.map((rival, index) => ({
-    ...rival,
-    weekXp: rivalWeeklyXp(rival, index),
-    weekKills: Math.max(0, rival.weeklyKills || 0),
-  }));
-  const xpRows = leaderboardRows(player, rivals, "weekXp");
-  const killRows = leaderboardRows(player, rivals, "weekKills");
-  // 競技排名（competition ranking）：分數相同 → 同名次；下一個跳過被佔的位置（1,1,3,4...）
-  const computeRanks = (items, key) => {
-    const ranks = [];
-    items.forEach((item, index) => {
-      if (index === 0) {
-        ranks.push(1);
-        return;
-      }
-      const prevValue = items[index - 1][key] || 0;
-      const currValue = item[key] || 0;
-      if (currValue === prevValue) ranks.push(ranks[index - 1]);
-      else ranks.push(index + 1);
-    });
-    return ranks;
-  };
-  const rows = (items, key, type) => {
-    const ranks = computeRanks(items, key);
-    return items.map((item, index) => `
-      <div class="rank-row ${item.isPlayer ? "active" : ""}">
-        <strong>${ranks[index]}</strong>
-        <span>${item.isPlayer ? `${escapeHtml(item.name)} (${t("rankYou")})` : escapeHtml(item.name)}</span>
-        <b>${item[key]}</b>
-      </div>
-    `).join("");
-  };
-  const playerXpRank = computeRanks(xpRows, "weekXp")[xpRows.findIndex((item) => item.isPlayer)] || "-";
-  const playerKillRank = computeRanks(killRows, "weekKills")[killRows.findIndex((item) => item.isPlayer)] || "-";
-  return appShell(`
-    <section class="panel">
-      <div class="page-head ranking-head">
-        <div>
-          <h2 class="page-title">${t("ranking")}</h2>
-          <div class="actions top-return-actions"><button class="btn secondary" data-action="back">${backButtonLabel()}</button></div>
-        </div>
-        <div class="ranking-self">
-          <span>${t("rankYou")}</span>
-          <strong>${t("xpRanking")} #${playerXpRank}</strong>
-          <strong>${t("killRanking")} #${playerKillRank}</strong>
-        </div>
-      </div>
-      <div class="ranking-grid">
-        <article class="card">
-          <h3>${t("xpRanking")}</h3>
-          <div class="rank-list">${rows(xpRows, "weekXp", "xp")}</div>
-        </article>
-        <article class="card">
-          <h3>${t("killRanking")}</h3>
-          <div class="rank-list">${rows(killRows, "weekKills", "kill")}</div>
-        </article>
-      </div>
-    </section>
-  `);
-}
-
 const RANK_TITLES_BY_LANG = {
   "zh-Hant": ["燭火侍從", "銅環見習騎士", "銀頁誓約者", "霜刃巡獵官", "聖紋守城將", "龍脊遠征侯", "星冠大賢王"],
   en: ["Candle Squire", "Copper-Ring Knight", "Silverleaf Oathbound", "Frostblade Ranger", "Sigil Keep Warden", "Dragonspine Margrave", "Starcrown High Sage"],
@@ -4222,29 +4100,6 @@ const RANK_TITLES = RANK_TITLES_BY_LANG["zh-Hant"]; // 相容舊呼叫；長度=
 function rankTierTitle(tier = 1) {
   const list = RANK_TITLES_BY_LANG[state.native || "zh-Hant"] || RANK_TITLES_BY_LANG["zh-Hant"];
   return list[Math.max(0, Math.min(list.length - 1, tier - 1))];
-}
-
-const BATTLE_RANK_TITLES = {
-  "zh-Hant": { champion: "討伐冠軍", front: "前線獵手", veteran: "征戰勇者", explorer: "遠征者" },
-  en: { champion: "Slayer Champion", front: "Frontline Hunter", veteran: "Battle Veteran", explorer: "Explorer" },
-  ja: { champion: "討伐王者", front: "前線の狩人", veteran: "征戦の勇者", explorer: "遠征者" },
-  ko: { champion: "토벌 챔피언", front: "전선 사냥꾼", veteran: "전투 베테랑", explorer: "원정자" },
-  es: { champion: "Campeón cazador", front: "Cazador de línea", veteran: "Veterano de combate", explorer: "Explorador" },
-};
-
-function battleRankTitle(rank) {
-  const map = BATTLE_RANK_TITLES[state.native || "zh-Hant"] || BATTLE_RANK_TITLES["zh-Hant"];
-  if (rank === 1) return map.champion;
-  if (rank <= 3) return map.front;
-  if (rank <= 10) return map.veteran;
-  return map.explorer;
-}
-
-function leaderboardRows(player, rivals, key) {
-  const all = [player, ...rivals];
-  // 直接拿顯示鍵排序，確保視覺與順序一致
-  all.sort((a, b) => (b[key] || 0) - (a[key] || 0));
-  return all.slice(0, 21);
 }
 
 // 成就 tier 條件模板：依分類 + 目標數動態組合句子（按語言）
@@ -4664,15 +4519,16 @@ function adminGroups() {
       ["open-daily", "直接開每日測驗"], ["open-weekly", "直接開週測驗"], ["open-review", "直接開總複習"],
       ["weekly-notice", "跳出「週測驗開放」通知"],
     ] },
-    { title: "打怪與道具", items: [
-      ["items", "道具各 +9"], ["items-clear", "清空道具"], ["battle", "隨機怪物"],
+    { title: "打怪與道具（點怪物名稱：設成頭目並開週測驗）", items: [
+      ["items", "道具各 +9"], ["items-clear", "清空道具"], ["battle", "隨機頭目（開週測驗）"],
       ...monsterRoster().map((monster) => [`monster:${monster.id}`, monster.name]),
     ] },
     { title: "時間與登入", items: [
       ["skip-day", "跳到明天"], ["back-today", "回到真正的今天"], ["streak7", "連續登入改成 7 天"],
+      ["stamp-today", "蓋今天的章"], ["freeze-plus", "給一張補簽"], ["miss-yesterday", "做出「昨天漏簽」（測補簽）"],
     ] },
-    { title: "成就與排行榜", items: [
-      ["ach-all", "成就數值全部拉滿"], ["battle-title", "發一個打怪榜稱號"], ["rival-reset", "重新產生排行榜對手"],
+    { title: "成就", items: [
+      ["ach-all", "成就數值全部拉滿"],
     ] },
   ];
 }
@@ -4722,7 +4578,6 @@ function renderAdmin() {
     </section>
   `);
 }
-
 
 function bindActions() {
   mountGoogleSignInButton();
@@ -4775,6 +4630,13 @@ function bindActions() {
       render();
     });
   });
+  // 不用登入就能開始：用這台裝置上的訪客帳號（進度一樣存在瀏覽器裡）
+  document.querySelectorAll("[data-action='guest-start']").forEach((button) => {
+    button.addEventListener("click", () => {
+      switchUserAccount({ id: "local:guest", provider: "guest", name: t("traveler") });
+      render();
+    });
+  });
   document.querySelectorAll("[data-action='admin-login']").forEach((button) => {
     button.addEventListener("click", () => {
       if (!isLocalHost()) return;
@@ -4789,8 +4651,7 @@ function bindActions() {
       navigateTo("login", { clearHistory: true, pushHistory: false });
       stopActiveQuiz();
       studySession = null;
-      battle = null;
-      render();
+          render();
     });
   });
   document.querySelectorAll("[data-action='admin']").forEach((button) => {
@@ -5107,55 +4968,18 @@ function bindActions() {
   });
   document.querySelectorAll("[data-action='weak-train']").forEach((button) => {
     button.addEventListener("click", () => {
-      studySession = createWeakTrainingSession();
+      const recent = button.dataset.recent ? button.dataset.recent.split("|") : [];
+      studySession = createWeakTrainingSession(recent);
       navigateTo("study");
       toast = "";
       render();
     });
   });
-  document.querySelectorAll("[data-action='minigame']").forEach((button) => {
-    button.addEventListener("click", () => {
-      if (!canBattlePendingLevelUp()) return;
-      navigateTo("monster-preview");
-      battle = null;
-      render();
-    });
-  });
-  document.querySelectorAll("[data-action='start-monster-battle']").forEach((button) => {
-    button.addEventListener("click", () => {
-      navigateTo("minigame");
-      battle = null;
-      render();
-    });
+  document.querySelectorAll("[data-quiz-item]").forEach((button) => {
+    button.addEventListener("click", () => useQuizItem(button.dataset.quizItem));
   });
   document.querySelectorAll("[data-action='claim-level-loot']").forEach((button) => {
     button.addEventListener("click", () => claimLevelLoot());
-  });
-  document.querySelectorAll("[data-action='claim-battle-title']").forEach((button) => {
-    button.addEventListener("click", () => claimBattleTitle());
-  });
-  document.querySelectorAll("[data-action='defer-battle']").forEach((button) => {
-    button.addEventListener("click", () => {
-      if (state.pendingLevelUp) {
-        state.pendingLevelUp.deferred = true;
-        if (state.pendingLevelUp.loot && !state.pendingLevelUp.lootClaimed) {
-          addInventory(state.pendingLevelUp.loot || {});
-          const rewardText = formatLoot(state.pendingLevelUp.loot || {});
-          state.rewardNotice = { title: t("itemReward"), items: rewardText };
-          // 獎勵改由 rewardNotice 視窗顯示，不再同時出 toast
-          state.pendingLevelUp.lootClaimed = true;
-        }
-      }
-      navigateTo("dashboard", { clearHistory: true, pushHistory: false });
-      saveState();
-      render();
-    });
-  });
-  document.querySelectorAll("[data-use-item]").forEach((button) => {
-    button.addEventListener("click", () => useBattleItem(button.dataset.useItem));
-  });
-  document.querySelectorAll("[data-action='claim-battle']").forEach((button) => {
-    button.addEventListener("click", () => claimBattleReward());
   });
   document.querySelectorAll("[data-action='achievements']").forEach((button) => {
     button.addEventListener("click", () => {
@@ -5163,9 +4987,16 @@ function bindActions() {
       render();
     });
   });
-  document.querySelectorAll("[data-action='ranking']").forEach((button) => {
+  document.querySelectorAll("[data-action='use-freeze']").forEach((button) => {
     button.addEventListener("click", () => {
-      navigateTo("ranking");
+      useStreakFreeze();
+      saveState();
+      render();
+    });
+  });
+  document.querySelectorAll("[data-action='progress']").forEach((button) => {
+    button.addEventListener("click", () => {
+      navigateTo("progress");
       render();
     });
   });
@@ -5221,7 +5052,6 @@ function resetCurrentAccountProgress() {
   selectedGoal = "";
   stopActiveQuiz();
   studySession = null;
-  battle = null;
   navigateTo("login", { clearHistory: true, pushHistory: false });
 }
 
@@ -5292,9 +5122,11 @@ function adminAddXpToRank(targetRank) {
 function adminOpenMonster(monsterId = "") {
   const rank = getPlayerRank();
   const monsterLevel = Math.max(5, Math.ceil(rank / 5) * 5);
-  state.pendingLevelUp = { from: rank, to: monsterLevel, loot: {}, monster: createMonster(monsterLevel, monsterId), monsterLevel, lootClaimed: true, deferred: true };
-  navigateTo("monster-preview");
-  battle = null;
+  state.pendingLevelUp = { from: rank, to: monsterLevel, loot: {}, monster: createMonster(monsterLevel, monsterId), monsterLevel, lootClaimed: true };
+  // 頭目只出現在週測驗、總複習：直接開一場週測驗測試
+  if (!buildWeeklyWords().length) adminCompleteToday();
+  stopActiveQuiz();
+  navigateTo("weekly");
 }
 
 function runAdminAction(action) {
@@ -5357,12 +5189,20 @@ function runAdminAction(action) {
   }
   if (action === "skip-day" || action === "back-today") {
     state.dayOffset = action === "skip-day" ? Number(state.dayOffset || 0) + 1 : 0;
-    state.lastRivalAdvanceDate = null;
     studySession = null;
     stopActiveQuiz();
     applyLoginReward();
   }
   if (action === "streak7") state.streakDays = 7;
+  if (action === "stamp-today") stampToday();
+  if (action === "freeze-plus") state.streakFreezes = Math.min(MAX_STREAK_FREEZES, (state.streakFreezes || 0) + 1);
+  if (action === "miss-yesterday") {
+    state.stamps = state.stamps || {};
+    delete state.stamps[srsAddDays(todayKey(), -1)];
+    state.stamps[srsAddDays(todayKey(), -2)] = "done";
+    state.stamps[srsAddDays(todayKey(), -3)] = "done";
+    state.streakFreezes = Math.max(1, state.streakFreezes || 0);
+  }
   if (action === "ach-all") {
     Object.assign(state.achievements, {
       totalCorrect: 1000, bestCombo: 50, totalLoginDays: 200, firstLevelUp: true,
@@ -5372,60 +5212,28 @@ function runAdminAction(action) {
     state.rankTier = RANK_TITLES.length;
     checkAchievementUnlocks();
   }
-  if (action === "battle-title") state.pendingBattleTitle = { rank: 1, expiresWeekKey: nextWeekKey() };
-  if (action === "rival-reset") {
-    state.rivals = [];
-    ensureRivals();
-  }
   if (action === "admin-clear") {
     if (!window.confirm(t("confirmReset"))) return;
     resetCurrentAccountProgress();
     leaveAdmin = true;
   }
   toast = leaveAdmin ? "" : `已執行：${label || action}`;
+  if (!leaveAdmin && screen !== "admin") toast = "";
   saveState();
   render();
 }
 
-
+// 道具只在週測驗、總複習的答題打怪中使用
 function battleItems() {
   return [
-    { id: "sword", name: "鐵劍", icon: "⚔️", damage: 24, effect: "-24 HP", image: treasureImagePath("sword") },
-    { id: "bomb", name: "火焰瓶", icon: "🔥", damage: 42, effect: "-42 HP", image: treasureImagePath("bomb") },
-    { id: "potion", name: "治療藥水", icon: "🧪", heal: 32, effect: "+32 HP", image: treasureImagePath("potion") },
+    { id: "sword", name: "鐵劍", effect: "下一題答對，傷害加倍", image: treasureImagePath("sword") },
+    { id: "bomb", name: "火焰瓶", damage: 20, effect: "直接造成 20 點傷害", image: treasureImagePath("bomb") },
+    { id: "potion", name: "治療藥水", heal: 32, effect: "回復 32 點生命", image: treasureImagePath("potion") },
   ];
 }
 
-function useBattleItem(itemId) {
-  if (!battle || (state.inventory[itemId] || 0) <= 0 || battle.monster.hp <= 0) return;
-  const item = battleItems().find((entry) => entry.id === itemId);
-  state.inventory[itemId] -= 1;
-  battle.usedItems = battle.usedItems || {};
-  battle.usedItems[itemId] = (battle.usedItems[itemId] || 0) + 1;
-  battle.lastHit = item.damage || null;
-  if (item.damage) battle.monster.hp = Math.max(0, battle.monster.hp - item.damage);
-  if (item.heal) battle.playerHp = Math.min(100, battle.playerHp + item.heal);
-  if (battle.monster.hp > 0) {
-    battle.lastTaken = battle.monster.attack;
-    battle.playerHp = Math.max(0, battle.playerHp - battle.monster.attack);
-  } else {
-    battle.lastTaken = null;
-  }
-  battle.log = item.damage ? msg("battleDamage", { item: item.name, damage: item.damage }) : msg("battleHeal", { item: item.name, heal: item.heal });
-  if (battle.playerHp <= 0) {
-    refundHalfUsedItems();
-    battle.lost = true;
-    battle.log = t("battleLost");
-    saveState();
-    render();
-    return;
-  }
-  saveState();
-  render();
-}
-
-function refundHalfUsedItems() {
-  Object.entries(battle?.usedItems || {}).forEach(([itemId, amount]) => {
+function refundHalfUsedItems(quizBattle) {
+  Object.entries(quizBattle?.usedItems || {}).forEach(([itemId, amount]) => {
     state.inventory[itemId] = (state.inventory[itemId] || 0) + Math.ceil(amount / 2);
   });
 }
@@ -5439,44 +5247,13 @@ function claimLevelLoot() {
     // 獎勵改由 rewardNotice 視窗顯示，不再同時出 toast
     state.pendingLevelUp.lootClaimed = true;
   }
-  if (canBattlePendingLevelUp()) {
-    state.pendingLevelUp.deferred = true;
-  } else {
-    state.pendingLevelUp = null;
-  }
+  if (!canBattlePendingLevelUp()) state.pendingLevelUp = null;
   saveState();
   render();
 }
 
 function formatLoot(items) {
   return Object.entries(items).map(([key, amount]) => `${battleItems().find((item) => item.id === key)?.name || key} x${amount}`).join("、");
-}
-
-function claimBattleTitle() {
-  if (!state.pendingBattleTitle) return;
-  state.limitedBattleTitle = {
-    rank: state.pendingBattleTitle.rank,
-    claimedWeekKey: currentWeekKey(),
-    expiresWeekKey: state.pendingBattleTitle.expiresWeekKey || nextWeekKey(),
-  };
-  state.pendingBattleTitle = null;
-  toast = msg("battleTitleActive", { title: battleRankTitle(state.limitedBattleTitle.rank) });
-  saveState();
-  render();
-}
-
-function claimBattleReward() {
-  if (!battle || battle.monster.hp > 0) return;
-  state.achievements.monstersDefeated += 1;
-  state.weeklyKillLog = state.weeklyKillLog || {};
-  const today = todayKey();
-  state.weeklyKillLog[today] = (state.weeklyKillLog[today] || 0) + 1;
-  state.pendingLevelUp = null;
-  addXp(50 + battle.monster.level * 5);
-  battle = null;
-  navigateTo("dashboard", { clearHistory: true, pushHistory: false });
-  saveState();
-  render();
 }
 
 function monsterImagePath(monster) {
@@ -5495,36 +5272,134 @@ function monsterArt(monster) {
   return `<div class="generated-monster">${assetImage(monsterImagePath(monster), monster.name, "monster-raster")}${monsterSvg(monster)}</div>`;
 }
 
-function applyQuizBattleTurn(current, isCorrect) {
-  const damage = 16 + current.level * 6;
-  if (isCorrect) {
-    battle.monster.hp = Math.max(0, battle.monster.hp - damage);
-    battle.lastHit = damage;
-    battle.lastTaken = null;
-    battle.log = msg("quizAttack", { damage });
-  } else {
-    const taken = battle.monster.attack;
-    battle.lastHit = null;
-    battle.playerHp = Math.max(0, battle.playerHp - taken);
-    battle.lastTaken = taken;
-    battle.log = msg("quizCounter", { damage: taken });
+// ===== 答題打怪（週測驗、總複習）=====
+// 怪物血量設成「答對七成」剛好打倒（升級頭目要八成）；每答錯一次被反擊，錯太多就倒下。
+// 倒下或怪物被打倒後，剩下的題目照常作答，測驗成績不受影響。
+const QUIZ_HIT = 10;
+
+function createQuizBattle(questionCount) {
+  const boss = canBattlePendingLevelUp() ? state.pendingLevelUp.monster : null;
+  const base = boss || createMonster(Math.max(1, getPlayerRank()));
+  const hitsNeeded = Math.max(1, Math.ceil(questionCount * (boss ? 0.8 : 0.7)));
+  const allowedWrong = Math.max(1, questionCount - hitsNeeded);
+  const maxHp = hitsNeeded * QUIZ_HIT;
+  return {
+    monster: { ...base, hp: maxHp, maxHp, attack: Math.ceil(100 / (allowedWrong + 1)) },
+    isBoss: !!boss,
+    playerHp: 100,
+    swordReady: false,
+    usedItems: {},
+    lastHit: null,
+    lastTaken: null,
+    log: "",
+    result: null,
+  };
+}
+
+function hitMonster(quizBattle, damage) {
+  quizBattle.monster.hp = Math.max(0, quizBattle.monster.hp - damage);
+  quizBattle.lastHit = damage;
+  if (quizBattle.monster.hp <= 0) {
+    quizBattle.result = "won";
+    quizBattle.log = t("battleWonContinue");
   }
 }
 
-function claimQuizBattleVictory() {
-  const defeated = battle.monster;
-  state.achievements.monstersDefeated += 1;
-  state.weeklyKillLog = state.weeklyKillLog || {};
-  const today = todayKey();
-  state.weeklyKillLog[today] = (state.weeklyKillLog[today] || 0) + 1;
-  state.pendingLevelUp = null;
-  addXp(50 + defeated.level * 5);
-  battle = null;
-  stopActiveQuiz();
-  toast = t("victory");
-  navigateTo("dashboard", { clearHistory: true, pushHistory: false });
+function applyQuizBattleTurn(quizBattle, isCorrect) {
+  if (!quizBattle || quizBattle.result) return;
+  quizBattle.lastHit = null;
+  quizBattle.lastTaken = null;
+  if (isCorrect) {
+    const damage = QUIZ_HIT * (quizBattle.swordReady ? 2 : 1);
+    quizBattle.swordReady = false;
+    quizBattle.log = msg("quizAttack", { damage });
+    hitMonster(quizBattle, damage);
+    return;
+  }
+  const taken = quizBattle.monster.attack;
+  quizBattle.playerHp = Math.max(0, quizBattle.playerHp - taken);
+  quizBattle.lastTaken = taken;
+  quizBattle.log = msg("quizCounter", { damage: taken });
+  if (quizBattle.playerHp <= 0) {
+    quizBattle.result = "lost";
+    quizBattle.log = t("battleLostContinue");
+  }
+}
+
+function useQuizItem(itemId) {
+  const quizBattle = activeQuiz?.battle;
+  const item = battleItems().find((entry) => entry.id === itemId);
+  if (!quizBattle || quizBattle.result || !item || (state.inventory[itemId] || 0) <= 0) return;
+  if (itemId === "sword" && quizBattle.swordReady) return;
+  if (itemId === "potion" && quizBattle.playerHp >= 100) return;
+  state.inventory[itemId] -= 1;
+  quizBattle.usedItems[itemId] = (quizBattle.usedItems[itemId] || 0) + 1;
+  quizBattle.lastHit = null;
+  quizBattle.lastTaken = null;
+  if (itemId === "sword") {
+    quizBattle.swordReady = true;
+    quizBattle.log = t("swordReady");
+  }
+  if (item.damage) {
+    quizBattle.log = msg("battleDamage", { item: item.name, damage: item.damage });
+    hitMonster(quizBattle, item.damage);
+  }
+  if (item.heal) {
+    quizBattle.playerHp = Math.min(100, quizBattle.playerHp + item.heal);
+    quizBattle.log = msg("battleHeal", { item: item.name, heal: item.heal });
+  }
   saveState();
   render();
+}
+
+// 測驗結束時結算戰鬥：打倒給經驗與道具；沒打倒（倒下或時間到）退還一半用掉的道具
+function settleQuizBattle(quizBattle) {
+  if (!quizBattle) return null;
+  const monster = quizBattle.monster;
+  if (quizBattle.result === "won") {
+    const loot = levelLoot(monster.level || getPlayerRank());
+    const xpGain = 50 + (monster.level || 1) * 5;
+    addInventory(loot);
+    addXp(xpGain);
+    state.achievements.monstersDefeated += 1;
+    if (quizBattle.isBoss) state.pendingLevelUp = null;
+    return { result: "won", name: monster.name, loot: formatLoot(loot), xp: xpGain, boss: quizBattle.isBoss };
+  }
+  refundHalfUsedItems(quizBattle);
+  return { result: quizBattle.result === "lost" ? "lost" : "escaped", name: monster.name, boss: quizBattle.isBoss };
+}
+
+function renderQuizBattle(quizBattle) {
+  const monster = quizBattle.monster;
+  const monsterPct = Math.round((monster.hp / Math.max(1, monster.maxHp)) * 100);
+  const playerPct = Math.max(0, Math.min(100, quizBattle.playerHp));
+  return `
+    <div class="quiz-battle ${quizBattle.result ? `is-${quizBattle.result}` : ""}">
+      <div class="quiz-battle-art ${quizBattle.lastHit ? "hit" : ""} ${quizBattle.result === "won" ? "defeated" : ""}">
+        ${monsterArt(monster)}
+        ${quizBattle.lastHit ? `<span class="damage-pop">-${quizBattle.lastHit}</span>` : ""}
+      </div>
+      <div class="quiz-battle-body">
+        <p class="quiz-battle-name"><strong>${escapeHtml(monster.name)}</strong>${quizBattle.isBoss ? `<span class="tag">${t("bossTag")}</span>` : ""}</p>
+        <div class="battle-meter-card monster-meter-card">
+          <div class="battle-meter-head"><span>${t("monsterHp")}</span><span>${monster.hp}/${monster.maxHp}</span></div>
+          <div class="battle-meter"><span style="width:${monsterPct}%"></span></div>
+        </div>
+        <div class="battle-meter-card">
+          <div class="battle-meter-head"><span>${t("playerHp")}${quizBattle.lastTaken ? `<b class="taken">-${quizBattle.lastTaken}</b>` : ""}</span><span>${quizBattle.playerHp}/100</span></div>
+          <div class="battle-meter"><span style="width:${playerPct}%"></span></div>
+        </div>
+        <p class="quiz-battle-log">${escapeHtml(quizBattle.log || monster.trait || "")}</p>
+        <div class="quiz-items">
+          ${battleItems().map((item) => {
+            const count = state.inventory[item.id] || 0;
+            const disabled = quizBattle.result || count <= 0 || (item.id === "sword" && quizBattle.swordReady) || (item.id === "potion" && quizBattle.playerHp >= 100);
+            return `<button class="item-chip ${item.id === "sword" && quizBattle.swordReady ? "armed" : ""}" data-quiz-item="${item.id}" title="${item.effect}" ${disabled ? "disabled" : ""}>${assetImage(treasureImagePath(item.id), item.name, "item-art")}<span>${item.name}</span><b>×${count}</b></button>`;
+          }).join("")}
+        </div>
+      </div>
+    </div>
+  `;
 }
 
 function monsterSvg(monster) {
@@ -5892,10 +5767,12 @@ function cleanMeaningPartForNative(part) {
   let s = String(part)
     .replace(/^(to|a|an|the)\s+/i, "")
     .replace(/^\s*\([^)]*\)\s*/, "")
-    .replace(/^[（(]\s*/, "")
-    .replace(/[）)]\s*$/, "")
     .replace(/\b(?:v|n|adj|adv|prep|conj|pron|interj|aux)\.?\b/gi, "")
     .trim();
+  // 括號補充說明（例如「是（複數形式）」）拿掉；只剩半邊括號的也一併清掉，避免出現「是（複數形式」
+  const withoutNotes = s.replace(/[（(][^）)]*[）)]/g, "").trim();
+  if (withoutNotes) s = withoutNotes;
+  s = s.replace(/[（(][^）)]*$/, "").replace(/^[^（(]*[）)]/, (m) => m.replace(/[）)]/g, "")).trim();
   if (!isSpanishNative()) s = s.replace(/[A-Za-z][A-Za-z'\-\s]*/g, " ");
   s = s.replace(/[`~!@#$%^&*()_+=|\\<>?[\]{}":']/g, "");
   s = s.replace(/\s+/g, isSpanishNative() ? " " : "").trim();
@@ -6020,7 +5897,7 @@ function createQuiz(kind) {
     } else {
       type = index % 2 === 1 ? "cloze" : "meaning";
     }
-    return buildQuestion(item, type, source);
+    return buildQuestion(item, type);
   });
   return {
     kind,
@@ -6033,6 +5910,7 @@ function createQuiz(kind) {
     duration: kind === "review" ? 900 : kind === "weekly" ? 300 : 180,
     mistakes: [],
     timer: null,
+    battle: (kind === "weekly" || kind === "review") && questions.length ? createQuizBattle(questions.length) : null,
   };
 }
 
@@ -6181,9 +6059,9 @@ function weightedSampleUnique(pool, count) {
   return selected;
 }
 
-function buildQuestion(item, type, source = quizChoicePool()) {
+function buildQuestion(item, type) {
   const resolvedType = questionTypeForItem(item, type);
-  const choices = resolvedType === "word" || resolvedType === "cloze" || resolvedType === "listen" ? buildWordChoices(item, source) : buildMeaningChoices(item, source);
+  const choices = resolvedType === "word" || resolvedType === "cloze" || resolvedType === "listen" ? buildWordChoices(item) : buildMeaningChoices(item);
   if (resolvedType === "listen") {
     return {
       ...item,
@@ -6258,6 +6136,7 @@ function answerQuiz(answer, correct) {
   }
   if (isCorrect) advanceWeakMastery(current.word);
   if (activeQuiz.kind !== "placement") srsUpdate(current.word, isCorrect);
+  applyQuizBattleTurn(activeQuiz.battle, isCorrect);
   saveState();
   activeQuiz.index += 1;
   const shouldFinish = activeQuiz.index >= activeQuiz.questions.length || getQuizRemainingSeconds() <= 0;
@@ -6322,7 +6201,9 @@ function finishQuiz() {
       total: activeQuiz.answers,
       finishedAt: new Date().toISOString(),
     };
+    stampToday();
   }
+  summary.battle = settleQuizBattle(activeQuiz.battle);
   // 把結果暫存到 state.lastQuizSummary 供 renderQuizSummary 讀取
   state.lastQuizSummary = summary;
   toast = "";
@@ -6420,7 +6301,7 @@ function createStudySession(libraryId = null) {
     previewIndex: 0,
     words: finalWords,
     libraryId,
-    questions: finalWords.map((item, index) => buildQuestion(item, libraryId ? (index % 2 === 0 ? "meaning" : "word") : (index % 2 === 0 ? "meaning" : "cloze"), source)),
+    questions: finalWords.map((item, index) => buildQuestion(item, libraryId ? (index % 2 === 0 ? "meaning" : "word") : (index % 2 === 0 ? "meaning" : "cloze"))),
     index: 0,
     correct: 0,
   };
@@ -6454,24 +6335,27 @@ function prefetchStudyWords(items) {
   ]).then(() => render());
 }
 
-function createWeakTrainingSession() {
+// 錯題加強：剛才答錯的字優先，再從弱點池補到 12 個；同一個字在任何測驗答對兩次就會移出弱點池
+const WEAK_TRAINING_SIZE = 12;
+function createWeakTrainingSession(priorityWords = []) {
   const profile = activeProfile();
-  // 弱點字可能來自內建或自訂庫，用 allWords() 才能找齊
-  const source = allWords().filter((item) => profile.weak.includes(item.word));
+  const weakSet = new Set(profile.weak || []);
+  // 弱點字可能來自內建或自訂庫；同一個字優先用目前目標那一筆
+  const source = uniqueWordObjects([...weakSet].map((wordText) => entryForActiveGoal(wordText)).filter(Boolean));
   if (!source.length) {
     return { phase: "empty", previewIndex: 0, words: [], libraryId: null, questions: [], index: 0, correct: 0 };
   }
-  const count = source.length > 10 ? Math.ceil(source.length / 2) : source.length;
-  const selectedWords = sampleUniqueWords(source, count);
-  // 干擾項池用全字庫，確保選項詞性 + 字義相近邏輯能正常運作
-  const quizSource = allWords();
-  const questionTypes = source.length < 5 ? ["cloze", "meaning", "word"] : ["meaning", "word"];
+  const priority = source.filter((item) => priorityWords.includes(item.word));
+  const others = shuffle(source.filter((item) => !priorityWords.includes(item.word)));
+  const selectedWords = [...priority, ...others].slice(0, Math.max(WEAK_TRAINING_SIZE, priority.length));
+  // 輪流換題型（看英文選中文、看中文選英文、克漏字），沒有例句的字會自動退回字義題
+  const questionTypes = ["word", "cloze", "meaning"];
   return {
     phase: "quiz",
     previewIndex: 0,
     words: selectedWords,
     libraryId: null,
-    questions: selectedWords.map((item, index) => buildQuestion(item, questionTypes[index % questionTypes.length], quizSource)),
+    questions: selectedWords.map((item, index) => buildQuestion(item, questionTypes[index % questionTypes.length])),
     index: 0,
     correct: 0,
     score: 0,
@@ -6678,127 +6562,154 @@ function findWord(wordText) {
   return wordIndexCache.map.get(wordText);
 }
 
-function buildWordChoices(item, source = quizChoicePool()) {
-  const distractors = getSimilarWords(item, source).map((candidate) => candidate.word);
-  return finalizeChoices(item, item.word, distractors, "word", source);
+function buildWordChoices(item) {
+  return buildChoices(item, "word");
 }
 
-function buildMeaningChoices(item, source = quizChoicePool()) {
-  const distractors = getSimilarWords(item, source).map((candidate) => compactMeaning(candidate.meaning));
-  return finalizeChoices(item, compactMeaning(item.meaning), distractors, "meaning", source);
+function buildMeaningChoices(item) {
+  return buildChoices(item, "meaning");
+}
+
+// ===== 選項（干擾項）=====
+// 原則：同一個考試目標、同詞性、難度相近；優先挑「拼字相近」（adapt／adopt）或「意思同一個範圍但不同」（借／租）的字；
+// 意思幾乎一樣的字（巨大的／龐大的）不能當選項，四個選項彼此也不能同義，否則題目會有兩個答案。
+const meaningSenseCache = new Map();
+function meaningInfo(meaning) {
+  const key = String(meaning || "");
+  let info = meaningSenseCache.get(key);
+  if (!info) {
+    const senses = String(compactMeaning(key) || key)
+      .split(/[、；;,，/]/)
+      .map((part) => part.replace(/[（(][^）)]*[）)]/g, "").replace(/[的地得了之]/g, "").trim())
+      .filter(Boolean);
+    info = { senses, chars: new Set(senses.join("")) };
+    meaningSenseCache.set(key, info);
+  }
+  return info;
+}
+
+function meaningOverlap(a, b) {
+  const ca = meaningInfo(a).chars;
+  const cb = meaningInfo(b).chars;
+  if (!ca.size || !cb.size) return 0;
+  let common = 0;
+  ca.forEach((ch) => {
+    if (cb.has(ch)) common += 1;
+  });
+  return common / (ca.size + cb.size - common);
+}
+
+// 判斷兩個字是否「中文意思一樣或幾乎一樣」，寧可多排除，也不要讓題目出現兩個正解。
+// 規則：義項相同或互相包含（租／租用）、兩個雙字詞最後一個字相同（迅速／快速、巨大／龐大）、整體用字重疊過半。
+function sameMeaning(a, b) {
+  const sa = meaningInfo(a).senses;
+  const sb = meaningInfo(b).senses;
+  if (!sa.length || !sb.length) return false;
+  const related = sa.some((x) => sb.some((y) => x.includes(y) || y.includes(x) || (x.length >= 2 && y.length >= 2 && x.slice(-1) === y.slice(-1))));
+  return related || meaningOverlap(a, b) >= 0.5;
+}
+
+function editDistance(a, b) {
+  const row = Array.from({ length: b.length + 1 }, (_, i) => i);
+  for (let i = 1; i <= a.length; i += 1) {
+    let prev = row[0];
+    row[0] = i;
+    for (let j = 1; j <= b.length; j += 1) {
+      const temp = row[j];
+      row[j] = Math.min(row[j] + 1, row[j - 1] + 1, prev + (a[i - 1] === b[j - 1] ? 0 : 1));
+      prev = temp;
+    }
+  }
+  return row[b.length];
+}
+
+function formSimilarity(a, b) {
+  const x = String(a).toLowerCase();
+  const y = String(b).toLowerCase();
+  let score = 1 - editDistance(x, y) / Math.max(x.length, y.length, 1);
+  if (x[0] === y[0]) score += 0.15;
+  if (x.length > 3 && x.slice(-3) === y.slice(-3)) score += 0.1;
+  return score;
+}
+
+// 依「目標＋詞性」快取候選池；內建字或自訂庫有變動時重建
+const distractorPoolCache = new Map();
+let distractorPoolSignature = "";
+function cachedPool(key, build) {
+  const signature = `${words.length}|${(state.customLibraries || []).map((library) => `${library.id}:${(library.words || []).length}`).join(",")}`;
+  if (signature !== distractorPoolSignature) {
+    distractorPoolCache.clear();
+    distractorPoolSignature = signature;
+  }
+  if (!distractorPoolCache.has(key)) distractorPoolCache.set(key, build());
+  return distractorPoolCache.get(key);
+}
+
+function distractorPool(item) {
+  const pos = normalizePos(item.pos);
+  const goal = item.library === "built-in" ? item.goal?.[0] || "" : "";
+  const sameGoal = goal
+    ? cachedPool(`${goal}|${pos}`, () => uniqueWordObjects(words.filter((candidate) => candidate.goal.includes(goal) && normalizePos(candidate.pos) === pos && hasText(candidate.meaning))))
+    : [];
+  const pool = sameGoal.length >= 12
+    ? sameGoal
+    : cachedPool(`*|${pos}`, () => uniqueWordObjects(allWords().filter((candidate) => normalizePos(candidate.pos) === pos && hasText(candidate.meaning))));
+  return pool.filter((candidate) => candidate.word !== item.word);
+}
+
+function getSimilarWords(item) {
+  const level = item.level || 1;
+  const all = distractorPool(item);
+  const near = all.filter((candidate) => Math.abs((candidate.level || 1) - level) <= 1);
+  const pool = near.length >= 30 ? near : all;
+  const scored = pool.map((candidate) => {
+    const lengthGap = Math.abs(candidate.word.length - item.word.length);
+    const form = lengthGap <= 4 ? formSimilarity(item.word, candidate.word) : 0;
+    const related = meaningOverlap(candidate.meaning, item.meaning);
+    return { candidate, form, related, score: form * 3 + related * 2 - Math.abs((candidate.level || 1) - level) * 0.2 };
+  });
+  // 先用便宜的分數排出前 40 名，再做比較嚴格的同義檢查
+  const top = scored
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 40)
+    .filter((entry) => !sameMeaning(entry.candidate.meaning, item.meaning));
+  if (!top.length) return [];
+  const byForm = [...top].sort((a, b) => b.form - a.form)[0];
+  const byMeaning = [...top].sort((a, b) => b.related - a.related)[0];
+  const picks = [];
+  if (byForm.form >= 0.45) picks.push(byForm.candidate);
+  if (byMeaning.related > 0) picks.push(byMeaning.candidate);
+  // 其餘從前 10 名洗牌補，讓同一個字每次出題的選項有些變化
+  return uniqueWordObjects([...picks, ...shuffle(top.slice(0, 10)).map((entry) => entry.candidate)]);
+}
+
+function buildChoices(item, mode) {
+  const valueOf = (entry) => (mode === "word" ? entry.word : compactMeaning(entry.meaning));
+  const chosen = [item];
+  const values = new Set([valueOf(item)]);
+  const tryAdd = (candidate) => {
+    if (chosen.length >= 4 || !candidate) return;
+    const value = valueOf(candidate);
+    if (!value || values.has(value)) return;
+    if (chosen.some((entry) => sameMeaning(entry.meaning, candidate.meaning))) return;
+    chosen.push(candidate);
+    values.add(value);
+  };
+  getSimilarWords(item).forEach(tryAdd);
+  if (chosen.length < 4) shuffle(distractorPool(item)).forEach(tryAdd);
+  if (chosen.length < 4) shuffle(allWords().filter((candidate) => candidate.word !== item.word)).slice(0, 200).forEach(tryAdd);
+  return shuffle(chosen.map(valueOf));
 }
 
 // 需求2 #1：干擾項從 allWords()（內建 + 所有自訂庫）取，不受 activeLibrary 限制
 // 即使單字庫很小，選項也不會重複度太高
-function quizChoicePool() {
-  return allWords();
-}
 
 // 中文字義相近度：共享字元 Jaccard 相似度（0~1）
-function meaningSimilarity(a, b) {
-  if (!a || !b) return 0;
-  const clean = (s) => String(s).replace(/[\s；;()（）的得地了]/g, "");
-  const setA = new Set(clean(a).split(""));
-  const setB = new Set(clean(b).split(""));
-  if (!setA.size || !setB.size) return 0;
-  let common = 0;
-  setA.forEach((ch) => {
-    if (setB.has(ch)) common += 1;
-  });
-  const denom = setA.size + setB.size - common;
-  return denom > 0 ? common / denom : 0;
-}
-
-function getSimilarWords(item, source = quizChoicePool()) {
-  // 先用 source 篩同詞性；若候選太少（< 6 個）就再從 allWords 補
-  let pool = source.filter((candidate) => candidate.word !== item.word && candidate.pos === item.pos);
-  if (pool.length < 6) {
-    const fallback = allWords().filter((candidate) => candidate.word !== item.word && candidate.pos === item.pos);
-    pool = uniqueWordObjects([...pool, ...fallback]);
-  }
-  if (!pool.length) return [];
-  // 打分：字義相近權重最高、段位接近、字形拼寫相近
-  const scored = pool.map((candidate) => ({
-    candidate,
-    score:
-      meaningSimilarity(candidate.meaning, item.meaning) * 10 +
-      (Math.abs((candidate.level || 1) - (item.level || 1)) <= 1 ? 3 : 0) +
-      similarityScore(item.word, candidate.word),
-  }));
-  scored.sort((a, b) => b.score - a.score);
-  // 取前 12 名做候選池、shuffle 取 3 → 同一個字每次出題時干擾項會洗牌增加變化
-  const top = scored.slice(0, Math.min(12, scored.length)).map((s) => s.candidate);
-  return shuffle(top).slice(0, 3);
-}
-
-function finalizeChoices(item, correctValue, distractors, mode, source = quizChoicePool()) {
-  const samePosPool = uniqueWordObjects([
-    ...allWords().filter((candidate) => candidate.word !== item.word && candidate.pos === item.pos),
-    ...source.filter((candidate) => candidate.word !== item.word && candidate.pos === item.pos),
-  ]);
-  // meaning 模式 → 所有選項用精簡版，避免「答案是精簡版但選項是長版」對不上
-  const meaningOf = (entry) => mode === "word" ? entry.word : compactMeaning(entry.meaning);
-  const pool = samePosPool.map(meaningOf);
-  const seen = new Set([correctValue]);
-  const answers = [correctValue];
-  const candidates = uniqueWords([
-    ...distractors,
-    ...getSimilarWords(item, source).map(meaningOf),
-    ...sampleUniqueValues(pool, 8),
-    ...pool,
-  ].filter(Boolean));
-  // 過濾「跟正解或已選選項字義太相近（≥70% 共享字）」的候選 — 避免「快速的」vs「迅速的」這類差異不大的選項
-  const tooSimilarToAny = (value) => {
-    if (mode !== "meaning") return false;
-    return answers.some((existing) => meaningTooSimilar(value, existing));
-  };
-  candidates.forEach((value) => {
-    if (answers.length >= 4) return;
-    if (seen.has(value) || value === correctValue) return;
-    if (tooSimilarToAny(value)) return;
-    seen.add(value);
-    answers.push(value);
-  });
-  // 還不夠 4 個 → 即使較相近也補（保證題目有 4 個選項）
-  while (answers.length < 4) {
-    const extra = pool.find((value) => !answers.includes(value) && value !== correctValue);
-    if (!extra) break;
-    answers.push(extra);
-  }
-  return shuffle(answers);
-}
 
 // 兩個 meaning 是否「太像」（70% 字符共享 + 至少其中之一很短時更嚴格）
-function meaningTooSimilar(a, b) {
-  if (!a || !b) return false;
-  if (a === b) return true;
-  const sa = new Set(String(a).replace(/[；;、,，/(){}（）的得地了]/g, ""));
-  const sb = new Set(String(b).replace(/[；;、,，/(){}（）的得地了]/g, ""));
-  if (!sa.size || !sb.size) return false;
-  let common = 0;
-  sa.forEach((c) => { if (sb.has(c)) common += 1; });
-  const minLen = Math.min(sa.size, sb.size);
-  return minLen > 0 && common / minLen >= 0.7;
-}
-
-function sampleUniqueValues(values, count) {
-  return shuffle(Array.from(new Set(values))).slice(0, count);
-}
 
 function sampleUniqueWords(source, count) {
   return shuffle(Array.from(new Map(source.map((item) => [item.word, item])).values())).slice(0, count);
-}
-
-function similarityScore(a, b) {
-  const prefix = commonPrefix(a, b);
-  const lengthCloseness = 1 / (1 + Math.abs(a.length - b.length));
-  return prefix * 2 + lengthCloseness;
-}
-
-function commonPrefix(a, b) {
-  let count = 0;
-  while (count < a.length && count < b.length && a[count] === b[count]) count += 1;
-  return count;
 }
 
 function uniqueWords(wordTexts) {

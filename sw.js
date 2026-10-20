@@ -5,7 +5,7 @@
 //   - 圖片、字型（幾乎不變、檔案較大）：cache-first，沒有才抓網路。
 //   - /api/*：network-first，離線時回退快取（字典查詢結果可離線重看）。
 //   - 預快取一律用 cache: "reload"，避免把瀏覽器 HTTP 快取裡的舊檔存進來。
-const CACHE_VERSION = "vocab-arcana-v4";
+const CACHE_VERSION = "vocab-arcana-v5";
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 

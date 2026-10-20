@@ -1,5 +1,15 @@
 # Version History
 
+## v0.4.0
+
+- Start without signing in; Google login is optional.
+- Weekly tests and grand reviews are now monster battles: correct answers attack, wrong answers get countered, items are used mid-quiz. Level-up bosses wait for the next big review.
+- Study calendar with stamps, study streak and streak savers (one per 7-day streak, max 2).
+- Fake leaderboard removed; "My progress" compares you with yourself (long-term words, due today, week vs week, retention, 8-week chart).
+- Quiz distractors: same goal, same part of speech, near level; spelling look-alikes and same-field meanings; synonyms excluded.
+- Optional "practice mistakes" sessions after any quiz, mixing new and older weak words.
+- Official difficulty grades (GSAT levels 1–6, CAP 1200/800) shown on cards; other lists ranked by word frequency.
+
 ## v0.3.1
 
 - Word cards now show phonetics, an example sentence and its Taiwanese Mandarin translation for all 7,747 built-in words (data/word-details.json), plus normal / slow pronunciation and read-the-example buttons.
