@@ -4,6 +4,36 @@
 
 ---
 
+## 階段 27（2026-10-20）by Claude — 字卡例句／音標／慢速朗讀、萬能管理員模式、詞表資料清理
+
+### 一、字卡資料：`data/word-details.json`（新檔，約 1MB）
+- 以單字為 key：`{ "abandon": { "p": "[əˈbændən]", "e": "英文例句", "z": "例句中文" } }`，涵蓋全部 7747 個內建字。
+- 例句與中文為本次分批撰寫，程式逐句檢查：單字原形完整出現、完整句子、6–16 字、中文用台灣繁體（擋簡體字與常見中國用語）。
+- 音標優先序：內建原有 > 英檢初級 CSV 的音標 > CMU 發音字典自動轉 KK 式（`scripts/kk_phonetics.py`）。少數 57 個罕見字沒有音標。
+- `app.js`：開機時與 `built-in-words.json` 一起載入並合併（`loadWordDetails` / `applyWordDetails`）。內建字資料齊全時不再向 `/api/cambridge` 查詢（`isEntryComplete`），本機伺服器也不會把整理過的例句換掉。
+- 例句變多之後，週測驗、總複習、背誦測驗的「克漏字」題型會真的出現（之前因為沒例句一律退回字義題）。克漏字改用整字比對挖空（`clozeFromExample`），不會再把 start 挖成 st____。
+- **`.gitignore` 原本把 `data/*` 全部排除，已加上 `!data/word-details.json`，否則推不上 GitHub。**
+
+### 二、朗讀
+- `speakWord(text, rate)`：正常 0.86、慢速 0.5（`SPEAK_RATE_*`）。
+- 字卡與字卡視窗：單字旁有「朗讀」「慢速」兩顆鍵，例句標題旁有「朗讀例句」。
+
+### 三、萬能管理員模式（僅限本機）
+- `isLocalHost()`：localhost / 127.0.0.1 / ::1 / file: 才成立。`canUseAdmin()` 改成只看這個，**線上版（GitHub Pages）不論誰登入都看不到管理員功能**，原本的 adminEmails 名單不再用於前端。
+- 登入頁在本機會多一顆「萬能管理員模式」，不需 Google、不需 `LOCAL_TEST_LOGIN`，以 `local:admin` 帳號登入。
+- 面板（`adminGroups()` / `runAdminAction()`）：經驗與段位（含直接升到 5 的倍數級遇怪）、學習進度（完成今日 10 字、學到 60%、全學完、弱點池增減、讓字到期複習）、直接開每日／週測驗／總複習、指定 12 隻怪物任一隻開戰、道具、跳日／回今天、連登 7 天、成就拉滿、打怪榜稱號、重產排行榜對手、清除進度。上方即時顯示日期、段位、經驗、登入天數、學過／弱點數、已學比例、道具數。
+- 怪物名單抽成 `monsterRoster()`，`createMonster(level, monsterId)` 可指定。
+- 測驗沒有任何題目時顯示提示頁，不再 crash（`renderQuiz` 開頭）。
+
+### 四、詞表資料清理（`scripts/clean-built-in-words.py`，已套用到 `data/built-in-words.json`）
+- 托福詞表是簡體 PDF 轉出來的，924 筆釋義是簡體字且有抽字重複（「管理理」「敏敏銳」「⻝食食宿」）：同字在其他詞表有釋義就沿用，否則轉繁體並去除重複字與部首殘字。
+- 多益詞表有 PDF 斷字（kidna、mortgag、titl、validat…共 26 筆），改回正確拼字；595 筆把好幾個詞性擠在同一格的釋義（「抽象的；深奧的 n 摘要」）只留第一段。
+
+### 五、Service worker
+- `CACHE_VERSION` → `vocab-arcana-v4`，預快取加入 `word-details.json`。
+
+---
+
 ## 階段 26（2026-10-18）by Claude — 修 bug + 全站改版（電子辭典風）
 
 ### 一、Bug 修正（`app.js`）
@@ -36,7 +66,8 @@
 - 觸控裝置不套 hover 樣式（避免點過的選項一直反白）；375px 寬無橫向捲動；`prefers-reduced-motion` 關閉動畫。
 
 ### 四、注意
-- `sw.js` 的 `CACHE_VERSION` 已升到 `vocab-arcana-v2`，舊快取會自動汰換。之後改版請記得再 bump。
+- `sw.js` 改為 v3：頁面、JS、CSS、JSON 改用 network-first（連得上就拿最新版），圖片與字型才 cache-first；預快取用 `cache: "reload"`，不會把瀏覽器裡的舊檔存進去。原本 cache-first 會讓改版推上去後一直看到舊版。
+- `registerServiceWorker()` 在新版 service worker 接手時，若停在首頁或登入頁會自動重整一次。
 - `server.js` 只加了 `.webp`、`.woff2` 的 MIME。
 - 已用 Playwright 跑過：登入 → 選目標 → 10 張字卡 → 背誦測驗 → 每日測驗 → 結算 → 弱點池/字卡視窗/弱點加強 → 學過的單字搜尋 → 匯入 → 自訂庫 → 管理員開怪 → 戰鬥到結束，桌面 1280 / 手機 390 / 夜間模式皆無 console error。
 

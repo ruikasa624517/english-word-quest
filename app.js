@@ -253,6 +253,11 @@ const i18n = {
     deferBattle: "下次再說",
     itemReward: "獲得打怪道具：{items}",
     itemRewardTitle: "獲得道具",
+    slowSpeak: "慢速",
+    speakExample: "朗讀例句",
+    noQuizWords: "目前沒有可以考的字。先去「學習 10 字」學幾個字再回來。",
+    adminLogin: "萬能管理員模式",
+    adminLoginNote: "只在這台電腦（localhost）上出現，用來測試各項功能，網路上的版本看不到。",
     importNoneFound: "這些字都查不到釋義。請確認拼字（只接受英文單字），或稍後在有網路時再試。",
     todayWordsEmpty: "按下「學習 10 字」就會抽出今天的字，同一天重新進來都是同一批。",
     monsterAttack: "攻擊力",
@@ -528,6 +533,11 @@ const i18n = {
     deferBattle: "Later",
     itemReward: "Gained battle items: {items}",
     itemRewardTitle: "Items received",
+    slowSpeak: "Slow",
+    speakExample: "Read the example aloud",
+    noQuizWords: "There are no words to test yet. Study a few words first.",
+    adminLogin: "Admin test mode",
+    adminLoginNote: "Only shown on localhost for testing; the online version never shows it.",
     importNoneFound: "None of these words could be found. Check the spelling (English words only) or try again when you're online.",
     todayWordsEmpty: "Tap “Study 10 Words” to draw today's set. It stays the same all day.",
     monsterAttack: "Attack",
@@ -803,6 +813,11 @@ const i18n = {
     deferBattle: "次回にする",
     itemReward: "討伐アイテムを獲得：{items}",
     itemRewardTitle: "アイテム獲得",
+    slowSpeak: "ゆっくり",
+    speakExample: "例文を読み上げる",
+    noQuizWords: "テストできる単語がまだありません。先に単語を学習してください。",
+    adminLogin: "管理者テストモード",
+    adminLoginNote: "localhost でのみ表示されるテスト用モードです。",
     importNoneFound: "どの単語も意味が見つかりませんでした。綴りを確認するか、オンライン時に再試行してください。",
     todayWordsEmpty: "「10語を学習」を押すと今日の単語が決まります。同じ日は同じセットです。",
     monsterAttack: "攻撃力",
@@ -1078,6 +1093,11 @@ const i18n = {
     deferBattle: "다음으로",
     itemReward: "토벌 아이템 획득: {items}",
     itemRewardTitle: "아이템 획득",
+    slowSpeak: "느리게",
+    speakExample: "예문 읽기",
+    noQuizWords: "아직 시험 볼 단어가 없습니다. 먼저 단어를 학습하세요.",
+    adminLogin: "관리자 테스트 모드",
+    adminLoginNote: "localhost에서만 보이는 테스트용 모드입니다.",
     importNoneFound: "어떤 단어도 뜻을 찾지 못했습니다. 철자를 확인하거나 온라인 상태에서 다시 시도하세요.",
     todayWordsEmpty: "‘10단어 학습’을 누르면 오늘의 단어가 정해지고, 하루 동안 그대로 유지됩니다.",
     monsterAttack: "공격력",
@@ -1353,6 +1373,11 @@ const i18n = {
     deferBattle: "Para luego",
     itemReward: "Objeto obtenido: {items}",
     itemRewardTitle: "Objetos obtenidos",
+    slowSpeak: "Lento",
+    speakExample: "Leer el ejemplo",
+    noQuizWords: "Todavía no hay palabras para evaluar. Estudia algunas primero.",
+    adminLogin: "Modo de prueba de administrador",
+    adminLoginNote: "Solo aparece en localhost para pruebas.",
     importNoneFound: "No se encontró ninguna de estas palabras. Revisa la ortografía o inténtalo de nuevo con conexión.",
     todayWordsEmpty: "Pulsa «Estudiar 10 palabras» para sacar las palabras de hoy; no cambian en todo el día.",
     monsterAttack: "Ataque",
@@ -2306,8 +2331,8 @@ function addInventory(items) {
   });
 }
 
-function createMonster(level) {
-  const monsters = [
+function monsterRoster() {
+  return [
     { id: "slime", name: "月露凝魔", icon: "○", hp: 70, attack: 18, color: "#58b8a8", accent: "#d7f3e8", trait: "會吸附魔力，生命較低但很靈活。", shape: "orb" },
     { id: "golem", name: "白塔石衛", icon: "▣", hp: 120, attack: 24, color: "#9b9488", accent: "#f1ead8", trait: "裝甲厚重，生命值偏高。", shape: "golem" },
     { id: "wraith", name: "霜紗幽影", icon: "☾", hp: 96, attack: 30, color: "#788aa0", accent: "#e5eef7", trait: "攻擊銳利，適合先用道具壓低生命。", shape: "wraith" },
@@ -2321,7 +2346,12 @@ function createMonster(level) {
     { id: "lantern", name: "迷霧燈靈", icon: "✧", hp: 92, attack: 31, color: "#6b80b8", accent: "#fff2bf", trait: "會干擾視線，攻擊節奏不穩。", shape: "lantern" },
     { id: "mandrake", name: "哭泣蔓根", icon: "♧", hp: 110, attack: 27, color: "#7fa35a", accent: "#f2d9c4", trait: "耐打且會纏住冒險者。", shape: "mandrake" },
   ];
-  const base = monsters[(Math.max(0, Math.floor(level / 5) - 1) + Math.floor(Math.random() * monsters.length)) % monsters.length];
+}
+
+function createMonster(level, monsterId = "") {
+  const monsters = monsterRoster();
+  const base = monsters.find((monster) => monster.id === monsterId)
+    || monsters[(Math.max(0, Math.floor(level / 5) - 1) + Math.floor(Math.random() * monsters.length)) % monsters.length];
   return { ...base, hp: base.hp + level * 6, maxHp: base.hp + level * 6, level };
 }
 
@@ -2353,10 +2383,13 @@ function activeGoal() {
   return userGoals[0] || "";
 }
 
+// 萬能管理員模式只在本機開放（localhost / 127.0.0.1 / 直接開檔案），GitHub Pages 上永遠看不到
+function isLocalHost() {
+  return location.protocol === "file:" || ["localhost", "127.0.0.1", "::1", "[::1]"].includes(location.hostname);
+}
+
 function canUseAdmin() {
-  if (!state.user) return false;
-  if (state.user.isAdmin === true) return true;
-  return runtimeConfig.adminEmails.includes(String(state.user.email || "").toLowerCase());
+  return !!state.user && isLocalHost();
 }
 
 function activeProfile() {
@@ -2916,6 +2949,38 @@ async function loadBuiltInWords() {
   }
 }
 
+// 字卡補充資料：音標、例句、例句中文（data/word-details.json，以單字為 key）
+// GitHub Pages 沒有查字典的伺服器，內建字的例句與音標都靠這份檔案。
+async function loadWordDetails() {
+  try {
+    const response = await fetch("./data/word-details.json");
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const data = await response.json();
+    return data && typeof data === "object" ? data : {};
+  } catch {
+    return {};
+  }
+}
+
+function clozeFromExample(example, wordText) {
+  const pattern = new RegExp(`(?<![A-Za-z])${escapeRegExp(wordText)}(?![A-Za-z])`, "i");
+  return pattern.test(example) ? example.replace(pattern, "____") : "";
+}
+
+function applyWordDetails(list, details) {
+  list.forEach((item) => {
+    const detail = details[item.word];
+    if (!detail) return;
+    if (detail.p && !isUsablePhonetic(item.phonetic)) item.phonetic = detail.p;
+    if (detail.e) {
+      item.example = detail.e;
+      item.exampleZh = detail.z || "";
+      item.exampleZhFor = detail.e.slice(0, 60);
+      item.cloze = clozeFromExample(detail.e, item.word);
+    }
+  });
+}
+
 async function loadRuntimeConfig() {
   const normalizeConfig = (config) => ({
     googleClientId: String(config.googleClientId || ""),
@@ -2949,6 +3014,17 @@ async function loadRuntimeConfig() {
 function registerServiceWorker() {
   if (!("serviceWorker" in navigator)) return;
   if (!/^https?:$/.test(location.protocol)) return;
+  // 新版 service worker 接手時自動重新整理一次，改版推上去後不必叫學生手動重整。
+  // 只在首頁或登入頁才重整，避免測驗做到一半被打斷；第一次安裝（原本沒有 controller）不重整。
+  const hadController = !!navigator.serviceWorker.controller;
+  let reloadingForUpdate = false;
+  navigator.serviceWorker.addEventListener("controllerchange", () => {
+    if (!hadController || reloadingForUpdate) return;
+    if (screen !== "dashboard" && screen !== "login") return;
+    reloadingForUpdate = true;
+    saveStateNow();
+    location.reload();
+  });
   navigator.serviceWorker.register("./sw.js").catch((error) => {
     console.warn("[sw] register failed:", error);
   });
@@ -2958,7 +3034,9 @@ async function bootstrap() {
   applyTheme();
   registerServiceWorker();
   await loadRuntimeConfig();
-  words = await loadBuiltInWords();
+  const [builtIn, details] = await Promise.all([loadBuiltInWords(), loadWordDetails()]);
+  words = builtIn;
+  applyWordDetails(words, details);
   migrateState();
   builtInWordsLoaded = true;
   if (state.user) {
@@ -2986,6 +3064,10 @@ function renderLogin() {
         <p class="muted">${t("loginStepNote")}</p>
         <div class="login-actions">
           <div id="googleSignInButton" class="google-signin-slot"></div>
+          ${isLocalHost() ? `
+            <button class="btn" data-action="admin-login">${t("adminLogin")}</button>
+            <p class="muted">${t("adminLoginNote")}</p>
+          ` : ""}
           ${runtimeConfig.localTestLoginEnabled ? `
             <div class="field">
               <label for="nameInput">${t("loginNameHint")}</label>
@@ -3090,6 +3172,16 @@ function renderGoalGate() {
 
 function renderQuiz(kind) {
   if (!activeQuiz || activeQuiz.kind !== kind) activeQuiz = createQuiz(kind);
+  if (!activeQuiz.questions.length) {
+    stopActiveQuiz();
+    return appShell(`
+      <section class="panel">
+        <h2 class="page-title">${kind === "review" ? t("reviewTitle") : kind === "weekly" ? t("weeklyTitle") : t("daily")}</h2>
+        <p class="hero-copy">${t("noQuizWords")}</p>
+        <div class="actions"><button class="btn secondary" data-action="back">${backButtonLabel()}</button></div>
+      </section>
+    `);
+  }
   const current = activeQuiz.questions[activeQuiz.index] || activeQuiz.questions[0];
   const remaining = getQuizRemainingSeconds();
   activeQuiz.timer = setInterval(updateQuizTimer, 1000);
@@ -3547,10 +3639,10 @@ function renderStudy() {
             <p class="flash-meta">
               ${phonetic ? `<span class="phonetic">${escapeHtml(phonetic)}</span>` : ""}
               ${current.pos && current.pos !== "word" ? `<span class="tag">${escapeHtml(current.pos)}</span>` : ""}
-              <button class="speak-btn" data-action="speak-word" data-word="${escapeHtml(current.word)}" title="${t("speak")}" aria-label="${t("speak")}">${speakerIcon()}</button>
+              ${speakButtons(current.word)}
             </p>
             <h3 class="flash-meaning">${displayMeaning(current)}</h3>
-            ${renderCambridgeExample(current)}
+            ${renderCambridgeExample(current, "", { withAudio: true })}
           </div>
           <footer class="flash-foot">
             <div class="actions">
@@ -3651,10 +3743,10 @@ function renderCardModal() {
           <p class="flash-meta">
             ${phonetic ? `<span class="phonetic">${escapeHtml(phonetic)}</span>` : ""}
             ${item.pos && item.pos !== "word" ? `<span class="tag">${escapeHtml(item.pos)}</span>` : ""}
-            <button class="speak-btn" data-action="speak-word" data-word="${escapeHtml(item.word)}" title="${t("speak")}" aria-label="${t("speak")}">${speakerIcon()}</button>
+            ${speakButtons(item.word)}
           </p>
           <h3 class="flash-meaning">${displayMeaning(item)}</h3>
-          ${renderCambridgeExample(item)}
+          ${renderCambridgeExample(item, "", { withAudio: true })}
         </div>
         <div class="actions">
           <button class="btn" data-action="close-card-modal">${t("backPrevious")}</button>
@@ -3705,7 +3797,15 @@ function cambridgeExampleText(item) {
   return ex && isCompleteExample(ex) ? ex : "";
 }
 
-function renderCambridgeExample(item, className = "") {
+// 單字朗讀：正常速度＋慢速（給聽不清楚的學生）
+function speakButtons(wordText) {
+  const word = escapeHtml(wordText);
+  return `
+    <button class="speak-btn" data-action="speak-word" data-word="${word}" title="${t("speak")}" aria-label="${t("speak")}">${speakerIcon()}</button>
+    <button class="speak-btn slow" data-action="speak-word" data-word="${word}" data-rate="${SPEAK_RATE_SLOW}" title="${t("slowSpeak")}" aria-label="${t("slowSpeak")}">${speakerIcon()}<span>${t("slowSpeak")}</span></button>`;
+}
+
+function renderCambridgeExample(item, className = "", options = {}) {
   const exampleText = cambridgeExampleText(item);
   if (!exampleText) {
     requestDictionaryEntry(item);
@@ -3714,8 +3814,9 @@ function renderCambridgeExample(item, className = "") {
     return "";
   }
   const extraClass = className ? ` ${className}` : "";
+  const englishOnly = exampleText.replace(/\s*\([^)]*[\u3400-\u9fff][^)]*\)\s*$/, "").trim();
   return `
-    <p class="example-label">${t("exampleLabel")}</p>
+    <p class="example-label">${t("exampleLabel")}${options.withAudio ? `<button class="speak-btn small" data-action="speak-word" data-word="${escapeHtml(englishOnly)}" title="${t("speakExample")}" aria-label="${t("speakExample")}">${speakerIcon()}</button>` : ""}</p>
     <p class="example${extraClass}">${escapeHtml(exampleText)}</p>
     ${item.exampleZh ? `<p class="example-zh muted">${escapeHtml(item.exampleZh)}</p>` : ""}
   `;
@@ -3730,7 +3831,14 @@ function dictionaryLookupUrl(wordText, force = false) {
   return `/api/cambridge?${params.toString()}`;
 }
 
+// 內建字在中文介面下，有中文釋義、完整例句、例句中文、音標，就不必再查字典
+function isEntryComplete(item) {
+  if (!item || item.library !== "built-in" || (state.native || "zh-Hant") !== "zh-Hant") return false;
+  return hasNativeMeaningChars(item.meaning) && !!cambridgeExampleText(item) && hasText(item.exampleZh) && isUsablePhonetic(item.phonetic);
+}
+
 function requestDictionaryEntry(item) {
+  if (isEntryComplete(item)) return;
   const wordText = String(item?.word || "").trim().toLowerCase();
   const requestKey = `${state.native || "zh-Hant"}::${wordText}`;
   if (!wordText || cambridgeExampleRequests.has(requestKey)) return;
@@ -4540,34 +4648,81 @@ function badgeSvg(icon, done, tierIndex = 0) {
   return `<svg class="badge ${done ? "is-done" : ""}" viewBox="0 0 128 128" aria-hidden="true"><path class="badge-plate" d="M64 8l49 28v56l-49 28-49-28V36z" stroke-width="6"/><g class="badge-mark" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">${mark}</g></svg>`;
 }
 
+// 萬能管理員面板（本機限定，純測試用，文字只做中文）
+function adminGroups() {
+  return [
+    { title: "經驗與段位", items: [
+      ["xp100", "+100 經驗"], ["xp500", "+500 經驗"], ["level-up", "升一級"],
+      ["level-next5", "升到下一個 5 的倍數級（會遇到怪物）"], ["rank-tier", "週排名稱號升一階"],
+    ] },
+    { title: "學習進度", items: [
+      ["today-done", "完成今天的 10 個字（開放每日測驗）"], ["learn60", "學到 60%（開放總複習）"],
+      ["learn-all", "這個目標全部學完"], ["weak10", "隨機加 10 個字進弱點池"], ["weak-clear", "清空弱點池"],
+      ["srs-due", "讓 10 個學過的字今天到期複習"],
+    ] },
+    { title: "測驗", items: [
+      ["open-daily", "直接開每日測驗"], ["open-weekly", "直接開週測驗"], ["open-review", "直接開總複習"],
+      ["weekly-notice", "跳出「週測驗開放」通知"],
+    ] },
+    { title: "打怪與道具", items: [
+      ["items", "道具各 +9"], ["items-clear", "清空道具"], ["battle", "隨機怪物"],
+      ...monsterRoster().map((monster) => [`monster:${monster.id}`, monster.name]),
+    ] },
+    { title: "時間與登入", items: [
+      ["skip-day", "跳到明天"], ["back-today", "回到真正的今天"], ["streak7", "連續登入改成 7 天"],
+    ] },
+    { title: "成就與排行榜", items: [
+      ["ach-all", "成就數值全部拉滿"], ["battle-title", "發一個打怪榜稱號"], ["rival-reset", "重新產生排行榜對手"],
+    ] },
+  ];
+}
+
 function renderAdmin() {
   if (!canUseAdmin()) {
     navigateTo("dashboard", { clearHistory: true, pushHistory: false });
     return renderDashboard();
   }
+  const profile = activeProfile();
+  const itemTotal = battleItems().reduce((sum, item) => sum + (state.inventory[item.id] || 0), 0);
   return appShell(`
-    <section class="panel">
-      <div class="eyebrow">${t("admin")}</div>
-      <h2 class="page-title">${t("adminPanel")}</h2>
-      <p class="hero-copy">${t("adminNote")}</p>
-      <div class="grid">
-        ${[
-          ["admin-xp", t("adminXp")],
-          ["admin-level", t("adminLevel")],
-          ["admin-learn", t("adminLearn")],
-          ["admin-review", t("adminReview")],
-          ["admin-battle", t("adminBattle")],
-          ["admin-items", t("adminItems")],
-          ["admin-skip-day", t("adminSkipDay")],
-        ].map(([action, label]) => `<button class="card admin-card" data-admin="${action}"><strong>${label}</strong></button>`).join("")}
-      </div>
-      <div class="actions">
+    <section class="panel admin-panel">
+      <div class="page-head">
+        <div>
+          <span class="eyebrow">localhost</span>
+          <h2 class="page-title">${t("adminLogin")}</h2>
+        </div>
         <button class="btn secondary" data-action="back">${backButtonLabel()}</button>
-        <button class="btn ghost" data-admin="admin-clear">${t("adminClear")}</button>
+      </div>
+      <dl class="readout admin-readout">
+        <div><dt>日期</dt><dd>${todayKey()}${state.dayOffset ? `（+${state.dayOffset} 天）` : ""}</dd></div>
+        <div><dt>段位</dt><dd>Lv.${getPlayerRank()}</dd></div>
+        <div><dt>經驗值</dt><dd>${state.xp || 0}</dd></div>
+        <div><dt>連續／累計登入</dt><dd>${state.streakDays || 0}／${state.achievements?.totalLoginDays || 0}</dd></div>
+        <div><dt>學過／弱點</dt><dd>${profile.learned.length}／${profile.weak.length}</dd></div>
+        <div><dt>已學比例</dt><dd>${getLearnedPercent()}%</dd></div>
+        <div><dt>道具</dt><dd>${itemTotal}</dd></div>
+      </dl>
+      ${toast ? `<div class="toast" role="status">${toast}</div>` : ""}
+      <div class="admin-groups">
+        ${adminGroups().map((group) => `
+          <section class="admin-group">
+            <h3>${group.title}</h3>
+            <div class="admin-keys">
+              ${group.items.map(([action, label]) => `<button class="btn secondary small" data-admin="${action}">${escapeHtml(label)}</button>`).join("")}
+            </div>
+          </section>
+        `).join("")}
+        <section class="admin-group">
+          <h3>存檔</h3>
+          <div class="admin-keys">
+            <button class="btn secondary small danger" data-admin="admin-clear">${t("adminClear")}</button>
+          </div>
+        </section>
       </div>
     </section>
   `);
 }
+
 
 function bindActions() {
   mountGoogleSignInButton();
@@ -4617,6 +4772,13 @@ function bindActions() {
     button.addEventListener("click", () => {
       const name = document.querySelector("#nameInput")?.value?.trim() || t("traveler");
       switchLocalTestAccount(name);
+      render();
+    });
+  });
+  document.querySelectorAll("[data-action='admin-login']").forEach((button) => {
+    button.addEventListener("click", () => {
+      if (!isLocalHost()) return;
+      switchUserAccount({ id: "local:admin", provider: "local-admin", name: t("adminLogin"), isAdmin: true });
       render();
     });
   });
@@ -4846,7 +5008,7 @@ function bindActions() {
     button.addEventListener("click", () => moveCard(-1));
   });
   document.querySelectorAll("[data-action='speak-word']").forEach((button) => {
-    button.addEventListener("click", () => speakWord(button.dataset.word));
+    button.addEventListener("click", () => speakWord(button.dataset.word, Number(button.dataset.rate) || SPEAK_RATE_NORMAL));
   });
   document.querySelectorAll("[data-action='learned-words']").forEach((button) => {
     button.addEventListener("click", () => {
@@ -5093,50 +5255,138 @@ function switchActiveGoal(goal) {
   render();
 }
 
+// 今天的 10 個字直接標成學會（沒抽過就先抽），用來解鎖每日測驗
+function adminCompleteToday() {
+  const libraryId = currentStudyLibraryId();
+  const key = dailyStudyKey(libraryId);
+  state.dailyStudy = state.dailyStudy || {};
+  if (!Array.isArray(state.dailyStudy[key]) || !state.dailyStudy[key].length) createStudySession(libraryId);
+  const profile = activeProfile();
+  const locked = state.dailyStudy[key] || [];
+  profile.learned = Array.from(new Set([...(profile.learned || []), ...locked]));
+  locked.forEach((wordText) => {
+    profile.learnedLog[wordText] = todayKey();
+  });
+  state.dailyStudyCompleted = state.dailyStudyCompleted || {};
+  state.dailyStudyCompleted[key] = true;
+}
+
+function adminLearnPercent(percent) {
+  const profile = activeProfile();
+  const source = uniqueWordObjects(studySourceForLibrary());
+  const learnedSet = new Set(profile.learned || []);
+  const need = Math.ceil(source.length * percent / 100) - source.filter((item) => learnedSet.has(item.word)).length;
+  shuffle(source.filter((item) => !learnedSet.has(item.word))).slice(0, Math.max(0, need)).forEach((item) => {
+    learnedSet.add(item.word);
+    profile.learnedLog[item.word] = todayKey();
+  });
+  profile.learned = Array.from(learnedSet);
+}
+
+function adminAddXpToRank(targetRank) {
+  let needed = 0;
+  for (let rank = getPlayerRank(); rank < targetRank; rank += 1) needed += xpNeededForRank(rank);
+  addXp(Math.max(0, needed - xpIntoCurrentRank()));
+}
+
+function adminOpenMonster(monsterId = "") {
+  const rank = getPlayerRank();
+  const monsterLevel = Math.max(5, Math.ceil(rank / 5) * 5);
+  state.pendingLevelUp = { from: rank, to: monsterLevel, loot: {}, monster: createMonster(monsterLevel, monsterId), monsterLevel, lootClaimed: true, deferred: true };
+  navigateTo("monster-preview");
+  battle = null;
+}
+
 function runAdminAction(action) {
   if (!canUseAdmin()) return;
   const profile = activeProfile();
-  if (action === "admin-xp") addXp(500);
-  if (action === "admin-level") {
-    const rank = getPlayerRank();
-    const monsterLevel = (rank + 1) % 5 === 0 ? rank + 1 : null;
-    state.pendingLevelUp = { from: rank, to: rank + 1, loot: levelLoot(rank + 1), monster: monsterLevel ? createMonster(monsterLevel) : null, monsterLevel };
+  const label = adminGroups().flatMap((group) => group.items).find(([key]) => key === action)?.[1] || "";
+  let leaveAdmin = false;
+  if (action === "xp100") addXp(100);
+  if (action === "xp500") addXp(500);
+  if (action === "level-up") adminAddXpToRank(getPlayerRank() + 1);
+  if (action === "level-next5") {
+    adminAddXpToRank(Math.floor(getPlayerRank() / 5) * 5 + 5);
+    navigateTo("dashboard", { clearHistory: true, pushHistory: false });
+    leaveAdmin = true;
   }
-  if (action === "admin-learn") {
-    profile.learned = activeWords().map((item) => item.word);
-    activeWords().forEach((item) => {
-      profile.learnedLog[item.word] = todayKey();
+  if (action === "rank-tier") state.rankTier = Math.min(RANK_TITLES.length, (state.rankTier || 1) + 1);
+  if (action === "today-done") adminCompleteToday();
+  if (action === "learn60") adminLearnPercent(60);
+  if (action === "learn-all") adminLearnPercent(100);
+  if (action === "weak10") {
+    const learned = new Set(profile.learned || []);
+    const source = uniqueWordObjects(studySourceForLibrary());
+    const pool = source.filter((item) => learned.has(item.word));
+    shuffle(pool.length >= 10 ? pool : source).slice(0, 10).forEach((item) => addWeak(item.word));
+  }
+  if (action === "weak-clear") {
+    profile.weak = [];
+    profile.weakHits = {};
+  }
+  if (action === "srs-due") {
+    if (!profile.learned.length) adminCompleteToday();
+    shuffle(profile.learned).slice(0, 10).forEach((wordText) => {
+      const entry = srsEnsureEntry(profile, wordText);
+      entry.nextReview = todayKey();
     });
   }
-  if (action === "admin-review") {
-    navigateTo("review");
+  if (action === "open-daily" || action === "open-weekly" || action === "open-review") {
+    if (!dailyTestAvailable() || !buildWeeklyWords().length) adminCompleteToday();
     stopActiveQuiz();
+    navigateTo(action === "open-daily" ? "daily" : action === "open-weekly" ? "weekly" : "review");
+    leaveAdmin = true;
   }
-  if (action === "admin-battle") {
-    const rank = getPlayerRank();
-    const monsterLevel = rank % 5 === 0 ? rank : Math.ceil(rank / 5) * 5;
-    state.pendingLevelUp = state.pendingLevelUp || { from: rank - 1, to: monsterLevel, loot: {}, monster: createMonster(monsterLevel), monsterLevel, lootClaimed: true, deferred: true };
-    state.pendingLevelUp.monster = state.pendingLevelUp.monster || createMonster(monsterLevel);
-    state.pendingLevelUp.monsterLevel = state.pendingLevelUp.monsterLevel || monsterLevel;
-    navigateTo("monster-preview");
-    battle = null;
+  if (action === "weekly-notice") {
+    if (!buildWeeklyWords().length) adminCompleteToday();
+    const days = state.achievements.totalLoginDays || 0;
+    state.achievements.totalLoginDays = Math.max(7, Math.ceil(days / 7) * 7);
+    state.weeklyNoticeShownFor = null;
+    navigateTo("dashboard", { clearHistory: true, pushHistory: false });
+    leaveAdmin = true;
   }
-  if (action === "admin-items") addInventory({ sword: 9, bomb: 9, potion: 9 });
-  if (action === "admin-skip-day") {
-    state.dayOffset = (Number(state.dayOffset || 0) + 1);
+  if (action === "items") addInventory({ sword: 9, bomb: 9, potion: 9 });
+  if (action === "items-clear") state.inventory = {};
+  if (action === "battle") {
+    adminOpenMonster();
+    leaveAdmin = true;
+  }
+  if (action.startsWith("monster:")) {
+    adminOpenMonster(action.slice("monster:".length));
+    leaveAdmin = true;
+  }
+  if (action === "skip-day" || action === "back-today") {
+    state.dayOffset = action === "skip-day" ? Number(state.dayOffset || 0) + 1 : 0;
     state.lastRivalAdvanceDate = null;
     studySession = null;
     stopActiveQuiz();
     applyLoginReward();
-    toast = t("adminSkipDay");
+  }
+  if (action === "streak7") state.streakDays = 7;
+  if (action === "ach-all") {
+    Object.assign(state.achievements, {
+      totalCorrect: 1000, bestCombo: 50, totalLoginDays: 200, firstLevelUp: true,
+      monstersDefeated: 100, importedLibraries: 10, grandReviews: 7,
+    });
+    state.streakDays = 100;
+    state.rankTier = RANK_TITLES.length;
+    checkAchievementUnlocks();
+  }
+  if (action === "battle-title") state.pendingBattleTitle = { rank: 1, expiresWeekKey: nextWeekKey() };
+  if (action === "rival-reset") {
+    state.rivals = [];
+    ensureRivals();
   }
   if (action === "admin-clear") {
     if (!window.confirm(t("confirmReset"))) return;
     resetCurrentAccountProgress();
+    leaveAdmin = true;
   }
+  toast = leaveAdmin ? "" : `已執行：${label || action}`;
   saveState();
   render();
 }
+
 
 function battleItems() {
   return [
@@ -5724,9 +5974,8 @@ function clozePrompt(item) {
   if (saved && hasCambridgeExampleSource(item)) return saved;
   const example = cambridgeExampleText(item);
   const wordText = String(item.word || "").trim();
-  if (example && wordText && example.toLowerCase().includes(wordText.toLowerCase())) {
-    return example.replace(new RegExp(escapeRegExp(wordText), "i"), "____");
-  }
+  const blanked = example && wordText ? clozeFromExample(example, wordText) : "";
+  if (blanked) return blanked;
   // 沒例句可用 → 直接顯示精簡後的中文意思當題目（不要再夾「____ (...)」格式）
   const meaning = compactMeaning(String(item.meaning || "").trim());
   return meaning || String(item.pos || "") || t("wordInput");
@@ -6185,7 +6434,7 @@ function createStudySession(libraryId = null) {
 function prefetchStudyWords(items) {
   const tasks = (items || []).map((item) => {
     const wordText = String(item?.word || "").trim().toLowerCase();
-    if (!wordText) return Promise.resolve();
+    if (!wordText || isEntryComplete(item)) return Promise.resolve();
     const key = `${state.native || "zh-Hant"}::${wordText}`;
     if (cambridgeExampleRequests.has(key)) return Promise.resolve();
     cambridgeExampleRequests.add(key);
@@ -6291,12 +6540,15 @@ document.addEventListener("keydown", (event) => {
   }
 });
 
-function speakWord(wordText) {
-  if (!("speechSynthesis" in window)) return;
+const SPEAK_RATE_NORMAL = 0.86;
+const SPEAK_RATE_SLOW = 0.5;
+
+function speakWord(wordText, rate = SPEAK_RATE_NORMAL) {
+  if (!("speechSynthesis" in window) || !wordText) return;
   window.speechSynthesis.cancel();
   const utterance = new SpeechSynthesisUtterance(wordText);
   utterance.lang = "en-US";
-  utterance.rate = 0.86;
+  utterance.rate = rate;
   window.speechSynthesis.speak(utterance);
 }
 

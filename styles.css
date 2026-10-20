@@ -2211,3 +2211,74 @@ button.card:hover {
     display: none;
   }
 }
+
+/* ---------- 朗讀：慢速、例句 ---------- */
+.speak-btn.slow {
+  width: auto;
+  gap: 4px;
+  padding: 0 12px 0 10px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+}
+
+.speak-btn.small {
+  width: 28px;
+  height: 28px;
+  margin-left: 8px;
+}
+
+.speak-btn.small .icon {
+  width: 14px;
+  height: 14px;
+}
+
+.example-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.word-bank-row .example-label,
+.weak-card .example-label {
+  justify-content: flex-start;
+}
+
+/* ---------- 萬能管理員 ---------- */
+.admin-readout {
+  margin: 18px 0 6px;
+  padding: 14px 16px;
+  border: 1px dashed var(--rule);
+  border-radius: 8px;
+}
+
+.admin-readout dd {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.admin-groups {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 18px 24px;
+  margin-top: 20px;
+}
+
+.admin-group h3 {
+  font-size: 14px;
+  color: var(--ink-2);
+  margin-bottom: 8px;
+}
+
+.admin-keys {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.admin-keys .btn {
+  white-space: normal;
+  text-align: left;
+}

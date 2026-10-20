@@ -1,5 +1,11 @@
 # Version History
 
+## v0.3.1
+
+- Word cards now show phonetics, an example sentence and its Taiwanese Mandarin translation for all 7,747 built-in words (data/word-details.json), plus normal / slow pronunciation and read-the-example buttons.
+- Local-only admin test mode (localhost) with one-click login and a full testing panel; admin is hidden on the online site.
+- Cleaned TOEFL meanings (Simplified → Traditional, PDF duplicate characters) and fixed truncated TOEIC words.
+
 ## v0.3.0
 
 - Electronic-dictionary redesign: slate device shell, sage LCD screens, physical keys, highlighter under the headword. styles.css rewritten; old ember/parchment/gold effects removed.
